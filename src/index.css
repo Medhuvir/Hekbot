@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    background-color: #0A0A0A;
+    color: #F5F3EE;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Tabular numbers for data/charts */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  /* DN Creative section label pattern */
+  .section-label {
+    @apply flex items-center gap-3 mb-7;
+  }
+  .section-label span {
+    @apply text-[10px] font-normal tracking-[0.2em] uppercase text-dn-graphite font-sans whitespace-nowrap;
+  }
+  .section-label::after {
+    content: '';
+    @apply flex-1 h-px bg-white/[0.12];
+  }
+
+  /* DN card with orange hover reveal */
+  .dn-card {
+    @apply relative bg-dn-surface border border-white/[0.08] rounded-sm overflow-hidden;
+    transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .dn-card::before {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-0.5 bg-dn-orange;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .dn-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  /* Stagger delay utilities */
+  .d1 { animation-delay: 0.05s; }
+  .d2 { animation-delay: 0.12s; }
+  .d3 { animation-delay: 0.19s; }
+  .d4 { animation-delay: 0.26s; }
+  .d5 { animation-delay: 0.33s; }
+  .d6 { animation-delay: 0.40s; }
+
+  /* Status color utilities */
+  .status-on-track { @apply text-green-400; }
+  .status-under    { @apply text-amber-400; }
+  .status-over     { @apply text-red-400; }
+}
+
+/* Thin 0.5px borders (Tailwind doesn't do sub-1px) */
+.border-half {
+  border-width: 0.5px;
+}
+.border-half-white {
+  border: 0.5px solid rgba(245, 243, 238, 0.08);
+}
+.border-half-white-soft {
+  border: 0.5px solid rgba(245, 243, 238, 0.15);
+}
+.divide-half > * + * {
+  border-top: 0.5px solid rgba(245, 243, 238, 0.08);
+}
