@@ -88,19 +88,21 @@ RULES
 5. Tone: warm, direct, performance-focused. Never preachy.`
 }
 
-// ── Extraction prompt ────────────────────────────────────────────────
-const EXTRACTION_SYSTEM = `You extract food and drink items from messages and estimate macronutrients. Return ONLY a valid JSON object — no explanation, no markdown, no code fences.
+// ── Extraction prompt — returns a JSON ARRAY, always ─────────────────
+const EXTRACTION_SYSTEM = `You extract food and drink items from messages and estimate macronutrients.
+Return ONLY a valid JSON array — no explanation, no markdown, no code fences.
 
-If a loggable food or drink is present:
-{"food_item":"string","meal_type":"breakfast","kcal":0,"protein_g":0,"carbs_g":0,"fat_g":0,"confidence":"high"}
+For each loggable food or drink item found, include one object:
+[{"food_item":"string","meal_type":"breakfast","kcal":0,"protein_g":0,"carbs_g":0,"fat_g":0,"confidence":"high"}]
 
-meal_type must be one of: breakfast, lunch, dinner, snack, drink
-confidence must be one of: high, medium, low
-
-If no loggable item is present:
-{"food_item":null}
-
-Notes: include caloric beverages; skip plain water and black coffee (zero-cal). Use "low" for vague descriptions, "high" for specific items with quantities.`
+Rules:
+- meal_type must be one of: breakfast, lunch, dinner, snack, drink
+- confidence must be one of: high, medium, low
+- Include every distinct food/drink item mentioned as a separate object in the array
+- Include caloric beverages (protein shakes, juice, milk, alcohol); skip plain water and black coffee
+- Use "low" confidence for vague items, "high" for specific items with quantities
+- If no loggable items are present, return an empty array: []
+- Never return a single object — always return an array`
 
 // ── Main handler ─────────────────────────────────────────────────────
 Deno.serve(async (req) => {
@@ -121,7 +123,7 @@ Deno.serve(async (req) => {
     const db       = createClient(SUPABASE_URL, SUPABASE_SVC)
     const todayStr = new Date().toISOString().split('T')[0]
 
-    // Fetch context in parallel — errors are soft (we fall back to defaults)
+    // Fetch context in parallel
     const [profileRes, targetsRes, logsRes, historyRes] = await Promise.all([
       db.from('profiles').select('*').limit(1).single(),
       db.from('targets').select('*').order('effective_from', { ascending: false }).limit(1).single(),
@@ -132,9 +134,8 @@ Deno.serve(async (req) => {
     if (profileRes.error)  console.error('[chat] profiles fetch:', profileRes.error.message)
     if (targetsRes.error)  console.error('[chat] targets fetch:',  targetsRes.error.message)
     if (logsRes.error)     console.error('[chat] food_logs fetch:', logsRes.error.message)
-    if (historyRes.error)  console.error('[chat] conversations fetch:', historyRes.error.message)
+    if (historyRes.error)  console.warn('[chat] conversations fetch:', historyRes.error.message)
 
-    // Sum today's totals
     const todayTotals = (logsRes.data ?? []).reduce(
       (acc: any, r: any) => ({
         calories:  acc.calories  + (Number(r.calories)  || 0),
@@ -145,7 +146,6 @@ Deno.serve(async (req) => {
       { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 },
     )
 
-    // Conversation history in chronological order
     const history: { role: 'user' | 'assistant'; content: string }[] =
       ((historyRes.data ?? []) as any[]).reverse()
 
@@ -166,71 +166,88 @@ Deno.serve(async (req) => {
 
     // Fire chat + extraction in parallel
     const [reply, extractionRaw] = await Promise.all([
-      callClaude({ model: 'claude-sonnet-4-6', system: systemPrompt, messages: conversationMessages, maxTokens: 512 }),
-      callClaude({ model: 'claude-haiku-4-5-20251001', system: EXTRACTION_SYSTEM, messages: [{ role: 'user', content: image ? userContent : msg }], maxTokens: 256 }),
+      callClaude({
+        model:     'claude-sonnet-4-6',
+        system:    systemPrompt,
+        messages:  conversationMessages,
+        maxTokens: 512,
+      }),
+      callClaude({
+        model:     'claude-haiku-4-5-20251001',
+        system:    EXTRACTION_SYSTEM,
+        messages:  [{ role: 'user', content: image ? userContent : msg }],
+        maxTokens: 1024,   // enough for 10+ item meals
+      }),
     ])
 
     console.log('[chat] extraction raw:', extractionRaw)
 
-    // Parse + log food item
-    let logged: Record<string, any> | null = null
+    // Parse extraction — now always an array
+    const logged: Record<string, any>[] = []
     try {
-      // Strip any accidental markdown fences Claude might add
-      const cleaned = extractionRaw.replace(/```json?\n?/g, '').replace(/```/g, '').trim()
-      const parsed  = JSON.parse(cleaned)
+      const cleaned = extractionRaw
+        .replace(/^```json\s*/i, '')
+        .replace(/^```\s*/,      '')
+        .replace(/\s*```$/,      '')
+        .trim()
 
-      if (parsed.food_item && (parsed.confidence === 'high' || parsed.confidence === 'medium')) {
-        // Use only core columns — resilient whether or not migration 002 has run
-        const coreInsert: Record<string, any> = {
-          log_date:  todayStr,
-          food_name: parsed.food_item,
-          calories:  Math.round(parsed.kcal ?? 0),
-          protein_g: Number((parsed.protein_g ?? 0).toFixed(1)),
-          carbs_g:   Number((parsed.carbs_g   ?? 0).toFixed(1)),
-          fat_g:     Number((parsed.fat_g     ?? 0).toFixed(1)),
+      const items = JSON.parse(cleaned)
+      if (!Array.isArray(items)) throw new Error('Expected array from extraction')
+
+      for (const item of items) {
+        if (!item.food_item) continue
+        if (item.confidence !== 'high' && item.confidence !== 'medium') {
+          console.log('[chat] skipping low-confidence item:', item.food_item)
+          continue
         }
 
-        // Extended columns — only added if migration 002 ran
-        const extendedInsert = {
-          ...coreInsert,
-          meal_type:  parsed.meal_type ?? null,
-          confidence: parsed.confidence,
+        const coreRow: Record<string, any> = {
+          log_date:  todayStr,
+          food_name: item.food_item,
+          calories:  Math.round(item.kcal ?? 0),
+          protein_g: Number((item.protein_g ?? 0).toFixed(1)),
+          carbs_g:   Number((item.carbs_g   ?? 0).toFixed(1)),
+          fat_g:     Number((item.fat_g     ?? 0).toFixed(1)),
+        }
+        const extendedRow = {
+          ...coreRow,
+          meal_type:  item.meal_type ?? null,
+          confidence: item.confidence,
           raw_input:  msg,
           source:     image ? 'image' : 'text',
         }
 
-        // Try extended insert first, fall back to core-only on error
-        const { error: extErr } = await db.from('food_logs').insert(extendedInsert)
+        // Try extended insert first, fall back to core-only
+        const { error: extErr } = await db.from('food_logs').insert(extendedRow)
         if (extErr) {
           console.warn('[chat] extended insert failed, trying core-only:', extErr.message)
-          const { error: coreErr } = await db.from('food_logs').insert(coreInsert)
+          const { error: coreErr } = await db.from('food_logs').insert(coreRow)
           if (coreErr) {
             console.error('[chat] core insert failed:', coreErr.message)
           } else {
-            logged = parsed
-            console.log('[chat] logged (core):', parsed.food_item)
+            logged.push(item)
           }
         } else {
-          logged = parsed
-          console.log('[chat] logged (extended):', parsed.food_item)
+          logged.push(item)
         }
-      } else {
-        console.log('[chat] no food to log — food_item:', parsed.food_item, 'confidence:', parsed.confidence)
       }
+
+      console.log('[chat] logged', logged.length, 'items:', logged.map(i => i.food_item).join(', ') || 'none')
     } catch (parseErr) {
       console.error('[chat] extraction parse error:', parseErr, '| raw:', extractionRaw)
     }
 
-    // Save conversation turns — soft failure, never blocks the reply
+    // Save conversation turns — soft failure
     const { error: convErr } = await db.from('conversations').insert([
       { role: 'user',      content: msg   },
       { role: 'assistant', content: reply },
     ])
-    if (convErr) console.warn('[chat] conversations insert failed:', convErr.message)
+    if (convErr) console.warn('[chat] conversations insert:', convErr.message)
 
-    return new Response(JSON.stringify({ reply, logged }), {
-      headers: { ...CORS, 'Content-Type': 'application/json' },
-    })
+    return new Response(
+      JSON.stringify({ reply, logged: logged.length > 0 ? logged : null }),
+      { headers: { ...CORS, 'Content-Type': 'application/json' } },
+    )
   } catch (err: any) {
     console.error('[chat] unhandled error:', err)
     return new Response(JSON.stringify({ error: err.message }), {

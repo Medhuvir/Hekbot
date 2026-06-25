@@ -154,13 +154,17 @@ export default function HekbotDrawer({ isOpen, onClose }) {
                     {msg.content}
                   </p>
                 </div>
-                {/* Logged food badge */}
-                {msg.logged?.food_item && (
-                  <div className="flex items-center gap-1.5 ml-0.5">
-                    <div className="w-1 h-1 rounded-full bg-green-400" />
-                    <span className="font-sans text-[9px] text-green-400 tracking-[0.15em] uppercase">
-                      Logged · {msg.logged.food_item} · {Math.round(msg.logged.kcal ?? 0)} kcal · {Math.round(msg.logged.protein_g ?? 0)}g protein
-                    </span>
+                {/* Logged food badges — logged is now an array */}
+                {Array.isArray(msg.logged) && msg.logged.length > 0 && (
+                  <div className="flex flex-col gap-1 ml-0.5">
+                    {msg.logged.map((item, j) => (
+                      <div key={j} className="flex items-center gap-1.5">
+                        <div className="w-1 h-1 rounded-full bg-green-400 flex-shrink-0" />
+                        <span className="font-sans text-[9px] text-green-400 tracking-[0.12em] uppercase">
+                          Logged · {item.food_item} · {Math.round(item.kcal ?? 0)} kcal · {Math.round(item.protein_g ?? 0)}g protein
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
