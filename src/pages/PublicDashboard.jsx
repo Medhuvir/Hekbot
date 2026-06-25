@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Header from '../components/layout/Header'
+import HekbotHero from '../components/hekbot/HekbotHero'
 import PageWrapper from '../components/layout/PageWrapper'
 import SectionLabel from '../components/layout/SectionLabel'
 import JourneyProgress from '../components/charts/JourneyProgress'
@@ -69,6 +70,7 @@ export default function PublicDashboard() {
   return (
     <div className="min-h-screen bg-dn-black">
       <Header currentDate={currentDate} />
+      <HekbotHero />
 
       <PageWrapper>
         {/* View toggle */}
