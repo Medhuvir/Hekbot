@@ -84,25 +84,39 @@ RULES
 1. Keep responses to 2–4 sentences unless a full summary is explicitly requested.
 2. NEVER calculate totals yourself — the database numbers above are the source of truth.
 3. When food is logged: brief acknowledgement + how it fits the plan + remaining macro context.
-4. When a summary is requested: use the exact numbers above, be specific.
-5. Tone: warm, direct, performance-focused. Never preachy.`
+4. When weight/waist is logged: acknowledge the number, note the trend direction if relevant.
+5. When a workout is logged: acknowledge it and connect to nutrition/recovery.
+6. When a summary is requested: use the exact numbers above, be specific.
+7. Tone: warm, direct, performance-focused. Never preachy.`
 }
 
-// ── Extraction prompt — returns a JSON ARRAY, always ─────────────────
-const EXTRACTION_SYSTEM = `You extract food and drink items from messages and estimate macronutrients.
-Return ONLY a valid JSON array — no explanation, no markdown, no code fences.
+// ── Unified extraction prompt ─────────────────────────────────────────
+// Returns one JSON object covering all three loggable data types.
+const EXTRACTION_SYSTEM = `You extract loggable fitness data from messages. Return ONLY a valid JSON object — no explanation, no markdown, no code fences.
 
-For each loggable food or drink item found, include one object:
-[{"food_item":"string","meal_type":"breakfast","kcal":0,"protein_g":0,"carbs_g":0,"fat_g":0,"confidence":"high"}]
+Always return this exact shape:
+{
+  "food_items": [],
+  "body_entry": null,
+  "workout_entry": null
+}
 
-Rules:
-- meal_type must be one of: breakfast, lunch, dinner, snack, drink
-- confidence must be one of: high, medium, low
-- Include every distinct food/drink item mentioned as a separate object in the array
-- Include caloric beverages (protein shakes, juice, milk, alcohol); skip plain water and black coffee
-- Use "low" confidence for vague items, "high" for specific items with quantities
-- If no loggable items are present, return an empty array: []
-- Never return a single object — always return an array`
+food_items — array of food/drink items (empty array if none):
+{"food_item":"string","meal_type":"breakfast|lunch|dinner|snack|drink","kcal":0,"protein_g":0,"carbs_g":0,"fat_g":0,"confidence":"high|medium|low"}
+- One object per distinct food/drink item
+- Include caloric beverages (shakes, juice, milk, alcohol); skip plain water and black coffee
+- confidence: "high" for specific items with quantities, "low" for vague descriptions
+
+body_entry — if user mentions body weight or waist, otherwise null:
+{"weight_lbs": number|null, "waist_cm": number|null}
+- Extract weight_lbs if user says "weighed X", "I'm at X lbs", "X pounds this morning", etc.
+- Extract waist_cm if user mentions waist measurement (convert inches to cm: ×2.54)
+- At least one field must be non-null to include body_entry
+
+workout_entry — if user mentions completing a workout, otherwise null:
+{"workout_type":"Resistance Training|Martial Arts|Other","workout_name":null,"duration_min":null,"calories_burned":null}
+- workout_type: "Resistance Training" for gym/weights/lifting; "Martial Arts" for BJJ/MMA/boxing/jiu-jitsu/martial arts; "Other" for everything else
+- duration_min and calories_burned: only include if explicitly stated, otherwise null`
 
 // ── Main handler ─────────────────────────────────────────────────────
 Deno.serve(async (req) => {
@@ -131,10 +145,10 @@ Deno.serve(async (req) => {
       db.from('conversations').select('role, content').order('created_at', { ascending: false }).limit(20),
     ])
 
-    if (profileRes.error)  console.error('[chat] profiles fetch:', profileRes.error.message)
-    if (targetsRes.error)  console.error('[chat] targets fetch:',  targetsRes.error.message)
-    if (logsRes.error)     console.error('[chat] food_logs fetch:', logsRes.error.message)
-    if (historyRes.error)  console.warn('[chat] conversations fetch:', historyRes.error.message)
+    if (profileRes.error)  console.error('[chat] profiles:', profileRes.error.message)
+    if (targetsRes.error)  console.error('[chat] targets:',  targetsRes.error.message)
+    if (logsRes.error)     console.error('[chat] food_logs:', logsRes.error.message)
+    if (historyRes.error)  console.warn('[chat] conversations:', historyRes.error.message)
 
     const todayTotals = (logsRes.data ?? []).reduce(
       (acc: any, r: any) => ({
@@ -149,7 +163,6 @@ Deno.serve(async (req) => {
     const history: { role: 'user' | 'assistant'; content: string }[] =
       ((historyRes.data ?? []) as any[]).reverse()
 
-    // Build user content (text + optional image)
     const userContent: any[] = []
     if (image) {
       const b64 = (image as string).replace(/^data:image\/\w+;base64,/, '')
@@ -176,32 +189,30 @@ Deno.serve(async (req) => {
         model:     'claude-haiku-4-5-20251001',
         system:    EXTRACTION_SYSTEM,
         messages:  [{ role: 'user', content: image ? userContent : msg }],
-        maxTokens: 1024,   // enough for 10+ item meals
+        maxTokens: 1024,
       }),
     ])
 
     console.log('[chat] extraction raw:', extractionRaw)
 
-    // Parse extraction — now always an array
-    const logged: Record<string, any>[] = []
+    // ── Parse + persist all data types ──────────────────────────────
+    const loggedFood:    Record<string, any>[] = []
+    let   loggedWeight:  Record<string, any> | null = null
+    let   loggedWorkout: Record<string, any> | null = null
+
     try {
       const cleaned = extractionRaw
-        .replace(/^```json\s*/i, '')
-        .replace(/^```\s*/,      '')
-        .replace(/\s*```$/,      '')
-        .trim()
+        .replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/\s*```$/, '').trim()
+      const extracted = JSON.parse(cleaned)
 
-      const items = JSON.parse(cleaned)
-      if (!Array.isArray(items)) throw new Error('Expected array from extraction')
-
-      for (const item of items) {
+      // ── Food items ─────────────────────────────────────────────────
+      for (const item of (extracted.food_items ?? [])) {
         if (!item.food_item) continue
         if (item.confidence !== 'high' && item.confidence !== 'medium') {
-          console.log('[chat] skipping low-confidence item:', item.food_item)
+          console.log('[chat] skipping low-confidence food:', item.food_item)
           continue
         }
-
-        const coreRow: Record<string, any> = {
+        const coreRow = {
           log_date:  todayStr,
           food_name: item.food_item,
           calories:  Math.round(item.kcal ?? 0),
@@ -209,35 +220,70 @@ Deno.serve(async (req) => {
           carbs_g:   Number((item.carbs_g   ?? 0).toFixed(1)),
           fat_g:     Number((item.fat_g     ?? 0).toFixed(1)),
         }
-        const extendedRow = {
-          ...coreRow,
-          meal_type:  item.meal_type ?? null,
-          confidence: item.confidence,
-          raw_input:  msg,
-          source:     image ? 'image' : 'text',
-        }
-
-        // Try extended insert first, fall back to core-only
-        const { error: extErr } = await db.from('food_logs').insert(extendedRow)
+        const { error: extErr } = await db.from('food_logs').insert({
+          ...coreRow, meal_type: item.meal_type ?? null, confidence: item.confidence, raw_input: msg, source: image ? 'image' : 'text',
+        })
         if (extErr) {
-          console.warn('[chat] extended insert failed, trying core-only:', extErr.message)
+          console.warn('[chat] food extended insert failed, trying core:', extErr.message)
           const { error: coreErr } = await db.from('food_logs').insert(coreRow)
-          if (coreErr) {
-            console.error('[chat] core insert failed:', coreErr.message)
-          } else {
-            logged.push(item)
-          }
+          if (coreErr) console.error('[chat] food core insert failed:', coreErr.message)
+          else loggedFood.push(item)
         } else {
-          logged.push(item)
+          loggedFood.push(item)
         }
       }
 
-      console.log('[chat] logged', logged.length, 'items:', logged.map(i => i.food_item).join(', ') || 'none')
+      // ── Body entry (weight / waist) ─────────────────────────────────
+      const body = extracted.body_entry
+      if (body && (body.weight_lbs != null || body.waist_cm != null)) {
+        const row: Record<string, any> = { checkin_date: todayStr }
+        if (body.weight_lbs != null) row.weight_lbs = Number(body.weight_lbs)
+        if (body.waist_cm   != null) row.waist_cm   = Number(body.waist_cm)
+
+        // Upsert — if a check-in already exists for today, update it
+        const { error: bodyErr } = await db
+          .from('weekly_checkins')
+          .upsert(row, { onConflict: 'checkin_date' })
+
+        if (bodyErr) {
+          console.error('[chat] body upsert failed:', bodyErr.message)
+        } else {
+          loggedWeight = body
+          console.log('[chat] body logged:', JSON.stringify(body))
+        }
+      }
+
+      // ── Workout entry ───────────────────────────────────────────────
+      const workout = extracted.workout_entry
+      if (workout?.workout_type) {
+        const row: Record<string, any> = {
+          log_date:     todayStr,
+          workout_type: workout.workout_type,
+        }
+        if (workout.workout_name)    row.workout_name    = workout.workout_name
+        if (workout.duration_min)    row.duration_min    = Number(workout.duration_min)
+        if (workout.calories_burned) row.calories_burned = Number(workout.calories_burned)
+
+        const { error: workoutErr } = await db.from('workout_logs').insert(row)
+        if (workoutErr) {
+          console.error('[chat] workout insert failed:', workoutErr.message)
+        } else {
+          loggedWorkout = workout
+          console.log('[chat] workout logged:', workout.workout_type)
+        }
+      }
+
+      console.log(
+        '[chat] logged —',
+        `food: ${loggedFood.length}`,
+        `weight: ${loggedWeight ? 'yes' : 'no'}`,
+        `workout: ${loggedWorkout ? 'yes' : 'no'}`,
+      )
     } catch (parseErr) {
       console.error('[chat] extraction parse error:', parseErr, '| raw:', extractionRaw)
     }
 
-    // Save conversation turns — soft failure
+    // Save conversation — soft failure
     const { error: convErr } = await db.from('conversations').insert([
       { role: 'user',      content: msg   },
       { role: 'assistant', content: reply },
@@ -245,7 +291,14 @@ Deno.serve(async (req) => {
     if (convErr) console.warn('[chat] conversations insert:', convErr.message)
 
     return new Response(
-      JSON.stringify({ reply, logged: logged.length > 0 ? logged : null }),
+      JSON.stringify({
+        reply,
+        logged: {
+          food:    loggedFood.length > 0 ? loggedFood : null,
+          weight:  loggedWeight,
+          workout: loggedWorkout,
+        },
+      }),
       { headers: { ...CORS, 'Content-Type': 'application/json' } },
     )
   } catch (err: any) {
