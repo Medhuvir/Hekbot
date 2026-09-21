@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Icon from '../Icon'
 
 const inputCls =
   'bg-dn-black/40 border border-white/[0.08] rounded-sm px-2.5 py-1.5 font-sans text-[12px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors tabular'
@@ -169,18 +170,18 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
                   type="button"
                   onClick={() => toggleSearch(it._id)}
                   aria-label="Search again"
-                  className={`font-sans text-[11px] transition-colors px-1 ${it.searching ? 'text-dn-orange' : 'text-dn-graphite hover:text-dn-orange'}`}
+                  className={`transition-colors px-1 ${it.searching ? 'text-dn-orange' : 'text-dn-graphite hover:text-dn-orange'}`}
                 >
-                  ⌕
+                  <Icon name="search" size={13} />
                 </button>
               )}
               <button
                 type="button"
                 onClick={() => removeItem(it._id)}
                 aria-label="Remove item"
-                className="font-sans text-[10px] text-dn-graphite hover:text-red-400 transition-colors px-1"
+                className="text-dn-graphite hover:text-red-400 transition-colors px-1"
               >
-                ✕
+                <Icon name="close" size={12} />
               </button>
             </div>
 

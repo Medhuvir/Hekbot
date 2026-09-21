@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import TopoBackground from '../TopoBackground'
+import Icon from '../Icon'
 import HekbotReview from './HekbotReview'
 import { usePresets } from '../../hooks/usePresets'
 import { prepareImageUpload, ImageValidationError } from '../../lib/imageUpload'
@@ -45,24 +46,6 @@ function today() {
 
 let msgCounter = 0
 function nextMsgId() { return `msg-${++msgCounter}` }
-
-function UploadIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-label="Upload meal photo">
-      <rect x="1" y="3" width="14" height="10" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
-      <circle cx="5.5" cy="6.5" r="1" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M1 10l3.5-3 3 2.5 2.5-2.5L15 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function SendIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
-      <path d="M2 6.5h9M7 2l4.5 4.5L7 11" stroke="#0A0A0A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
 
 export default function HekbotPanel({ onLogged }) {
   const [messages, setMessages] = useState([])
@@ -207,7 +190,10 @@ export default function HekbotPanel({ onLogged }) {
                 className="w-full bg-transparent font-sans text-[14px] sm:text-[15px] text-dn-white placeholder-dn-graphite outline-none resize-none disabled:opacity-50"
               />
               <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/[0.06]">
-                <label className="cursor-pointer text-dn-graphite hover:text-dn-white transition-colors">
+                <label
+                  aria-label="Upload meal photo"
+                  className="cursor-pointer text-dn-graphite hover:text-dn-white transition-colors"
+                >
                   <input
                     type="file"
                     accept="image/*"
@@ -215,14 +201,14 @@ export default function HekbotPanel({ onLogged }) {
                     onChange={handleImageUpload}
                     disabled={loading}
                   />
-                  <UploadIcon />
+                  <Icon name="add_photo_alternate" size={16} />
                 </label>
                 <button
                   type="submit"
                   disabled={!input.trim() || loading}
                   className="w-9 h-9 flex items-center justify-center bg-dn-orange rounded-sm hover:bg-dn-orange-dark transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
                 >
-                  <SendIcon />
+                  <Icon name="send" size={13} className="text-dn-black" />
                 </button>
               </div>
             </form>
@@ -369,7 +355,7 @@ export default function HekbotPanel({ onLogged }) {
                     onClick={() => handlePresetTap(preset)}
                     className="font-sans text-[9px] tracking-[0.1em] text-dn-orange border border-dn-orange/25 hover:border-dn-orange/50 rounded-sm px-2.5 py-1.5 transition-all duration-200"
                   >
-                    ★ {preset.name}
+                    <Icon name="star" size={11} /> {preset.name}
                   </button>
                 ))}
               </div>
@@ -394,7 +380,10 @@ export default function HekbotPanel({ onLogged }) {
               onSubmit={handleSubmit}
               className="flex items-center gap-3 px-4 sm:px-5 py-3.5 border-t border-white/[0.08] bg-dn-black flex-shrink-0"
             >
-              <label className="flex-shrink-0 cursor-pointer text-dn-graphite hover:text-dn-white transition-colors">
+              <label
+                aria-label="Upload meal photo"
+                className="flex-shrink-0 cursor-pointer text-dn-graphite hover:text-dn-white transition-colors"
+              >
                 <input
                   type="file"
                   accept="image/*"
@@ -402,7 +391,7 @@ export default function HekbotPanel({ onLogged }) {
                   onChange={handleImageUpload}
                   disabled={loading}
                 />
-                <UploadIcon />
+                <Icon name="add_photo_alternate" size={16} />
               </label>
 
               <input
@@ -418,7 +407,7 @@ export default function HekbotPanel({ onLogged }) {
                 disabled={!input.trim() || loading}
                 className="w-8 h-8 flex items-center justify-center bg-dn-orange rounded-sm flex-shrink-0 hover:bg-dn-orange-dark transition-colors duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                <SendIcon />
+                <Icon name="send" size={13} className="text-dn-black" />
               </button>
             </form>
           </div>

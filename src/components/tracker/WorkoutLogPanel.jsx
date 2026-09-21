@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Icon from '../Icon'
 import { addWorkoutLog, deleteWorkoutLog } from '../../lib/mutations'
 import { MACRO_COLORS, MACRO_CHIP_BG, CALORIE_CHIP_BG } from '../../lib/macroColors'
 
@@ -59,9 +60,10 @@ function WorkoutRow({ item, isAdmin, onDelete }) {
         ) : (
           <button
             onClick={() => setConfirming(true)}
-            className="opacity-0 group-hover:opacity-100 font-sans text-[10px] text-dn-graphite hover:text-red-400 transition-all duration-200 shrink-0"
+            aria-label="Delete workout entry"
+            className="opacity-0 group-hover:opacity-100 text-dn-graphite hover:text-red-400 transition-all duration-200 shrink-0"
           >
-            ✕
+            <Icon name="close" size={12} />
           </button>
         )
       )}

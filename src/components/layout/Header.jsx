@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import DNMark from '../DNMark'
+import Icon from '../Icon'
 import TopoBackground from '../TopoBackground'
 
 export default function Header({ isAdmin = false, onSignOut, currentDate }) {
@@ -57,7 +58,7 @@ export default function Header({ isAdmin = false, onSignOut, currentDate }) {
               to="/admin/login"
               className="font-sans text-[10px] sm:text-[11px] text-dn-graphite hover:text-dn-white transition-colors duration-200 whitespace-nowrap"
             >
-              Admin →
+              Admin <Icon name="arrow_forward" size={11} className="align-[-1px]" />
             </Link>
           )}
         </div>

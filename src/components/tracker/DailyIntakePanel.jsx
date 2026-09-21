@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Icon from '../Icon'
 import { addFoodLog, deleteFoodLog } from '../../lib/mutations'
 import { MACRO_COLORS, MACRO_CHIP_BG, CALORIE_CHIP_BG, STATUS_COLORS } from '../../lib/macroColors'
 
@@ -52,9 +53,10 @@ function FoodRow({ item, isAdmin, onDelete }) {
         ) : (
           <button
             onClick={() => setConfirming(true)}
-            className="opacity-0 group-hover:opacity-100 font-sans text-[10px] text-dn-graphite hover:text-red-400 transition-all duration-200 shrink-0"
+            aria-label="Delete food entry"
+            className="opacity-0 group-hover:opacity-100 text-dn-graphite hover:text-red-400 transition-all duration-200 shrink-0"
           >
-            ✕
+            <Icon name="close" size={12} />
           </button>
         )
       )}

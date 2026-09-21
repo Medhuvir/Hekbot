@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import Icon from '../Icon'
 import { bulkAddFoodLogs } from '../../lib/mutations'
 
 // ─── CSV parser ──────────────────────────────────────────────────────────────
@@ -164,7 +165,9 @@ export default function ImportModal({ onClose, onImported }) {
               MFP → Settings → Export Data → select date range → download CSV
             </div>
           </div>
-          <button onClick={onClose} className="font-sans text-[18px] text-dn-graphite hover:text-dn-white transition-colors leading-none">✕</button>
+          <button onClick={onClose} aria-label="Close" className="text-dn-graphite hover:text-dn-white transition-colors leading-none">
+            <Icon name="close" size={16} />
+          </button>
         </div>
 
         {/* Success state */}

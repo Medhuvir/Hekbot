@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import DNMark from '../components/DNMark'
+import Icon from '../components/Icon'
 import TopoBackground from '../components/TopoBackground'
 
 export default function AdminLogin() {
@@ -92,7 +93,7 @@ export default function AdminLogin() {
 
         <div className="mt-8 text-center">
           <a href="/" className="font-sans text-[11px] text-dn-graphite hover:text-dn-white transition-colors">
-            ← Public dashboard
+            <Icon name="arrow_back" size={11} className="align-[-1px]" /> Public dashboard
           </a>
         </div>
       </div>
