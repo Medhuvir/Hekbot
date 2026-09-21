@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import HekbotReview from './HekbotReview'
 import { usePresets } from '../../hooks/usePresets'
+import { prepareImageUpload, ImageValidationError } from '../../lib/imageUpload'
+
+const MEAL_PHOTO_PROMPT = 'Extract macros from this meal'
 
 const QUICK_ACTIONS = ['Daily summary', 'Weekly summary', 'Log weight', 'Log waist']
 
@@ -110,12 +113,24 @@ export default function HekbotDrawer({ isOpen, onClose, onLogged }) {
     sendMessage(input)
   }
 
-  function handleImageUpload(e) {
+  async function handleImageUpload(e) {
     const file = e.target.files?.[0]
+    e.target.value = '' // allow re-selecting the same file after an error
     if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => sendMessage(input || 'What are the macros in this meal?', reader.result)
-    reader.readAsDataURL(file)
+
+    try {
+      const prepared = await prepareImageUpload(file)
+      sendMessage(MEAL_PHOTO_PROMPT, prepared)
+    } catch (err) {
+      const message = err instanceof ImageValidationError
+        ? err.message
+        : 'Could not process that image — try a different file.'
+      setError(message)
+      setMessages(prev => [
+        ...prev,
+        { id: nextMsgId(), role: 'assistant', content: message, isError: true },
+      ])
+    }
   }
 
   async function researchFoodItem(query) {

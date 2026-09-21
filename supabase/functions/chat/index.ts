@@ -9,6 +9,31 @@ const CORS = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024 // 10MB — mirrors the client-side limit
+
+function jsonError(message: string, status: number) {
+  return new Response(JSON.stringify({ error: message }), {
+    status,
+    headers: { ...CORS, 'Content-Type': 'application/json' },
+  })
+}
+
+// Parses a data URL into its declared media type + base64 payload, rejecting
+// anything that isn't actually an image or is over the size limit. The
+// client already validates and re-encodes to JPEG before sending, but this
+// function never trusts that alone — it's reachable directly, not just from
+// the app.
+function parseImageDataUrl(image: string): { mediaType: string; data: string } | { error: string } {
+  const match = image.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/)
+  if (!match) return { error: 'Invalid image data' }
+  const [, mediaType, data] = match
+  if (!ALLOWED_IMAGE_TYPES.has(mediaType)) return { error: `Unsupported image type: ${mediaType}` }
+  const approxBytes = Math.ceil((data.length * 3) / 4)
+  if (approxBytes > MAX_IMAGE_BYTES) return { error: 'Image exceeds the 10MB limit' }
+  return { mediaType, data }
+}
+
 // ── Claude API helper ────────────────────────────────────────────────
 async function callClaude(opts: {
   model: string
@@ -128,10 +153,14 @@ Deno.serve(async (req) => {
     const { message, image } = await req.json()
     const msg = (message ?? '').trim()
     if (!msg) {
-      return new Response(JSON.stringify({ error: 'message is required' }), {
-        status: 400,
-        headers: { ...CORS, 'Content-Type': 'application/json' },
-      })
+      return jsonError('message is required', 400)
+    }
+
+    let parsedImage: { mediaType: string; data: string } | null = null
+    if (image) {
+      const result = parseImageDataUrl(image as string)
+      if ('error' in result) return jsonError(result.error, 400)
+      parsedImage = result
     }
 
     const db       = createClient(SUPABASE_URL, SUPABASE_SVC)
@@ -164,15 +193,17 @@ Deno.serve(async (req) => {
       ((historyRes.data ?? []) as any[]).reverse()
 
     const userContent: any[] = []
-    if (image) {
-      const b64 = (image as string).replace(/^data:image\/\w+;base64,/, '')
-      userContent.push({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } })
+    if (parsedImage) {
+      userContent.push({
+        type: 'image',
+        source: { type: 'base64', media_type: parsedImage.mediaType, data: parsedImage.data },
+      })
     }
     userContent.push({ type: 'text', text: msg })
 
     const conversationMessages = [
       ...history.map(h => ({ role: h.role, content: h.content })),
-      { role: 'user' as const, content: image ? userContent : msg },
+      { role: 'user' as const, content: parsedImage ? userContent : msg },
     ]
 
     const systemPrompt = buildSystemPrompt(profileRes.data, targetsRes.data, todayTotals)
@@ -188,7 +219,7 @@ Deno.serve(async (req) => {
       callClaude({
         model:     'claude-haiku-4-5-20251001',
         system:    EXTRACTION_SYSTEM,
-        messages:  [{ role: 'user', content: image ? userContent : msg }],
+        messages:  [{ role: 'user', content: parsedImage ? userContent : msg }],
         maxTokens: 1024,
       }),
     ])
@@ -237,7 +268,7 @@ Deno.serve(async (req) => {
         reply,
         extraction: {
           log_date:      todayStr,
-          source:        image ? 'image' : 'text',
+          source:        parsedImage ? 'image' : 'text',
           raw_input:     msg,
           food_items:    foodItems,
           body_entry:    bodyEntry,
