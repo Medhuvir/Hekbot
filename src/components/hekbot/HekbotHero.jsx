@@ -2,7 +2,7 @@ import { useState } from 'react'
 import TopoBackground from '../TopoBackground'
 import HekbotDrawer from './HekbotDrawer'
 
-export default function HekbotHero() {
+export default function HekbotHero({ onLogged }) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -129,7 +129,7 @@ export default function HekbotHero() {
         </div>
       </section>
 
-      <HekbotDrawer isOpen={open} onClose={() => setOpen(false)} />
+      <HekbotDrawer isOpen={open} onClose={() => setOpen(false)} onLogged={onLogged} />
     </>
   )
 }

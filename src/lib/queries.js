@@ -72,6 +72,15 @@ export async function getAllCheckins() {
   return data ?? []
 }
 
+export async function getFoodPresets() {
+  const { data, error } = await supabase
+    .from('food_presets')
+    .select('*')
+    .order('name', { ascending: true })
+  if (error) throw error
+  return data ?? []
+}
+
 export async function getLatestCheckin() {
   const { data, error } = await supabase
     .from('weekly_checkins')
