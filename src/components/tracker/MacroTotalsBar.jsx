@@ -1,3 +1,4 @@
+import CardTexture from '../CardTexture'
 import { MACRO_COLORS } from '../../lib/macroColors'
 
 function MacroBarRow({ label, value, target, targetMax, unit = 'g', color, big }) {
@@ -45,7 +46,9 @@ export default function MacroTotalsBar({ totals, targets, netCalories }) {
   if (!targets) return null
 
   return (
-    <div className="dn-card p-4 sm:p-5 space-y-4">
+    <div className="dn-card relative overflow-hidden p-4 sm:p-5">
+      <CardTexture />
+      <div className="relative space-y-4">
       <MacroBarRow
         label="Calories"
         value={totals.calories}
@@ -86,6 +89,7 @@ export default function MacroTotalsBar({ totals, targets, netCalories }) {
           </span>
         </div>
       )}
+      </div>
     </div>
   )
 }

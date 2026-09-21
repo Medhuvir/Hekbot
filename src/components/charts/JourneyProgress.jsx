@@ -1,5 +1,5 @@
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import TopoBackground from '../TopoBackground'
+import CardTexture from '../CardTexture'
 import { getPhaseProgress, formatDate } from '../../lib/helpers'
 
 function MiniTooltip({ active, payload, label }) {
@@ -63,7 +63,7 @@ function WeightMiniChart({ checkins }) {
             stroke="#FF5E1A"
             strokeWidth={2}
             fill="url(#journeyWeightFill)"
-            dot={false}
+            dot={{ r: 3, fill: '#FF5E1A', strokeWidth: 0 }}
             activeDot={{ r: 4, fill: '#FF5E1A' }}
           />
         </AreaChart>
@@ -82,11 +82,7 @@ export default function JourneyProgress({ currentWeight, checkins }) {
 
   return (
     <div className="dn-card relative overflow-hidden p-4 sm:p-6 animate-fade-in-up">
-      <TopoBackground opacity={0.1} />
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: 'linear-gradient(to bottom, rgba(10,10,10,0.65) 0%, rgba(10,10,10,0.28) 40%, rgba(10,10,10,0) 70%)' }}
-      />
+      <CardTexture />
 
       <div className="relative">
         {/* Header row */}

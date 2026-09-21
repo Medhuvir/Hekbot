@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Icon from '../Icon'
+import CardTexture from '../CardTexture'
 import { addWorkoutLog, deleteWorkoutLog } from '../../lib/mutations'
 import { MACRO_COLORS, MACRO_CHIP_BG, CALORIE_CHIP_BG } from '../../lib/macroColors'
 
@@ -174,7 +175,9 @@ export default function WorkoutLogPanel({ workoutLogs, isAdmin, date, onRefresh,
   }
 
   return (
-    <div className="dn-card p-4 sm:p-5">
+    <div className="dn-card relative overflow-hidden p-4 sm:p-5">
+      <CardTexture />
+      <div className="relative">
       <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
         <h3 className="font-display text-[16px] tracking-[0.06em] text-dn-white">Training</h3>
         {totalBurned > 0 && (
@@ -212,6 +215,7 @@ export default function WorkoutLogPanel({ workoutLogs, isAdmin, date, onRefresh,
           </button>
         )
       )}
+      </div>
     </div>
   )
 }

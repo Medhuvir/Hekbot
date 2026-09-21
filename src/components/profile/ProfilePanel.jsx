@@ -1,3 +1,4 @@
+import CardTexture from '../CardTexture'
 import { lbsToKg } from '../../lib/helpers'
 
 export default function ProfilePanel({ profile, latestCheckin }) {
@@ -7,7 +8,9 @@ export default function ProfilePanel({ profile, latestCheckin }) {
   const currentKg     = lbsToKg(currentWeight)
 
   return (
-    <div className="dn-card p-4 sm:p-5">
+    <div className="dn-card relative overflow-hidden p-4 sm:p-5">
+      <CardTexture />
+      <div className="relative">
       <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-dn-graphite mb-4">Profile</div>
 
       <div className="flex items-start gap-4">
@@ -84,6 +87,7 @@ export default function ProfilePanel({ profile, latestCheckin }) {
             )
           })}
         </div>
+      </div>
       </div>
     </div>
   )

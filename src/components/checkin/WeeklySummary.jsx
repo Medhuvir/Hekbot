@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import CardTexture from '../CardTexture'
 import { addCheckin } from '../../lib/mutations'
 import { today } from '../../lib/helpers'
 
@@ -114,7 +115,9 @@ export default function WeeklySummary({ summary, isAdmin, onRefresh }) {
   const { avgCalories, proteinAdherence, weightDelta, waistDelta, trend, latest } = summary
 
   return (
-    <div className="dn-card p-4 sm:p-5">
+    <div className="dn-card relative overflow-hidden p-4 sm:p-5">
+      <CardTexture />
+      <div className="relative">
       <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
         <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-dn-graphite">
           Weekly Summary
@@ -169,6 +172,7 @@ export default function WeeklySummary({ summary, isAdmin, onRefresh }) {
       </div>
 
       {isAdmin && <CheckinForm onAdded={onRefresh} />}
+      </div>
     </div>
   )
 }
