@@ -7,9 +7,9 @@ export default function DotGridWave({
   className = '',
   color = '#FF5E1A',
   spacing = 26,
-  baseOpacity = 0.05,
-  peakOpacity = 0.4,
-  overallOpacity = 0.1,
+  baseOpacity = 0.12,
+  peakOpacity = 0.75,
+  overallOpacity = 0.16,
 }) {
   const canvasRef = useRef(null)
 
@@ -48,7 +48,7 @@ export default function DotGridWave({
           const phase = (x + y) * 0.02 - t * 0.03
           const wave  = (Math.sin(phase) + 1) / 2 // 0..1
           const alpha = baseOpacity + wave * (peakOpacity - baseOpacity)
-          const radius = 1 + wave * 1.2
+          const radius = 1.2 + wave * 1.6
 
           ctx.beginPath()
           ctx.arc(x, y, radius, 0, Math.PI * 2)
@@ -65,11 +65,20 @@ export default function DotGridWave({
       if (!reduceMotion) frame = requestAnimationFrame(tick)
     }
 
-    resize()
-    draw()
+    // Changing canvas.width/height (inside resize()) clears the buffer, so
+    // every resize must be immediately followed by a redraw — including the
+    // mandatory first callback ResizeObserver fires right after observe(),
+    // which would otherwise leave a blank canvas whenever the RAF loop isn't
+    // running (prefers-reduced-motion).
+    function resizeAndDraw() {
+      resize()
+      draw()
+    }
+
+    resizeAndDraw()
     if (!reduceMotion) frame = requestAnimationFrame(tick)
 
-    const ro = new ResizeObserver(resize)
+    const ro = new ResizeObserver(resizeAndDraw)
     ro.observe(canvas.parentElement)
 
     return () => {
