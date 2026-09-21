@@ -133,22 +133,21 @@ export default function AdminDashboard() {
               <SectionLabel number="01">Today's Nutrition</SectionLabel>
               <div className="space-y-4">
                 <MacroTotalsBar totals={dailyMacros} targets={targets} netCalories={netCalories} />
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <DailyIntakePanel
-                    foodLogs={foodLogs}
-                    isAdmin={true}
-                    date={todayStr}
-                    onRefresh={refreshFood}
-                    loading={foodLoading}
-                  />
-                  <WorkoutLogPanel
-                    workoutLogs={workoutLogs}
-                    isAdmin={true}
-                    date={todayStr}
-                    onRefresh={refreshWorkout}
-                    loading={workoutLoading}
-                  />
-                </div>
+                <DailyIntakePanel
+                  foodLogs={foodLogs}
+                  isAdmin={true}
+                  date={todayStr}
+                  onRefresh={refreshFood}
+                  loading={foodLoading}
+                  targets={targets}
+                />
+                <WorkoutLogPanel
+                  workoutLogs={workoutLogs}
+                  isAdmin={true}
+                  date={todayStr}
+                  onRefresh={refreshWorkout}
+                  loading={workoutLoading}
+                />
               </div>
             </section>
 

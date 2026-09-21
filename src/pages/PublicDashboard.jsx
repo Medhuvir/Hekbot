@@ -107,22 +107,21 @@ export default function PublicDashboard() {
               <SectionLabel number="01">Today's Nutrition</SectionLabel>
               <div className="space-y-4">
                 <MacroTotalsBar totals={dailyMacros} targets={targets} netCalories={netCalories} />
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <DailyIntakePanel
-                    foodLogs={foodLogs}
-                    isAdmin={false}
-                    date={todayStr}
-                    onRefresh={refreshFoodLogs}
-                    loading={foodLoading}
-                  />
-                  <WorkoutLogPanel
-                    workoutLogs={workoutLogs}
-                    isAdmin={false}
-                    date={todayStr}
-                    onRefresh={refreshWorkoutLogs}
-                    loading={workoutLoading}
-                  />
-                </div>
+                <DailyIntakePanel
+                  foodLogs={foodLogs}
+                  isAdmin={false}
+                  date={todayStr}
+                  onRefresh={refreshFoodLogs}
+                  loading={foodLoading}
+                  targets={targets}
+                />
+                <WorkoutLogPanel
+                  workoutLogs={workoutLogs}
+                  isAdmin={false}
+                  date={todayStr}
+                  onRefresh={refreshWorkoutLogs}
+                  loading={workoutLoading}
+                />
               </div>
             </section>
 

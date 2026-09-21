@@ -1,36 +1,38 @@
-function MacroBar({ label, value, target, targetMax, unit = 'g', colorOverride }) {
-  const pct = target ? Math.min(100, Math.round((value / target) * 100)) : 0
+import CalorieRing from './CalorieRing'
+import { MACRO_COLORS } from '../../lib/macroColors'
 
-  const color = colorOverride
-    ? colorOverride
-    : pct >= 90 ? '#22C55E'
-    : pct >= 70 ? '#FF5E1A'
-    : '#F59E0B'
+function MacroBarRow({ label, value, target, targetMax, unit = 'g', color }) {
+  const denom = targetMax || target
+  const pct = denom ? Math.min(100, Math.round((value / denom) * 100)) : 0
+  const remaining = denom ? Math.round(denom - value) : null
+  const over = remaining !== null && remaining < 0
 
   return (
     <div>
-      <div className="flex justify-between items-baseline mb-1.5">
-        <span className="font-sans text-[10px] uppercase tracking-[0.12em] text-dn-graphite">{label}</span>
-        <span className="font-sans text-[11px] tabular">
-          <span className="font-display text-[18px] leading-none tabular" style={{ color }}>
-            {typeof value === 'number' ? value.toFixed(0) : '0'}
-          </span>
-          <span className="text-dn-graphite ml-0.5 text-[10px]">
-            {unit}
-            {targetMax
-              ? ` / ${target}–${targetMax}${unit}`
-              : target
-              ? ` / ${target}${unit}`
-              : ''}
-          </span>
+      <div className="flex items-center gap-2">
+        <span
+          className="w-14 shrink-0 font-sans text-[10px] font-semibold uppercase tracking-[0.1em]"
+          style={{ color }}
+        >
+          {label}
+        </span>
+        <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-700 ease-dn"
+            style={{ width: `${pct}%`, backgroundColor: color, opacity: over ? 0.7 : 1 }}
+          />
+        </div>
+        <span className="shrink-0 font-sans text-[10px] text-dn-graphite tabular text-right">
+          {Math.round(value)}
+          {targetMax ? ` / ${target}–${targetMax}` : target ? ` / ${target}` : ''}
+          {unit}
         </span>
       </div>
-      <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
-        <div
-          className="h-full rounded-full transition-all duration-700 ease-dn"
-          style={{ width: `${pct}%`, backgroundColor: color }}
-        />
-      </div>
+      {denom > 0 && (
+        <div className={`text-right font-sans text-[9px] tracking-[0.06em] mt-0.5 ${over ? 'text-red-400' : 'text-dn-graphite'}`}>
+          {over ? `${Math.abs(remaining)}${unit} over` : `${remaining}${unit} remaining`}
+        </div>
+      )}
     </div>
   )
 }
@@ -38,68 +40,43 @@ function MacroBar({ label, value, target, targetMax, unit = 'g', colorOverride }
 export default function MacroTotalsBar({ totals, targets, netCalories }) {
   if (!targets) return null
 
-  const calStatus =
-    totals.calories > targets.calories_max ? 'over' :
-    totals.calories > 0 && totals.calories < targets.calories_min ? 'under' :
-    'on-track'
-
-  const calColor =
-    calStatus === 'over'  ? '#EF4444' :
-    calStatus === 'under' ? '#F59E0B' :
-    '#22C55E'
-
   return (
-    <div className="dn-card p-4 sm:p-5 space-y-4">
-      {/* Calorie overview row */}
-      <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-white/[0.06]">
-        <div>
-          <div className="font-sans text-[10px] uppercase tracking-[0.15em] text-dn-graphite mb-0.5">
-            Calories Today
-          </div>
-          <div className="flex items-baseline gap-2 flex-wrap">
-            <span className="font-display text-[32px] sm:text-[42px] leading-none tabular" style={{ color: calColor }}>
-              {totals.calories.toFixed(0)}
-            </span>
-            <span className="font-sans text-[11px] sm:text-[12px] text-dn-graphite">
-              / {targets.calories_min}–{targets.calories_max} kcal
-            </span>
-          </div>
+    <div className="dn-card p-4 sm:p-5">
+      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-5">
+        <CalorieRing value={totals.calories} target={targets.calories_max} size={92} />
+        <div className="w-full flex-1 min-w-0 space-y-2.5">
+          <MacroBarRow label="Protein" value={totals.protein_g} target={targets.protein_g} color={MACRO_COLORS.protein} />
+          <MacroBarRow
+            label="Carbs"
+            value={totals.carbs_g}
+            target={targets.carbs_min_g}
+            targetMax={targets.carbs_max_g}
+            color={MACRO_COLORS.carbs}
+          />
+          <MacroBarRow
+            label="Fat"
+            value={totals.fat_g}
+            target={targets.fat_min_g}
+            targetMax={targets.fat_max_g}
+            color={MACRO_COLORS.fat}
+          />
         </div>
-        {netCalories !== null && netCalories !== undefined && (
-          <div className="text-right">
-            <div className="font-sans text-[10px] uppercase tracking-[0.12em] text-dn-graphite mb-0.5">Net</div>
-            <div className="font-display text-[20px] sm:text-[24px] leading-none tabular text-dn-white">
-              {netCalories >= 0 ? '+' : ''}{netCalories.toFixed(0)}
-              <span className="font-sans text-[11px] ml-1 text-dn-graphite">kcal</span>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Macro bars */}
-      <div className="grid grid-cols-3 gap-3 sm:gap-4">
-        <MacroBar
-          label="Protein"
-          value={totals.protein_g}
-          target={targets.protein_g}
-          unit="g"
-        />
-        <MacroBar
-          label="Carbs"
-          value={totals.carbs_g}
-          target={targets.carbs_min_g}
-          targetMax={targets.carbs_max_g}
-          unit="g"
-          colorOverride="rgba(245,243,238,0.5)"
-        />
-        <MacroBar
-          label="Fat"
-          value={totals.fat_g}
-          target={targets.fat_min_g}
-          targetMax={targets.fat_max_g}
-          unit="g"
-          colorOverride="rgba(245,243,238,0.4)"
-        />
+      <div className="flex items-center justify-between flex-wrap gap-2 mt-4 pt-3 border-t border-white/[0.06]">
+        <span className="font-sans text-[10px] uppercase tracking-[0.15em] text-dn-graphite">
+          {targets.calories_min}–{targets.calories_max} kcal target
+        </span>
+        {netCalories !== null && netCalories !== undefined && (
+          <span className="font-sans text-[11px] text-dn-graphite">
+            Net
+            <span className="font-display text-[16px] text-dn-white tabular ml-1.5">
+              {netCalories >= 0 ? '+' : ''}
+              {netCalories.toFixed(0)}
+            </span>
+            <span className="text-[10px] ml-0.5">kcal</span>
+          </span>
+        )}
       </div>
     </div>
   )

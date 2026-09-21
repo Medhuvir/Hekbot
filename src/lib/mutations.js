@@ -12,10 +12,10 @@ export async function bulkAddFoodLogs(entries) {
   return data
 }
 
-export async function addFoodLog({ log_date, food_name, calories, protein_g, carbs_g, fat_g, notes }) {
+export async function addFoodLog({ log_date, food_name, calories, protein_g, carbs_g, fat_g, notes, meal_type }) {
   const { data, error } = await supabase
     .from('food_logs')
-    .insert([{ log_date, food_name, calories, protein_g, carbs_g, fat_g, notes }])
+    .insert([{ log_date, food_name, calories, protein_g, carbs_g, fat_g, notes, meal_type }])
     .select()
     .single()
   if (error) throw error
