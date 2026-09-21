@@ -1,14 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom'
 import DNMark from '../DNMark'
 import Icon from '../Icon'
-import DotGridWave from '../DotGridWave'
+import TopoBackground from '../TopoBackground'
 
 export default function Header({ isAdmin = false, onSignOut, currentDate }) {
   const navigate = useNavigate()
 
   return (
     <header className="relative overflow-hidden bg-dn-black border-b border-white/[0.08]">
-      <DotGridWave />
+      <TopoBackground opacity={0.09} />
 
       <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 py-2.5 sm:py-5 flex items-center justify-between">
 

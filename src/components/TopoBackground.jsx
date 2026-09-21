@@ -1,8 +1,11 @@
-// Topographic texture — brand-standard, always at low opacity
-export default function TopoBackground({ className = '', opacity = 0.08 }) {
+// Topographic texture — brand-standard, always at low opacity.
+// `animate` applies the long, slow topo-shift drift (defined in
+// tailwind.config.js) — skipped automatically under prefers-reduced-motion
+// via the motion-safe: variant.
+export default function TopoBackground({ className = '', opacity = 0.08, animate = true }) {
   return (
     <svg
-      className={`absolute inset-0 w-full h-full pointer-events-none ${className}`}
+      className={`absolute inset-0 w-full h-full pointer-events-none ${animate ? 'motion-safe:animate-topo-shift' : ''} ${className}`}
       viewBox="0 0 1440 240"
       preserveAspectRatio="xMidYMid slice"
       xmlns="http://www.w3.org/2000/svg"
