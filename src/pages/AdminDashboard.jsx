@@ -108,7 +108,7 @@ export default function AdminDashboard() {
         {/* Nutrition summary + weight progress — always visible, side by side */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5 sm:mb-7">
           <MacroTotalsBar totals={dailyMacros} targets={targets} netCalories={netCalories} />
-          <JourneyProgress currentWeight={latestCheckin?.weight_lbs} />
+          <JourneyProgress currentWeight={latestCheckin?.weight_lbs} checkins={checkins} />
         </div>
 
         {/* View toggle */}
