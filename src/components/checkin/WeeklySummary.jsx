@@ -99,7 +99,7 @@ function CheckinForm({ onAdded }) {
 export default function WeeklySummary({ summary, isAdmin, onRefresh }) {
   if (!summary) {
     return (
-      <div className="dn-card p-5">
+      <div className="dn-card p-4 sm:p-5">
         <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-dn-graphite mb-3">
           Weekly Check-in
         </div>
@@ -114,8 +114,8 @@ export default function WeeklySummary({ summary, isAdmin, onRefresh }) {
   const { avgCalories, proteinAdherence, weightDelta, waistDelta, trend, latest } = summary
 
   return (
-    <div className="dn-card p-5">
-      <div className="flex items-center justify-between mb-4">
+    <div className="dn-card p-4 sm:p-5">
+      <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
         <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-dn-graphite">
           Weekly Summary
         </div>

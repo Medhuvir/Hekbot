@@ -9,7 +9,7 @@ export default function JourneyProgress({ currentWeight }) {
     '#F5F3EE'
 
   return (
-    <div className="dn-card p-6 animate-fade-in-up">
+    <div className="dn-card p-4 sm:p-6 animate-fade-in-up">
       {/* Header row */}
       <div className="flex items-start justify-between mb-5">
         <div>
@@ -44,7 +44,7 @@ export default function JourneyProgress({ currentWeight }) {
       </div>
 
       {/* Current weight pill */}
-      <div className="mt-4 flex items-center gap-3">
+      <div className="mt-4 flex items-center gap-2 sm:gap-3 flex-wrap">
         <div className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-sm">
           <span className="font-sans text-[10px] text-dn-graphite tracking-wide">Current</span>
           <span className="font-display text-[16px] tracking-[0.08em] text-dn-white tabular">

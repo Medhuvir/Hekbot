@@ -80,7 +80,7 @@ export default function PublicDashboard() {
 
       <PageWrapper>
         {/* View toggle */}
-        <div className="flex items-center gap-1 mb-7 w-fit border border-white/[0.08] rounded-sm p-0.5">
+        <div className="flex items-center gap-1 mb-5 sm:mb-7 w-fit border border-white/[0.08] rounded-sm p-0.5">
           {[VIEW_DAILY, VIEW_WEEKLY].map(v => (
             <button
               key={v}
@@ -97,12 +97,12 @@ export default function PublicDashboard() {
         </div>
 
         {/* Journey progress — always visible */}
-        <div className="mb-6 animate-fade-in-up">
+        <div className="mb-4 sm:mb-6 animate-fade-in-up">
           <JourneyProgress currentWeight={latestCheckin?.weight_lbs} />
         </div>
 
         {view === VIEW_DAILY && (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <section>
               <SectionLabel number="01">Today's Nutrition</SectionLabel>
               <div className="space-y-4">
@@ -139,7 +139,7 @@ export default function PublicDashboard() {
         )}
 
         {view === VIEW_WEEKLY && (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <section>
               <SectionLabel number="01">Weight Trend</SectionLabel>
               <WeightTrendChart checkins={checkins} />
@@ -164,8 +164,8 @@ export default function PublicDashboard() {
       </PageWrapper>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.06] mt-16 py-6 px-6">
-        <div className="max-w-screen-xl mx-auto flex items-center justify-between">
+      <footer className="border-t border-white/[0.06] mt-10 sm:mt-16 py-5 sm:py-6 px-4 sm:px-6">
+        <div className="max-w-screen-xl mx-auto flex items-center justify-between flex-wrap gap-2">
           <div className="font-sans text-[9px] text-dn-graphite tracking-[0.1em]">
             Ascension · Personal · Read-only view
           </div>

@@ -80,16 +80,17 @@ export default function AdminDashboard() {
 
       <PageWrapper>
         {/* Admin banner */}
-        <div className="mb-6 flex items-center justify-between px-4 py-2.5 bg-dn-orange/[0.08] border border-dn-orange/20 rounded-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-dn-orange" />
+        <div className="mb-6 flex items-center justify-between flex-wrap gap-3 px-4 py-2.5 bg-dn-orange/[0.08] border border-dn-orange/20 rounded-sm">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-1.5 h-1.5 rounded-full bg-dn-orange shrink-0" />
             <span className="font-sans text-[11px] text-dn-orange">
-              Admin mode — all edit controls are active
+              <span className="sm:hidden">Admin mode</span>
+              <span className="hidden sm:inline">Admin mode — all edit controls are active</span>
             </span>
           </div>
           <button
             onClick={() => setShowImport(true)}
-            className="flex items-center gap-2 px-3 py-1 border border-dn-orange/30 rounded-sm hover:bg-dn-orange/10 transition-colors"
+            className="flex items-center gap-2 px-3 py-1 border border-dn-orange/30 rounded-sm hover:bg-dn-orange/10 transition-colors shrink-0"
           >
             <span className="font-sans text-[10px] text-dn-orange">↑</span>
             <span className="font-sans text-[11px] text-dn-orange tracking-wide">Import MFP</span>
@@ -105,7 +106,7 @@ export default function AdminDashboard() {
         )}
 
         {/* View toggle */}
-        <div className="flex items-center gap-1 mb-7 w-fit border border-white/[0.08] rounded-sm p-0.5">
+        <div className="flex items-center gap-1 mb-5 sm:mb-7 w-fit border border-white/[0.08] rounded-sm p-0.5">
           {[VIEW_DAILY, VIEW_WEEKLY].map(v => (
             <button
               key={v}
@@ -122,12 +123,12 @@ export default function AdminDashboard() {
         </div>
 
         {/* Journey progress */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <JourneyProgress currentWeight={latestCheckin?.weight_lbs} />
         </div>
 
         {view === VIEW_DAILY && (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <section>
               <SectionLabel number="01">Today's Nutrition</SectionLabel>
               <div className="space-y-4">
@@ -164,7 +165,7 @@ export default function AdminDashboard() {
         )}
 
         {view === VIEW_WEEKLY && (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <section>
               <SectionLabel number="01">Weight Trend</SectionLabel>
               <WeightTrendChart checkins={checkins} />
@@ -188,8 +189,8 @@ export default function AdminDashboard() {
         )}
       </PageWrapper>
 
-      <footer className="border-t border-white/[0.06] mt-16 py-6 px-6">
-        <div className="max-w-screen-xl mx-auto flex items-center justify-between">
+      <footer className="border-t border-white/[0.06] mt-10 sm:mt-16 py-5 sm:py-6 px-4 sm:px-6">
+        <div className="max-w-screen-xl mx-auto flex items-center justify-between flex-wrap gap-2">
           <div className="font-sans text-[9px] text-dn-graphite tracking-[0.1em]">
             Ascension · Admin Portal
           </div>

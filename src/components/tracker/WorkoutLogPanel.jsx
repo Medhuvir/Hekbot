@@ -137,8 +137,8 @@ export default function WorkoutLogPanel({ workoutLogs, isAdmin, date, onRefresh,
   const totalBurned = workoutLogs.reduce((s, w) => s + (w.calories_burned || 0), 0)
 
   return (
-    <div className="dn-card p-5">
-      <div className="flex items-center justify-between mb-4">
+    <div className="dn-card p-4 sm:p-5">
+      <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
         <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-dn-graphite">
           Training
         </div>

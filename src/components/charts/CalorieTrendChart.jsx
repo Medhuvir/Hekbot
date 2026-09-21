@@ -49,12 +49,12 @@ export default function CalorieTrendChart({ dailyTotals, targets }) {
   const calMax = targets?.calories_max ?? 2400
 
   return (
-    <div className="dn-card p-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="dn-card p-4 sm:p-6">
+      <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
         <div className="font-sans text-[10px] tracking-[0.2em] uppercase text-dn-graphite">
           Calorie Trend
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-0.5 bg-dn-orange inline-block" />
             <span className="font-sans text-[9px] text-dn-graphite">Intake</span>

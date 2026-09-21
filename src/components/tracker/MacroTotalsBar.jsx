@@ -49,18 +49,18 @@ export default function MacroTotalsBar({ totals, targets, netCalories }) {
     '#22C55E'
 
   return (
-    <div className="dn-card p-5 space-y-4">
+    <div className="dn-card p-4 sm:p-5 space-y-4">
       {/* Calorie overview row */}
-      <div className="flex items-center justify-between pb-4 border-b border-white/[0.06]">
+      <div className="flex items-center justify-between flex-wrap gap-3 pb-4 border-b border-white/[0.06]">
         <div>
           <div className="font-sans text-[10px] uppercase tracking-[0.15em] text-dn-graphite mb-0.5">
             Calories Today
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="font-display text-[42px] leading-none tabular" style={{ color: calColor }}>
+          <div className="flex items-baseline gap-2 flex-wrap">
+            <span className="font-display text-[32px] sm:text-[42px] leading-none tabular" style={{ color: calColor }}>
               {totals.calories.toFixed(0)}
             </span>
-            <span className="font-sans text-[12px] text-dn-graphite">
+            <span className="font-sans text-[11px] sm:text-[12px] text-dn-graphite">
               / {targets.calories_min}–{targets.calories_max} kcal
             </span>
           </div>
@@ -68,7 +68,7 @@ export default function MacroTotalsBar({ totals, targets, netCalories }) {
         {netCalories !== null && netCalories !== undefined && (
           <div className="text-right">
             <div className="font-sans text-[10px] uppercase tracking-[0.12em] text-dn-graphite mb-0.5">Net</div>
-            <div className="font-display text-[24px] leading-none tabular text-dn-white">
+            <div className="font-display text-[20px] sm:text-[24px] leading-none tabular text-dn-white">
               {netCalories >= 0 ? '+' : ''}{netCalories.toFixed(0)}
               <span className="font-sans text-[11px] ml-1 text-dn-graphite">kcal</span>
             </div>
@@ -77,7 +77,7 @@ export default function MacroTotalsBar({ totals, targets, netCalories }) {
       </div>
 
       {/* Macro bars */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-3 sm:gap-4">
         <MacroBar
           label="Protein"
           value={totals.protein_g}

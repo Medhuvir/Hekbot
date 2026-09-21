@@ -10,12 +10,12 @@ export default function HekbotHero({ onLogged }) {
       <section className="relative overflow-hidden bg-dn-surface-dark border-b border-white/[0.08]">
         <TopoBackground opacity={0.07} />
 
-        <div className="relative max-w-screen-xl mx-auto px-6 py-14 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+        <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 py-6 sm:py-10 lg:py-14 grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-8 lg:gap-16 items-center">
 
           {/* Left — HekBot identity block */}
           <div className="animate-fade-in-up">
             {/* Label */}
-            <div className="flex items-center gap-2.5 mb-5">
+            <div className="flex items-center gap-2.5 mb-3 sm:mb-5">
               <div className="w-1.5 h-1.5 rounded-full bg-dn-orange" />
               <span className="font-sans text-[10px] tracking-[0.3em] uppercase text-dn-orange">
                 AI Nutrition Coach
@@ -23,12 +23,12 @@ export default function HekbotHero({ onLogged }) {
             </div>
 
             {/* Name */}
-            <h1 className="font-display text-[92px] text-dn-white leading-none tracking-[0.04em] mb-4">
+            <h1 className="font-display text-[56px] sm:text-[72px] lg:text-[92px] text-dn-white leading-none tracking-[0.04em] mb-3 sm:mb-4">
               HekBot
             </h1>
 
             {/* Divider */}
-            <div className="w-12 h-px bg-dn-orange mb-5" />
+            <div className="w-12 h-px bg-dn-orange mb-3 sm:mb-5" />
 
             {/* Description */}
             <p className="font-sans text-[13px] text-dn-graphite leading-relaxed max-w-sm">
@@ -37,7 +37,7 @@ export default function HekbotHero({ onLogged }) {
             </p>
 
             {/* Meta tags */}
-            <div className="flex items-center gap-3 mt-6">
+            <div className="flex items-center gap-2 sm:gap-3 mt-4 sm:mt-6 flex-wrap">
               {['Macros', 'Coaching', 'Weekly Check-ins'].map(tag => (
                 <span
                   key={tag}

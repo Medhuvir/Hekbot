@@ -121,9 +121,9 @@ function AddFoodForm({ date, onAdded }) {
           onChange={e => set('carbs_g', e.target.value)}
         />
       </div>
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center flex-wrap">
         <input
-          className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[12px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors"
+          className="flex-1 min-w-[120px] bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[12px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors"
           placeholder="Notes (optional)"
           value={form.notes}
           onChange={e => set('notes', e.target.value)}
@@ -161,7 +161,7 @@ export default function DailyIntakePanel({ foodLogs, isAdmin, date, onRefresh, l
   }
 
   return (
-    <div className="dn-card p-5">
+    <div className="dn-card p-4 sm:p-5">
       <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-dn-graphite mb-4">
         Food Log
         {isAdmin && <span className="text-dn-orange ml-2">— Admin</span>}

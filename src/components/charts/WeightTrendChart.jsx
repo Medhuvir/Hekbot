@@ -61,7 +61,7 @@ export default function WeightTrendChart({ checkins }) {
   const yMax = Math.ceil(Math.max(...weights, 211) + 2)
 
   return (
-    <div className="dn-card p-6">
+    <div className="dn-card p-4 sm:p-6">
       <div className="font-sans text-[10px] tracking-[0.2em] uppercase text-dn-graphite mb-4">
         Weight Trend
       </div>
