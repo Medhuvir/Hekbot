@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import TopoBackground from '../TopoBackground'
+import DotGridWave from '../DotGridWave'
 import Icon from '../Icon'
 import HekbotReview from './HekbotReview'
 import { usePresets } from '../../hooks/usePresets'
@@ -162,7 +162,7 @@ export default function HekbotPanel({ onLogged }) {
 
   return (
     <section className="relative overflow-hidden bg-dn-surface-dark border-b border-white/[0.08]">
-      <TopoBackground opacity={0.07} />
+      <DotGridWave overallOpacity={0.07} />
 
       <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 py-8 sm:py-14">
         {!started ? (
