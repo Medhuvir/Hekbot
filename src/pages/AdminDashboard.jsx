@@ -105,6 +105,12 @@ export default function AdminDashboard() {
           />
         )}
 
+        {/* Nutrition summary + weight progress — always visible, side by side */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5 sm:mb-7">
+          <MacroTotalsBar totals={dailyMacros} targets={targets} netCalories={netCalories} />
+          <JourneyProgress currentWeight={latestCheckin?.weight_lbs} />
+        </div>
+
         {/* View toggle */}
         <div className="flex items-center gap-1 mb-5 sm:mb-7 w-fit border border-white/[0.08] rounded-sm p-0.5">
           {[VIEW_DAILY, VIEW_WEEKLY].map(v => (
@@ -122,17 +128,11 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Journey progress */}
-        <div className="mb-4 sm:mb-6">
-          <JourneyProgress currentWeight={latestCheckin?.weight_lbs} />
-        </div>
-
         {view === VIEW_DAILY && (
           <div className="space-y-4 sm:space-y-6">
             <section>
               <SectionLabel number="01">Today's Nutrition</SectionLabel>
               <div className="space-y-4">
-                <MacroTotalsBar totals={dailyMacros} targets={targets} netCalories={netCalories} />
                 <DailyIntakePanel
                   foodLogs={foodLogs}
                   isAdmin={true}
