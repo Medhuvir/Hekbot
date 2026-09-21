@@ -4,6 +4,14 @@ const ANTHROPIC_KEY = Deno.env.get('ANTHROPIC_API_KEY')!
 const SUPABASE_URL  = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SVC  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
+// Both calls here are low-complexity (a short templated coaching reply, and
+// structured JSON extraction) — no reasoning task needs a flagship model.
+// Defaults to the current cheapest capable model; override via Supabase
+// secrets (`supabase secrets set ANTHROPIC_CHAT_MODEL=...`) to bump later
+// without a code deploy.
+const CHAT_MODEL       = Deno.env.get('ANTHROPIC_CHAT_MODEL')       ?? 'claude-haiku-4-5-20251001'
+const EXTRACTION_MODEL = Deno.env.get('ANTHROPIC_EXTRACTION_MODEL') ?? 'claude-haiku-4-5-20251001'
+
 const CORS = {
   'Access-Control-Allow-Origin':  '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -211,13 +219,13 @@ Deno.serve(async (req) => {
     // Fire chat + extraction in parallel
     const [reply, extractionRaw] = await Promise.all([
       callClaude({
-        model:     'claude-sonnet-4-6',
+        model:     CHAT_MODEL,
         system:    systemPrompt,
         messages:  conversationMessages,
         maxTokens: 512,
       }),
       callClaude({
-        model:     'claude-haiku-4-5-20251001',
+        model:     EXTRACTION_MODEL,
         system:    EXTRACTION_SYSTEM,
         messages:  [{ role: 'user', content: parsedImage ? userContent : msg }],
         maxTokens: 1024,
