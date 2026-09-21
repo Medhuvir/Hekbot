@@ -1,32 +1,51 @@
 import { useState, useRef, useEffect } from 'react'
+import HekbotReview from './HekbotReview'
+import { usePresets } from '../../hooks/usePresets'
 
 const QUICK_ACTIONS = ['Daily summary', 'Weekly summary', 'Log weight', 'Log waist']
 
 const SUPABASE_URL     = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_ANON    = import.meta.env.VITE_SUPABASE_ANON_KEY
 const CHAT_ENDPOINT    = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/chat` : null
+const LOG_COMMIT_ENDPOINT = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/log-commit` : null
 
-async function callChat(message, image = null) {
-  if (!CHAT_ENDPOINT) throw new Error('Supabase not configured')
-  const res = await fetch(CHAT_ENDPOINT, {
+async function postJson(endpoint, body) {
+  if (!endpoint) throw new Error('Supabase not configured')
+  const res = await fetch(endpoint, {
     method:  'POST',
     headers: {
       'Content-Type':  'application/json',
       'Authorization': `Bearer ${SUPABASE_ANON}`,
       'apikey':        SUPABASE_ANON,
     },
-    body: JSON.stringify({ message, image }),
+    body: JSON.stringify(body),
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
     throw new Error(err.error ?? `HTTP ${res.status}`)
   }
-  return res.json() // { reply, logged }
+  return res.json()
 }
 
-export default function HekbotDrawer({ isOpen, onClose }) {
+async function callChat(message, image = null) {
+  return postJson(CHAT_ENDPOINT, { message, image }) // { reply, extraction }
+}
+
+async function callLogCommit(payload) {
+  return postJson(LOG_COMMIT_ENDPOINT, payload) // { logged }
+}
+
+function today() {
+  return new Date().toISOString().split('T')[0]
+}
+
+let msgCounter = 0
+function nextMsgId() { return `msg-${++msgCounter}` }
+
+export default function HekbotDrawer({ isOpen, onClose, onLogged }) {
   const [messages, setMessages] = useState([
     {
+      id: 'msg-welcome',
       role: 'assistant',
       content: "Hey Medhuvir — what did you eat today, or what can I help you track?",
     },
@@ -34,8 +53,10 @@ export default function HekbotDrawer({ isOpen, onClose }) {
   const [input, setInput]   = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError]   = useState(null)
+  const [committingId, setCommittingId] = useState(null)
   const inputRef  = useRef(null)
   const threadRef = useRef(null)
+  const { presets, refresh: refreshPresets } = usePresets()
 
   useEffect(() => {
     if (isOpen) {
@@ -50,25 +71,34 @@ export default function HekbotDrawer({ isOpen, onClose }) {
     }
   }, [messages, loading])
 
+  function hasReviewable(extraction) {
+    return extraction && (extraction.food_items?.length > 0 || extraction.body_entry || extraction.workout_entry)
+  }
+
   async function sendMessage(text, image = null) {
     const trimmed = text.trim()
     if (!trimmed || loading) return
     setError(null)
-    setMessages(prev => [...prev, { role: 'user', content: trimmed }])
+    setMessages(prev => [...prev, { id: nextMsgId(), role: 'user', content: trimmed }])
     setInput('')
     setLoading(true)
 
     try {
-      const { reply, logged } = await callChat(trimmed, image)
+      const { reply, extraction } = await callChat(trimmed, image)
       setMessages(prev => [
         ...prev,
-        { role: 'assistant', content: reply, logged },
+        {
+          id: nextMsgId(),
+          role: 'assistant',
+          content: reply,
+          extraction: hasReviewable(extraction) ? extraction : null,
+        },
       ])
     } catch (err) {
       setError(err.message)
       setMessages(prev => [
         ...prev,
-        { role: 'assistant', content: "Something went wrong — check the backend connection and try again.", isError: true },
+        { id: nextMsgId(), role: 'assistant', content: "Something went wrong — check the backend connection and try again.", isError: true },
       ])
     } finally {
       setLoading(false)
@@ -86,6 +116,36 @@ export default function HekbotDrawer({ isOpen, onClose }) {
     const reader = new FileReader()
     reader.onload = () => sendMessage(input || 'What are the macros in this meal?', reader.result)
     reader.readAsDataURL(file)
+  }
+
+  async function researchFoodItem(query) {
+    const { extraction } = await callChat(query)
+    return extraction?.food_items?.[0] ?? null
+  }
+
+  function handlePresetTap(preset) {
+    setMessages(prev => [
+      ...prev,
+      { id: nextMsgId(), role: 'assistant', content: `Log "${preset.name}" from your presets?`, preset },
+    ])
+  }
+
+  async function handleConfirmReview(messageId, payload) {
+    setCommittingId(messageId)
+    try {
+      const { logged } = await callLogCommit(payload)
+      setMessages(prev => prev.map(m => (m.id === messageId ? { ...m, extraction: null, preset: null, logged } : m)))
+      onLogged?.()
+      if (payload.save_as_preset?.length > 0) refreshPresets()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setCommittingId(null)
+    }
+  }
+
+  function handleDiscardReview(messageId) {
+    setMessages(prev => prev.map(m => (m.id === messageId ? { ...m, extraction: null, preset: null, discarded: true } : m)))
   }
 
   return (
@@ -133,14 +193,14 @@ export default function HekbotDrawer({ isOpen, onClose }) {
 
         {/* Message thread */}
         <div ref={threadRef} className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
-          {messages.map((msg, i) => (
-            <div key={i} className={`flex items-start gap-2.5 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+          {messages.map(msg => (
+            <div key={msg.id} className={`flex items-start gap-2.5 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
               {msg.role === 'assistant' && (
                 <div className="w-5 h-5 rounded-full bg-dn-orange/20 border border-dn-orange/30 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <div className="w-1.5 h-1.5 rounded-full bg-dn-orange" />
                 </div>
               )}
-              <div className="flex flex-col gap-1.5 max-w-[80%]">
+              <div className={`flex flex-col gap-1.5 ${(msg.extraction || msg.preset) ? 'max-w-[92%] flex-1' : 'max-w-[80%]'}`}>
                 <div
                   className={`rounded-sm px-3.5 py-2.5 ${
                     msg.role === 'user'
@@ -154,6 +214,23 @@ export default function HekbotDrawer({ isOpen, onClose }) {
                     {msg.content}
                   </p>
                 </div>
+
+                {/* Pending review — nothing is logged until confirmed */}
+                {(msg.extraction || msg.preset) && (
+                  <HekbotReview
+                    extraction={msg.extraction}
+                    preset={msg.preset}
+                    logDate={today()}
+                    submitting={committingId === msg.id}
+                    onConfirm={payload => handleConfirmReview(msg.id, payload)}
+                    onDiscard={() => handleDiscardReview(msg.id)}
+                    onResearchItem={researchFoodItem}
+                  />
+                )}
+                {msg.discarded && (
+                  <span className="ml-0.5 font-sans text-[9px] text-dn-graphite tracking-[0.12em] uppercase">Discarded</span>
+                )}
+
                 {/* Logged data badges */}
                 {msg.logged && (
                   <div className="flex flex-col gap-1 ml-0.5">
@@ -213,6 +290,21 @@ export default function HekbotDrawer({ isOpen, onClose }) {
             </div>
           )}
         </div>
+
+        {/* Preset chips */}
+        {presets.length > 0 && (
+          <div className="px-5 py-3 border-t border-white/[0.06] flex items-center gap-2 flex-wrap flex-shrink-0">
+            {presets.map(preset => (
+              <button
+                key={preset.id}
+                onClick={() => handlePresetTap(preset)}
+                className="font-sans text-[9px] tracking-[0.1em] text-dn-orange border border-dn-orange/25 hover:border-dn-orange/50 rounded-sm px-2.5 py-1.5 transition-all duration-200"
+              >
+                ★ {preset.name}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Quick action chips */}
         <div className="px-5 py-3 border-t border-white/[0.06] flex items-center gap-2 flex-wrap flex-shrink-0">

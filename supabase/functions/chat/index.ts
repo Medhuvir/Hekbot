@@ -195,89 +195,31 @@ Deno.serve(async (req) => {
 
     console.log('[chat] extraction raw:', extractionRaw)
 
-    // ── Parse + persist all data types ──────────────────────────────
-    const loggedFood:    Record<string, any>[] = []
-    let   loggedWeight:  Record<string, any> | null = null
-    let   loggedWorkout: Record<string, any> | null = null
+    // ── Parse extraction — nothing is written here. This is a preview only;
+    // the client reviews/edits it and confirms via the log-commit function. ──
+    let foodItems:    Record<string, any>[] = []
+    let bodyEntry:    Record<string, any> | null = null
+    let workoutEntry: Record<string, any> | null = null
 
     try {
       const cleaned = extractionRaw
         .replace(/^```json\s*/i, '').replace(/^```\s*/, '').replace(/\s*```$/, '').trim()
       const extracted = JSON.parse(cleaned)
 
-      // ── Food items ─────────────────────────────────────────────────
-      for (const item of (extracted.food_items ?? [])) {
-        if (!item.food_item) continue
-        if (item.confidence !== 'high' && item.confidence !== 'medium') {
-          console.log('[chat] skipping low-confidence food:', item.food_item)
-          continue
-        }
-        const coreRow = {
-          log_date:  todayStr,
-          food_name: item.food_item,
-          calories:  Math.round(item.kcal ?? 0),
-          protein_g: Number((item.protein_g ?? 0).toFixed(1)),
-          carbs_g:   Number((item.carbs_g   ?? 0).toFixed(1)),
-          fat_g:     Number((item.fat_g     ?? 0).toFixed(1)),
-        }
-        const { error: extErr } = await db.from('food_logs').insert({
-          ...coreRow, meal_type: item.meal_type ?? null, confidence: item.confidence, raw_input: msg, source: image ? 'image' : 'text',
-        })
-        if (extErr) {
-          console.warn('[chat] food extended insert failed, trying core:', extErr.message)
-          const { error: coreErr } = await db.from('food_logs').insert(coreRow)
-          if (coreErr) console.error('[chat] food core insert failed:', coreErr.message)
-          else loggedFood.push(item)
-        } else {
-          loggedFood.push(item)
-        }
-      }
-
-      // ── Body entry (weight / waist) ─────────────────────────────────
+      foodItems = (extracted.food_items ?? []).filter(
+        (item: any) => item.food_item && (item.confidence === 'high' || item.confidence === 'medium'),
+      )
       const body = extracted.body_entry
-      if (body && (body.weight_lbs != null || body.waist_cm != null)) {
-        const row: Record<string, any> = { checkin_date: todayStr }
-        if (body.weight_lbs != null) row.weight_lbs = Number(body.weight_lbs)
-        if (body.waist_cm   != null) row.waist_cm   = Number(body.waist_cm)
+      if (body && (body.weight_lbs != null || body.waist_cm != null)) bodyEntry = body
 
-        // Upsert — if a check-in already exists for today, update it
-        const { error: bodyErr } = await db
-          .from('weekly_checkins')
-          .upsert(row, { onConflict: 'checkin_date' })
-
-        if (bodyErr) {
-          console.error('[chat] body upsert failed:', bodyErr.message)
-        } else {
-          loggedWeight = body
-          console.log('[chat] body logged:', JSON.stringify(body))
-        }
-      }
-
-      // ── Workout entry ───────────────────────────────────────────────
       const workout = extracted.workout_entry
-      if (workout?.workout_type) {
-        const row: Record<string, any> = {
-          log_date:     todayStr,
-          workout_type: workout.workout_type,
-        }
-        if (workout.workout_name)    row.workout_name    = workout.workout_name
-        if (workout.duration_min)    row.duration_min    = Number(workout.duration_min)
-        if (workout.calories_burned) row.calories_burned = Number(workout.calories_burned)
-
-        const { error: workoutErr } = await db.from('workout_logs').insert(row)
-        if (workoutErr) {
-          console.error('[chat] workout insert failed:', workoutErr.message)
-        } else {
-          loggedWorkout = workout
-          console.log('[chat] workout logged:', workout.workout_type)
-        }
-      }
+      if (workout?.workout_type) workoutEntry = workout
 
       console.log(
-        '[chat] logged —',
-        `food: ${loggedFood.length}`,
-        `weight: ${loggedWeight ? 'yes' : 'no'}`,
-        `workout: ${loggedWorkout ? 'yes' : 'no'}`,
+        '[chat] extracted —',
+        `food: ${foodItems.length}`,
+        `weight: ${bodyEntry ? 'yes' : 'no'}`,
+        `workout: ${workoutEntry ? 'yes' : 'no'}`,
       )
     } catch (parseErr) {
       console.error('[chat] extraction parse error:', parseErr, '| raw:', extractionRaw)
@@ -293,10 +235,13 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         reply,
-        logged: {
-          food:    loggedFood.length > 0 ? loggedFood : null,
-          weight:  loggedWeight,
-          workout: loggedWorkout,
+        extraction: {
+          log_date:      todayStr,
+          source:        image ? 'image' : 'text',
+          raw_input:     msg,
+          food_items:    foodItems,
+          body_entry:    bodyEntry,
+          workout_entry: workoutEntry,
         },
       }),
       { headers: { ...CORS, 'Content-Type': 'application/json' } },

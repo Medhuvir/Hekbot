@@ -40,8 +40,8 @@ export default function PublicDashboard() {
   const todayStr = today()
 
   // Daily data
-  const { logs: foodLogs,    loading: foodLoading   } = useFoodLogs(todayStr)
-  const { logs: workoutLogs, loading: workoutLoading } = useWorkoutLogs(todayStr)
+  const { logs: foodLogs,    loading: foodLoading,    refresh: refreshFoodLogs    } = useFoodLogs(todayStr)
+  const { logs: workoutLogs, loading: workoutLoading, refresh: refreshWorkoutLogs } = useWorkoutLogs(todayStr)
 
   // Weekly range data (last 14 days for charts)
   const rangeStart = nDaysAgo(13)
@@ -67,10 +67,16 @@ export default function PublicDashboard() {
 
   const currentDate = formatDateLong(todayStr)
 
+  function handleLogged() {
+    refreshFoodLogs()
+    refreshWorkoutLogs()
+    refreshCheckins()
+  }
+
   return (
     <div className="min-h-screen bg-dn-black">
       <Header currentDate={currentDate} />
-      <HekbotHero />
+      <HekbotHero onLogged={handleLogged} />
 
       <PageWrapper>
         {/* View toggle */}
@@ -106,14 +112,14 @@ export default function PublicDashboard() {
                     foodLogs={foodLogs}
                     isAdmin={false}
                     date={todayStr}
-                    onRefresh={() => {}}
+                    onRefresh={refreshFoodLogs}
                     loading={foodLoading}
                   />
                   <WorkoutLogPanel
                     workoutLogs={workoutLogs}
                     isAdmin={false}
                     date={todayStr}
-                    onRefresh={() => {}}
+                    onRefresh={refreshWorkoutLogs}
                     loading={workoutLoading}
                   />
                 </div>
