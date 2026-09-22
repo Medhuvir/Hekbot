@@ -126,8 +126,9 @@ export default function Header({
           ) : (
             <Link
               to="/login"
-              className="font-sans text-[13px] sm:text-[14px] text-dn-gray-light hover:text-dn-white transition-colors duration-200 whitespace-nowrap"
+              className="flex items-center gap-1 font-sans text-[13px] sm:text-[14px] text-dn-orange hover:text-dn-orange-light transition-colors duration-200 whitespace-nowrap"
             >
+              <Icon name="person" size={14} />
               Sign in <Icon name="arrow_forward" size={11} className="align-[-1px]" />
             </Link>
           )}
