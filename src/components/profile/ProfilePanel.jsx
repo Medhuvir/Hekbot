@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import CardTexture from '../CardTexture'
-import { lbsToKg, toLocalISODate } from '../../lib/helpers'
+import { lbsToKg, todayInTZ, addDays } from '../../lib/helpers'
+import { updateProfile } from '../../lib/mutations'
 
 const TRAINING_TYPE_LABELS = {
   'Resistance Training': 'Resistance',
@@ -9,27 +11,49 @@ const TRAINING_TYPE_LABELS = {
 
 const DAY_LETTERS = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
-// Monday–Sunday dates for the week containing `today`, as 'YYYY-MM-DD' strings
-// (matches the log_date format used elsewhere in the app).
-function currentWeekDates() {
-  const now = new Date()
-  const mondayOffset = now.getDay() === 0 ? -6 : 1 - now.getDay()
-  const monday = new Date(now)
-  monday.setDate(now.getDate() + mondayOffset)
+const TIMEZONE_OPTIONS = [
+  { value: 'America/New_York',    label: 'Eastern (New York)' },
+  { value: 'America/Chicago',     label: 'Central (Chicago)' },
+  { value: 'America/Denver',      label: 'Mountain (Denver)' },
+  { value: 'America/Los_Angeles', label: 'Pacific (Los Angeles)' },
+  { value: 'America/Anchorage',   label: 'Alaska' },
+  { value: 'Pacific/Honolulu',    label: 'Hawaii' },
+  { value: 'UTC',                 label: 'UTC' },
+]
 
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(monday)
-    d.setDate(monday.getDate() + i)
-    return toLocalISODate(d)
-  })
+// Monday–Sunday dates for the week containing `today` in the profile's
+// timezone, as 'YYYY-MM-DD' strings (matches the log_date format used
+// elsewhere in the app).
+function currentWeekDates(timezone) {
+  const todayStr = todayInTZ(timezone)
+  const dow = new Date(todayStr + 'T00:00:00').getDay()
+  const mondayOffset = dow === 0 ? -6 : 1 - dow
+  const monday = addDays(todayStr, mondayOffset)
+
+  return Array.from({ length: 7 }, (_, i) => addDays(monday, i))
 }
 
-export default function ProfilePanel({ profile, latestCheckin, workoutLogs = [] }) {
+export default function ProfilePanel({ profile, latestCheckin, workoutLogs = [], isAdmin = false, onProfileUpdated }) {
+  const [savingTimezone, setSavingTimezone] = useState(false)
+
   if (!profile) return null
 
   const currentWeight = latestCheckin?.weight_lbs ?? profile.start_weight_lbs
   const currentKg     = lbsToKg(currentWeight)
-  const weekDates     = currentWeekDates()
+  const weekDates     = currentWeekDates(profile.timezone)
+
+  async function handleTimezoneChange(e) {
+    const timezone = e.target.value
+    setSavingTimezone(true)
+    try {
+      await updateProfile(profile.id, { timezone })
+      onProfileUpdated?.()
+    } catch (err) {
+      console.error('[ProfilePanel] timezone update failed:', err)
+    } finally {
+      setSavingTimezone(false)
+    }
+  }
 
   return (
     <div className="dn-card relative overflow-hidden p-4 sm:p-5">
@@ -41,7 +65,7 @@ export default function ProfilePanel({ profile, latestCheckin, workoutLogs = [] 
         {/* Avatar placeholder */}
         <div className="w-14 h-14 rounded-sm bg-white/[0.06] border border-white/[0.08] flex items-center justify-center shrink-0">
           {profile.avatar_url ? (
-            <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover rounded-sm" />
+            <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover object-top rounded-sm" />
           ) : (
             <span className="font-display text-[22px] text-dn-gray-light tracking-wider">
               {profile.name?.[0] ?? 'M'}
@@ -75,6 +99,28 @@ export default function ProfilePanel({ profile, latestCheckin, workoutLogs = [] 
               <span className="text-dn-gray-light/60 ml-1">({currentKg} kg)</span>
             </span>
           </div>
+
+          {isAdmin ? (
+            <label className="mt-2.5 flex items-center gap-2 font-sans text-[13px] text-dn-gray-light">
+              Timezone
+              <select
+                value={profile.timezone ?? 'America/New_York'}
+                onChange={handleTimezoneChange}
+                disabled={savingTimezone}
+                className="bg-white/[0.04] border border-white/[0.08] rounded-sm px-2 py-1 text-[13px] text-dn-white focus:outline-none focus:border-dn-orange/40 transition-colors disabled:opacity-50"
+              >
+                {TIMEZONE_OPTIONS.map(tz => (
+                  <option key={tz.value} value={tz.value}>{tz.label}</option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            profile.timezone && (
+              <div className="mt-2 font-sans text-[13px] text-dn-gray-light">
+                Timezone <span className="text-dn-white">{TIMEZONE_OPTIONS.find(tz => tz.value === profile.timezone)?.label ?? profile.timezone}</span>
+              </div>
+            )
+          )}
         </div>
       </div>
 

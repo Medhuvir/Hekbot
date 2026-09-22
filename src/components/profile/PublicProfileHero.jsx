@@ -16,7 +16,7 @@ export default function PublicProfileHero({ profile, currentWeight }) {
       <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 py-5 sm:py-7 flex items-center gap-3.5 sm:gap-4">
         <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-sm bg-white/[0.06] border border-white/[0.08] flex items-center justify-center shrink-0">
           {profile.avatar_url ? (
-            <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover rounded-sm" />
+            <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover object-top rounded-sm" />
           ) : (
             <span className="font-display text-[18px] sm:text-[22px] text-dn-gray-light tracking-wider">
               {profile.name?.[0] ?? 'M'}

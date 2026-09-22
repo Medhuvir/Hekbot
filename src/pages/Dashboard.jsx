@@ -25,7 +25,7 @@ import { useProfile } from '../hooks/useProfile'
 import { useAuth } from '../hooks/useAuth'
 import { useLiveToday } from '../hooks/useLiveToday'
 
-import { nDaysAgo, addDays, formatDate, formatDateLong, toLocalISODate, sumMacros, sumCaloriesBurned, buildDailyTotals, computeWeeklySummary } from '../lib/helpers'
+import { addDays, formatDate, formatDateLong, toLocalISODate, sumMacros, sumCaloriesBurned, buildDailyTotals, computeWeeklySummary } from '../lib/helpers'
 
 const VIEW_DAILY  = 'daily'
 const VIEW_WEEKLY = 'weekly'
@@ -52,10 +52,14 @@ export default function Dashboard({ mode }) {
   const [view, setView] = useState(VIEW_DAILY)
   const [showImport, setShowImport] = useState(false)
 
-  // The real, live calendar date — updates on its own if a tab is left open
-  // past midnight. `viewDate` is the day currently being browsed; null means
-  // "follow today" (so a midnight rollover carries the view forward too).
-  const liveToday = useLiveToday()
+  const { profile, refresh: refreshProfile } = useProfile()
+  const timezone = profile?.timezone
+
+  // The real, live calendar date in the profile's timezone — updates on its
+  // own if a tab is left open past midnight. `viewDate` is the day currently
+  // being browsed; null means "follow today" (so a midnight rollover carries
+  // the view forward too).
+  const liveToday = useLiveToday(timezone)
   const [viewDate, setViewDate] = useState(null)
   const displayDate    = viewDate ?? liveToday
   const isViewingToday = displayDate === liveToday
@@ -79,16 +83,15 @@ export default function Dashboard({ mode }) {
   const { logs: foodLogs,    loading: foodLoading,    refresh: refreshFoodLogs    } = useFoodLogs(displayDate)
   const { logs: workoutLogs, loading: workoutLoading, refresh: refreshWorkoutLogs } = useWorkoutLogs(displayDate)
 
-  // Weekly range data always trails the real live "today", independent of
-  // whichever single day is being browsed above.
-  const rangeStart = nDaysAgo(13)
+  // Weekly range data always trails the real live "today" (in the profile's
+  // timezone), independent of whichever single day is being browsed above.
+  const rangeStart = addDays(liveToday, -13)
   const { logs: foodRange    } = useFoodLogsRange(rangeStart, liveToday)
   const { logs: workoutRange } = useWorkoutLogsRange(rangeStart, liveToday)
 
   const { checkins, refresh: refreshCheckins } = useCheckins()
   const { checkin: latestCheckin } = useLatestCheckin()
   const { targets } = useTargets()
-  const { profile } = useProfile()
 
   const dailyMacros = sumMacros(foodLogs)
   const dailyBurned = sumCaloriesBurned(workoutLogs)
@@ -98,7 +101,7 @@ export default function Dashboard({ mode }) {
   const dailyTotals = buildDailyTotals(foodRange, workoutRange, dates)
   const last7       = dailyTotals.slice(-7)
 
-  const last7Food = foodRange.filter(f => f.log_date >= nDaysAgo(6))
+  const last7Food = foodRange.filter(f => f.log_date >= addDays(liveToday, -6))
   const summary   = computeWeeklySummary(last7Food, checkins.slice(-2), targets)
 
   const currentDate = formatDateLong(displayDate)
@@ -132,7 +135,7 @@ export default function Dashboard({ mode }) {
       />
 
       {isApp
-        ? <HekbotPanel onLogged={handleLogged} userName={profile?.name} />
+        ? <HekbotPanel onLogged={handleLogged} userName={profile?.name} timezone={timezone} />
         : <PublicProfileHero profile={profile} currentWeight={latestCheckin?.weight_lbs} />
       }
 
@@ -220,7 +223,13 @@ export default function Dashboard({ mode }) {
 
             <section>
               <SectionLabel number="03">Profile</SectionLabel>
-              <ProfilePanel profile={profile} latestCheckin={latestCheckin} workoutLogs={workoutRange} />
+              <ProfilePanel
+                profile={profile}
+                latestCheckin={latestCheckin}
+                workoutLogs={workoutRange}
+                isAdmin={isApp}
+                onProfileUpdated={refreshProfile}
+              />
             </section>
           </div>
         )}

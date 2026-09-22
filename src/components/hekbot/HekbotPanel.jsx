@@ -5,7 +5,7 @@ import HekbotReview from './HekbotReview'
 import { usePresets } from '../../hooks/usePresets'
 import { prepareImageUpload, ImageValidationError } from '../../lib/imageUpload'
 import { supabase } from '../../supabaseClient'
-import { today } from '../../lib/helpers'
+import { todayInTZ } from '../../lib/helpers'
 
 const MEAL_PHOTO_PROMPT = 'Extract macros from this meal'
 const QUICK_ACTIONS = ['Daily summary', 'Weekly summary', 'Log weight', 'Log waist']
@@ -82,11 +82,12 @@ async function postJson(endpoint, body) {
   return res.json()
 }
 
-async function callChat(message, image = null) {
+async function callChat(message, image = null, timezone = null) {
   // The Edge Function runs server-side with no notion of the caller's
   // timezone, so it can't derive "today" correctly on its own — the client
-  // sends its actual local date instead of leaving the server to guess (in UTC).
-  return postJson(CHAT_ENDPOINT, { message, image, client_date: today() }) // { reply, extraction }
+  // sends the profile's actual timezone-local date instead of leaving the
+  // server to guess (in UTC).
+  return postJson(CHAT_ENDPOINT, { message, image, client_date: todayInTZ(timezone) }) // { reply, extraction }
 }
 
 async function callLogCommit(payload) {
@@ -109,7 +110,7 @@ function getMealGreeting(name) {
 let msgCounter = 0
 function nextMsgId() { return `msg-${++msgCounter}` }
 
-export default function HekbotPanel({ onLogged, userName }) {
+export default function HekbotPanel({ onLogged, userName, timezone }) {
   const [messages, setMessages] = useState([])
   const [input, setInput]   = useState('')
   const [loading, setLoading] = useState(false)
@@ -168,7 +169,7 @@ export default function HekbotPanel({ onLogged, userName }) {
     setLoading(true)
 
     try {
-      const { reply, extraction } = await callChat(trimmed, image)
+      const { reply, extraction } = await callChat(trimmed, image, timezone)
       setMessages(prev => [
         ...prev,
         {
@@ -222,7 +223,7 @@ export default function HekbotPanel({ onLogged, userName }) {
   }
 
   async function researchFoodItem(query) {
-    const { extraction } = await callChat(query)
+    const { extraction } = await callChat(query, null, timezone)
     return extraction?.food_items?.[0] ?? null
   }
 
@@ -407,7 +408,7 @@ export default function HekbotPanel({ onLogged, userName }) {
                       <HekbotReview
                         extraction={msg.extraction}
                         preset={msg.preset}
-                        logDate={today()}
+                        logDate={todayInTZ(timezone)}
                         submitting={committingId === msg.id}
                         onConfirm={payload => handleConfirmReview(msg.id, payload)}
                         onDiscard={() => handleDiscardReview(msg.id)}

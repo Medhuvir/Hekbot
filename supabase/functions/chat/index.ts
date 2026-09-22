@@ -19,6 +19,26 @@ async function requireAuthenticatedUser(req: Request): Promise<{ id: string } | 
   return { id: data.user.id }
 }
 
+// "Today" as 'YYYY-MM-DD', resolved in order of trust: the profile's own
+// timezone (set by the user, so authoritative) > the client's local date
+// (a reasonable guess, but depends on the caller's device being configured
+// correctly) > a plain UTC guess (last resort — drifts from any non-UTC
+// local date for part of every day).
+function resolveToday(profileTimezone?: string | null, clientDate?: string | null): string {
+  if (profileTimezone) {
+    try {
+      return new Intl.DateTimeFormat('en-CA', {
+        timeZone: profileTimezone,
+        year: 'numeric', month: '2-digit', day: '2-digit',
+      }).format(new Date())
+    } catch {
+      // Invalid IANA zone somehow made it into the profile — fall through.
+    }
+  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(clientDate ?? '')) return clientDate as string
+  return new Date().toISOString().split('T')[0]
+}
+
 // Both calls here are low-complexity (a short templated coaching reply, and
 // structured JSON extraction) — no reasoning task needs a flagship model.
 // Defaults to the current cheapest capable model; override via Supabase
@@ -190,23 +210,23 @@ Deno.serve(async (req) => {
     }
 
     const db = createClient(SUPABASE_URL, SUPABASE_SVC)
-    // The server has no notion of the caller's timezone, so it can't derive
-    // "today" correctly on its own (a plain UTC date drifts from the user's
-    // actual local date for part of every day). Prefer the client's local
-    // date; only fall back to the server's UTC guess if it's missing/malformed.
-    const todayStr = /^\d{4}-\d{2}-\d{2}$/.test(client_date ?? '')
-      ? client_date
-      : new Date().toISOString().split('T')[0]
 
-    // Fetch context in parallel
-    const [profileRes, targetsRes, logsRes, historyRes] = await Promise.all([
-      db.from('profiles').select('*').limit(1).single(),
+    // The profile's own timezone is the authoritative source for "today" —
+    // fetched first since everything else below depends on it. Falls back to
+    // the client's local date, then a plain UTC guess, only if the profile
+    // has no timezone set for some reason.
+    const profileRes = await db.from('profiles').select('*').limit(1).single()
+    if (profileRes.error) console.error('[chat] profiles:', profileRes.error.message)
+
+    const todayStr = resolveToday(profileRes.data?.timezone, client_date)
+
+    // Fetch the rest of the context in parallel
+    const [targetsRes, logsRes, historyRes] = await Promise.all([
       db.from('targets').select('*').order('effective_from', { ascending: false }).limit(1).single(),
       db.from('food_logs').select('calories, protein_g, carbs_g, fat_g').eq('log_date', todayStr),
       db.from('conversations').select('role, content').order('created_at', { ascending: false }).limit(20),
     ])
 
-    if (profileRes.error)  console.error('[chat] profiles:', profileRes.error.message)
     if (targetsRes.error)  console.error('[chat] targets:',  targetsRes.error.message)
     if (logsRes.error)     console.error('[chat] food_logs:', logsRes.error.message)
     if (historyRes.error)  console.warn('[chat] conversations:', historyRes.error.message)

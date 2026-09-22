@@ -16,6 +16,22 @@ export function today() {
   return toLocalISODate(new Date())
 }
 
+// 'YYYY-MM-DD' for the given moment in a specific IANA timezone (e.g.
+// 'America/New_York') — the authoritative version of "today" once a
+// profile has a timezone set, since it doesn't depend on the browser's
+// or device's own timezone being configured correctly. Falls back to the
+// browser-local date if no timezone is given (profile still loading, etc).
+export function todayInTZ(timeZone) {
+  if (!timeZone) return today()
+  // en-CA's standard date format is already 'YYYY-MM-DD'.
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date())
+}
+
 export function formatDate(dateStr) {
   const d = new Date(dateStr + 'T00:00:00')
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
