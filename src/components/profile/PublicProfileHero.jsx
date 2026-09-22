@@ -1,4 +1,5 @@
 import DotGridWave from '../DotGridWave'
+import OrderOfFireMedallion from '../OrderOfFireMedallion'
 import { getPhaseProgress } from '../../lib/helpers'
 
 // Small, branded header for the public dashboard — reuses the same animated
@@ -30,7 +31,8 @@ export default function PublicProfileHero({ profile, currentWeight }) {
           </div>
           <div className="flex items-center gap-x-2.5 gap-y-1 mt-1.5 flex-wrap">
             {profile.affiliation && (
-              <span className="font-sans text-[11px] sm:text-[12px] tracking-[0.2em] uppercase text-dn-orange">
+              <span className="inline-flex items-center gap-1.5 font-sans text-[11px] sm:text-[12px] tracking-[0.2em] uppercase text-dn-orange">
+                <OrderOfFireMedallion size={12} />
                 {profile.affiliation}
               </span>
             )}

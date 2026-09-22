@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import CardTexture from '../CardTexture'
+import OrderOfFireMedallion from '../OrderOfFireMedallion'
 import { lbsToKg, todayInTZ, addDays } from '../../lib/helpers'
 import { updateProfile } from '../../lib/mutations'
 
@@ -78,7 +79,8 @@ export default function ProfilePanel({ profile, latestCheckin, workoutLogs = [],
             {profile.name}
           </div>
           {profile.affiliation && (
-            <div className="font-sans text-[13px] tracking-[0.15em] uppercase text-dn-orange mt-0.5">
+            <div className="flex items-center gap-1.5 font-sans text-[13px] tracking-[0.15em] uppercase text-dn-orange mt-0.5">
+              <OrderOfFireMedallion size={14} />
               {profile.affiliation}
             </div>
           )}
