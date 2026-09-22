@@ -54,6 +54,27 @@ export function addDays(dateStr, n) {
   return toLocalISODate(d)
 }
 
+// ─── Training schedule ───────────────────────────────────────────────────────
+
+export const TRAINING_DAY_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+export const TRAINING_DAY_LABEL = { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' }
+
+// Renders {mon: "Resistance Training", tue: "Martial Arts", ...} as a grouped
+// "Resistance Training Mon/Wed/Fri · Martial Arts Tue/Thu/Sat" summary,
+// skipping rest days (null).
+export function formatTrainingDays(trainingDays) {
+  if (!trainingDays) return 'No training days set.'
+  const byType = new Map()
+  for (const day of TRAINING_DAY_ORDER) {
+    const type = trainingDays[day]
+    if (!type) continue
+    if (!byType.has(type)) byType.set(type, [])
+    byType.get(type).push(TRAINING_DAY_LABEL[day])
+  }
+  if (byType.size === 0) return 'Rest week — no training days set.'
+  return [...byType.entries()].map(([type, days]) => `${type} ${days.join('/')}`).join(' · ')
+}
+
 // ─── Unit conversion ─────────────────────────────────────────────────────────
 
 export function lbsToKg(lbs) {

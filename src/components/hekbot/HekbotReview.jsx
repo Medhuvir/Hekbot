@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import Icon from '../Icon'
+import { TRAINING_DAY_ORDER, TRAINING_DAY_LABEL } from '../../lib/helpers'
+
+const WORKOUT_TYPE_OPTIONS = ['Rest', 'Resistance Training', 'Martial Arts', 'Other']
 
 const inputCls =
   'bg-dn-black/40 border border-white/[0.08] rounded-sm px-2.5 py-1.5 font-sans text-[12px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors tabular'
@@ -43,8 +46,15 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
   })
   const [bodyEntry, setBodyEntry] = useState(() => extraction?.body_entry ? { ...extraction.body_entry, include: true } : null)
   const [workoutEntry, setWorkoutEntry] = useState(() => extraction?.workout_entry ? { ...extraction.workout_entry, include: true } : null)
+  const [trainingSchedule, setTrainingSchedule] = useState(() => (
+    extraction?.training_schedule ? { ...extraction.training_schedule, include: true } : null
+  ))
 
-  const hasContent = foodItems.length > 0 || bodyEntry || workoutEntry
+  const hasContent = foodItems.length > 0 || bodyEntry || workoutEntry || trainingSchedule
+
+  function updateScheduleDay(day, value) {
+    setTrainingSchedule(s => ({ ...s, [day]: value === 'Rest' ? null : value }))
+  }
 
   function updateItem(id, field, value) {
     setFoodItems(items => items.map(it => {
@@ -145,6 +155,9 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
         calories_burned: workoutEntry.calories_burned,
       } : null,
       save_as_preset: savePresetPayload,
+      training_schedule: trainingSchedule?.include
+        ? Object.fromEntries(TRAINING_DAY_ORDER.map(day => [day, trainingSchedule[day] ?? null]))
+        : null,
     })
   }
 
@@ -277,6 +290,36 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
               <input className={inputCls} type="number" min="0" value={workoutEntry.calories_burned ?? ''}
                 onChange={e => setWorkoutEntry(w => ({ ...w, calories_burned: e.target.value === '' ? null : e.target.value }))}
                 placeholder="kcal burned" />
+            </div>
+          </div>
+        )}
+
+        {trainingSchedule && (
+          <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
+            <label className="flex items-center gap-1.5 font-sans text-[13px] text-dn-gray-light">
+              <input
+                type="checkbox"
+                checked={trainingSchedule.include}
+                onChange={e => setTrainingSchedule(s => ({ ...s, include: e.target.checked }))}
+                className="accent-dn-orange"
+              />
+              Weekly training schedule
+            </label>
+            <div className="grid grid-cols-7 gap-1">
+              {TRAINING_DAY_ORDER.map(day => (
+                <div key={day} className="space-y-1">
+                  <div className={`${fieldLabelCls} text-center`}>{TRAINING_DAY_LABEL[day]}</div>
+                  <select
+                    value={trainingSchedule[day] ?? 'Rest'}
+                    onChange={e => updateScheduleDay(day, e.target.value)}
+                    className={`${inputCls} w-full px-1 py-1 text-[11px]`}
+                  >
+                    {WORKOUT_TYPE_OPTIONS.map(opt => (
+                      <option key={opt} value={opt}>{opt === 'Resistance Training' ? 'Resist.' : opt === 'Martial Arts' ? 'Martial' : opt}</option>
+                    ))}
+                  </select>
+                </div>
+              ))}
             </div>
           </div>
         )}

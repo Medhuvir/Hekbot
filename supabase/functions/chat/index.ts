@@ -106,6 +106,30 @@ async function callClaude(opts: {
   return data.content[0].text as string
 }
 
+const DEFAULT_TRAINING_DAYS: Record<string, string | null> = {
+  mon: 'Resistance Training', tue: 'Martial Arts', wed: 'Resistance Training',
+  thu: 'Martial Arts',        fri: 'Resistance Training', sat: 'Martial Arts', sun: null,
+}
+const DAY_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+const DAY_LABEL: Record<string, string> = {
+  mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun',
+}
+
+// Renders {mon: "Resistance Training", tue: "Martial Arts", ...} as the
+// grouped "Resistance Training Mon/Wed/Fri · Martial Arts Tue/Thu/Sat" style
+// summary the coaching prompt (and the user) expect, skipping rest days.
+function formatTrainingDays(trainingDays: Record<string, string | null>): string {
+  const byType = new Map<string, string[]>()
+  for (const day of DAY_ORDER) {
+    const type = trainingDays[day]
+    if (!type) continue
+    if (!byType.has(type)) byType.set(type, [])
+    byType.get(type)!.push(DAY_LABEL[day])
+  }
+  if (byType.size === 0) return 'No training days set — all rest.'
+  return [...byType.entries()].map(([type, days]) => `${type} ${days.join('/')}`).join(' · ')
+}
+
 // ── System prompt ────────────────────────────────────────────────────
 function buildSystemPrompt(
   profile: Record<string, any> | null,
@@ -125,13 +149,14 @@ function buildSystemPrompt(
   const remProt = Math.round(prot - totals.protein_g)
   const name    = profile?.name  ?? 'Medhuvir'
   const age     = profile?.age   ?? 43
+  const trainingDays = formatTrainingDays(profile?.training_days ?? DEFAULT_TRAINING_DAYS)
 
   return `You are HekBot — the personal AI nutrition coach for ${name}.
 Your style: Coach Josh — direct, succinct, supportive. Every nutritional insight connects to athletic performance and discipline. Never lecture. Coach.
 
 PROFILE
 Name: ${name} | Age: ${age} | 5'10"
-Training: Resistance Training Mon/Wed/Fri · Martial Arts Tue/Thu/Sat
+Training: ${trainingDays}
 Program: Retatrutide-assisted fat loss cut
 
 DAILY TARGETS
@@ -155,18 +180,24 @@ RULES
 4. When weight/waist is logged: acknowledge the number, note the trend direction if relevant.
 5. When a workout is logged: acknowledge it and connect to nutrition/recovery.
 6. When a summary is requested: use the exact numbers above, be specific.
-7. Tone: warm, direct, performance-focused. Never preachy.`
+7. When the user asks to change their weekly training schedule/days: confirm what you understood the new schedule to be — it is shown to them to review and confirm before it's saved, so don't claim it's already saved.
+8. Tone: warm, direct, performance-focused. Never preachy.`
 }
 
 // ── Unified extraction prompt ─────────────────────────────────────────
-// Returns one JSON object covering all three loggable data types.
-const EXTRACTION_SYSTEM = `You extract loggable fitness data from messages. Return ONLY a valid JSON object — no explanation, no markdown, no code fences.
+// Returns one JSON object covering all loggable data types. The current
+// training schedule is interpolated in so the model can resolve relative/
+// partial edits ("move Saturday to Sunday instead") against what's actually
+// set today, rather than guessing at a full week from a partial instruction.
+function buildExtractionSystem(currentTrainingDays: Record<string, string | null>): string {
+  return `You extract loggable fitness data from messages. Return ONLY a valid JSON object — no explanation, no markdown, no code fences.
 
 Always return this exact shape:
 {
   "food_items": [],
   "body_entry": null,
-  "workout_entry": null
+  "workout_entry": null,
+  "training_schedule": null
 }
 
 food_items — array of food/drink items (empty array if none):
@@ -184,7 +215,15 @@ body_entry — if user mentions body weight or waist, otherwise null:
 workout_entry — if user mentions completing a workout, otherwise null:
 {"workout_type":"Resistance Training|Martial Arts|Other","workout_name":null,"duration_min":null,"calories_burned":null}
 - workout_type: "Resistance Training" for gym/weights/lifting; "Martial Arts" for BJJ/MMA/boxing/jiu-jitsu/martial arts; "Other" for everything else
-- duration_min and calories_burned: only include if explicitly stated, otherwise null`
+- duration_min and calories_burned: only include if explicitly stated, otherwise null
+
+training_schedule — if the user asks to change, set, update, or move their WEEKLY training days/plan (not a single day's completed workout), otherwise null:
+{"mon":"Resistance Training"|"Martial Arts"|"Other"|null, "tue":..., "wed":..., "thu":..., "fri":..., "sat":..., "sun":...}
+- The user's CURRENT schedule is: ${JSON.stringify(currentTrainingDays)}
+- Start from the current schedule and apply only the change described — always return all 7 days (mon..sun), carrying over any day the user didn't mention
+- null means a rest day
+- Do NOT set this for "I trained today" / "logged a workout" style messages — that's workout_entry, not a schedule change`
+}
 
 // ── Main handler ─────────────────────────────────────────────────────
 Deno.serve(async (req) => {
@@ -259,6 +298,7 @@ Deno.serve(async (req) => {
     ]
 
     const systemPrompt = buildSystemPrompt(profileRes.data, targetsRes.data, todayTotals)
+    const currentTrainingDays = profileRes.data?.training_days ?? DEFAULT_TRAINING_DAYS
 
     // Fire chat + extraction in parallel
     const [reply, extractionRaw] = await Promise.all([
@@ -270,7 +310,7 @@ Deno.serve(async (req) => {
       }),
       callClaude({
         model:     EXTRACTION_MODEL,
-        system:    EXTRACTION_SYSTEM,
+        system:    buildExtractionSystem(currentTrainingDays),
         messages:  [{ role: 'user', content: parsedImage ? userContent : msg }],
         maxTokens: 1024,
       }),
@@ -280,9 +320,10 @@ Deno.serve(async (req) => {
 
     // ── Parse extraction — nothing is written here. This is a preview only;
     // the client reviews/edits it and confirms via the log-commit function. ──
-    let foodItems:    Record<string, any>[] = []
-    let bodyEntry:    Record<string, any> | null = null
-    let workoutEntry: Record<string, any> | null = null
+    let foodItems:        Record<string, any>[] = []
+    let bodyEntry:         Record<string, any> | null = null
+    let workoutEntry:      Record<string, any> | null = null
+    let trainingSchedule:  Record<string, any> | null = null
 
     try {
       const cleaned = extractionRaw
@@ -298,11 +339,17 @@ Deno.serve(async (req) => {
       const workout = extracted.workout_entry
       if (workout?.workout_type) workoutEntry = workout
 
+      const schedule = extracted.training_schedule
+      if (schedule && DAY_ORDER.some(day => day in schedule)) {
+        trainingSchedule = Object.fromEntries(DAY_ORDER.map(day => [day, schedule[day] ?? null]))
+      }
+
       console.log(
         '[chat] extracted —',
         `food: ${foodItems.length}`,
         `weight: ${bodyEntry ? 'yes' : 'no'}`,
         `workout: ${workoutEntry ? 'yes' : 'no'}`,
+        `training_schedule: ${trainingSchedule ? 'yes' : 'no'}`,
       )
     } catch (parseErr) {
       console.error('[chat] extraction parse error:', parseErr, '| raw:', extractionRaw)
@@ -319,12 +366,13 @@ Deno.serve(async (req) => {
       JSON.stringify({
         reply,
         extraction: {
-          log_date:      todayStr,
-          source:        parsedImage ? 'image' : 'text',
-          raw_input:     msg,
-          food_items:    foodItems,
-          body_entry:    bodyEntry,
-          workout_entry: workoutEntry,
+          log_date:          todayStr,
+          source:            parsedImage ? 'image' : 'text',
+          raw_input:         msg,
+          food_items:        foodItems,
+          body_entry:        bodyEntry,
+          workout_entry:     workoutEntry,
+          training_schedule: trainingSchedule,
         },
       }),
       { headers: { ...CORS, 'Content-Type': 'application/json' } },

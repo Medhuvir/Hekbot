@@ -5,7 +5,7 @@ import HekbotReview from './HekbotReview'
 import { usePresets } from '../../hooks/usePresets'
 import { prepareImageUpload, ImageValidationError } from '../../lib/imageUpload'
 import { supabase } from '../../supabaseClient'
-import { todayInTZ } from '../../lib/helpers'
+import { todayInTZ, formatTrainingDays } from '../../lib/helpers'
 
 const MEAL_PHOTO_PROMPT = 'Extract macros from this meal'
 const QUICK_ACTIONS = ['Daily summary', 'Weekly summary', 'Log weight', 'Log waist']
@@ -110,7 +110,7 @@ function getMealGreeting(name) {
 let msgCounter = 0
 function nextMsgId() { return `msg-${++msgCounter}` }
 
-export default function HekbotPanel({ onLogged, userName, timezone }) {
+export default function HekbotPanel({ onLogged, onProfileUpdated, userName, timezone }) {
   const [messages, setMessages] = useState([])
   const [input, setInput]   = useState('')
   const [loading, setLoading] = useState(false)
@@ -157,7 +157,7 @@ export default function HekbotPanel({ onLogged, userName, timezone }) {
   }, [started])
 
   function hasReviewable(extraction) {
-    return extraction && (extraction.food_items?.length > 0 || extraction.body_entry || extraction.workout_entry)
+    return extraction && (extraction.food_items?.length > 0 || extraction.body_entry || extraction.workout_entry || extraction.training_schedule)
   }
 
   async function sendMessage(text, image = null) {
@@ -240,6 +240,7 @@ export default function HekbotPanel({ onLogged, userName, timezone }) {
       const { logged } = await callLogCommit(payload)
       setMessages(prev => prev.map(m => (m.id === messageId ? { ...m, extraction: null, preset: null, logged } : m)))
       onLogged?.()
+      if (logged.training_schedule) onProfileUpdated?.()
       if (payload.save_as_preset?.length > 0) refreshPresets()
     } catch (err) {
       setError(err.message)
@@ -446,6 +447,14 @@ export default function HekbotPanel({ onLogged, userName, timezone }) {
                               Logged · {msg.logged.workout.workout_type}
                               {msg.logged.workout.duration_min ? ` · ${msg.logged.workout.duration_min} min` : ''}
                               {msg.logged.workout.calories_burned ? ` · ${msg.logged.workout.calories_burned} kcal burned` : ''}
+                            </span>
+                          </div>
+                        )}
+                        {msg.logged.training_schedule && (
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-1 h-1 rounded-full bg-dn-orange flex-shrink-0" />
+                            <span className="font-sans text-[12px] text-dn-orange tracking-[0.12em] uppercase">
+                              Training schedule updated · {formatTrainingDays(msg.logged.training_schedule)}
                             </span>
                           </div>
                         )}

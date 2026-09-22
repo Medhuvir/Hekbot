@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import CardTexture from '../CardTexture'
 import OrderOfFireMedallion from '../OrderOfFireMedallion'
-import { lbsToKg, todayInTZ, addDays } from '../../lib/helpers'
+import { lbsToKg, todayInTZ, addDays, formatTrainingDays } from '../../lib/helpers'
 import { updateProfile } from '../../lib/mutations'
 
 const TRAINING_TYPE_LABELS = {
@@ -140,7 +140,12 @@ export default function ProfilePanel({ profile, latestCheckin, workoutLogs = [],
 
       {/* Training schedule */}
       <div className="mt-4 pt-4 border-t border-white/[0.06]">
-        <div className="font-sans text-[13px] uppercase tracking-[0.12em] text-dn-gray-light mb-2">Weekly Training</div>
+        <div className="flex items-baseline justify-between mb-2">
+          <div className="font-sans text-[13px] uppercase tracking-[0.12em] text-dn-gray-light">Weekly Training</div>
+          {profile.training_days && (
+            <div className="font-sans text-[11px] text-dn-gray-light">{formatTrainingDays(profile.training_days)}</div>
+          )}
+        </div>
         <div className="grid grid-cols-7 gap-1">
           {weekDates.map((date, i) => {
             const dayLogs  = workoutLogs.filter(w => w.log_date === date)

@@ -135,7 +135,7 @@ export default function Dashboard({ mode }) {
       />
 
       {isApp
-        ? <HekbotPanel onLogged={handleLogged} userName={profile?.name} timezone={timezone} />
+        ? <HekbotPanel onLogged={handleLogged} onProfileUpdated={refreshProfile} userName={profile?.name} timezone={timezone} />
         : <PublicProfileHero profile={profile} />
       }
 

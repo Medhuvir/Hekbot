@@ -71,6 +71,28 @@ async function upsertBodyEntry(
   return true
 }
 
+const DAY_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+
+async function updateTrainingSchedule(
+  db: any,
+  schedule: Record<string, string | null>,
+): Promise<boolean> {
+  const row = Object.fromEntries(DAY_ORDER.map(day => [day, schedule[day] ?? null]))
+  // Single-user app — the profile row to update isn't passed by the client,
+  // same assumption /chat already makes when it reads "the" profile.
+  const { data: profile, error: profileErr } = await db.from('profiles').select('id').limit(1).single()
+  if (profileErr || !profile) {
+    console.error('[log-commit] training schedule: no profile found:', profileErr?.message)
+    return false
+  }
+  const { error } = await db.from('profiles').update({ training_days: row, updated_at: new Date().toISOString() }).eq('id', profile.id)
+  if (error) {
+    console.error('[log-commit] training schedule update failed:', error.message)
+    return false
+  }
+  return true
+}
+
 async function insertWorkoutEntry(
   db: any,
   workout: { workout_type?: string; workout_name?: string | null; duration_min?: number | null; calories_burned?: number | null },
@@ -117,8 +139,9 @@ Deno.serve(async (req) => {
     const db = createClient(SUPABASE_URL, SUPABASE_SVC)
 
     const loggedFood: Record<string, any>[] = []
-    let   loggedWeight:  Record<string, any> | null = null
-    let   loggedWorkout: Record<string, any> | null = null
+    let   loggedWeight:   Record<string, any> | null = null
+    let   loggedWorkout:  Record<string, any> | null = null
+    let   loggedSchedule: Record<string, any> | null = null
 
     for (const item of (body.food_items ?? [])) {
       if (!item.food_item) continue
@@ -158,6 +181,11 @@ Deno.serve(async (req) => {
       if (ok) loggedWorkout = body.workout_entry
     }
 
+    if (body.training_schedule) {
+      const ok = await updateTrainingSchedule(db, body.training_schedule)
+      if (ok) loggedSchedule = body.training_schedule
+    }
+
     // Bookmark any confirmed food items as reusable presets
     for (const save of (body.save_as_preset ?? [])) {
       const item = (body.food_items ?? [])[save.food_item_index]
@@ -176,9 +204,10 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         logged: {
-          food:    loggedFood.length > 0 ? loggedFood : null,
-          weight:  loggedWeight,
-          workout: loggedWorkout,
+          food:              loggedFood.length > 0 ? loggedFood : null,
+          weight:            loggedWeight,
+          workout:           loggedWorkout,
+          training_schedule: loggedSchedule,
         },
       }),
       { headers: { ...CORS, 'Content-Type': 'application/json' } },
