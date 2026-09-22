@@ -13,6 +13,7 @@ import DailyIntakePanel from '../components/tracker/DailyIntakePanel'
 import WorkoutLogPanel from '../components/tracker/WorkoutLogPanel'
 import MacroTotalsBar from '../components/tracker/MacroTotalsBar'
 import ProfilePanel from '../components/profile/ProfilePanel'
+import PublicProfileHero from '../components/profile/PublicProfileHero'
 import WeeklySummary from '../components/checkin/WeeklySummary'
 import ImportModal from '../components/admin/ImportModal'
 
@@ -92,7 +93,10 @@ export default function Dashboard({ mode }) {
       <HeroImageBackdrop />
       <Header isAdmin={isApp} currentDate={currentDate} onSignOut={handleSignOut} />
 
-      {isApp && <HekbotPanel onLogged={handleLogged} userName={profile?.name} />}
+      {isApp
+        ? <HekbotPanel onLogged={handleLogged} userName={profile?.name} />
+        : <PublicProfileHero profile={profile} currentWeight={latestCheckin?.weight_lbs} />
+      }
 
       <PageWrapper>
         {isApp && (
