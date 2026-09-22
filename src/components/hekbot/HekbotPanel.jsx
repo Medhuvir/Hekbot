@@ -4,6 +4,7 @@ import Icon from '../Icon'
 import HekbotReview from './HekbotReview'
 import { usePresets } from '../../hooks/usePresets'
 import { prepareImageUpload, ImageValidationError } from '../../lib/imageUpload'
+import { supabase } from '../../supabaseClient'
 
 const MEAL_PHOTO_PROMPT = 'Extract macros from this meal'
 const QUICK_ACTIONS = ['Daily summary', 'Weekly summary', 'Log weight', 'Log waist']
@@ -58,11 +59,17 @@ const LOG_COMMIT_ENDPOINT = SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/log-com
 
 async function postJson(endpoint, body) {
   if (!endpoint) throw new Error('Supabase not configured')
+
+  // These are authenticated-only endpoints — the anon key alone no longer
+  // gets past them, so this must carry the signed-in user's own session token.
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) throw new Error('Sign in required.')
+
   const res = await fetch(endpoint, {
     method:  'POST',
     headers: {
       'Content-Type':  'application/json',
-      'Authorization': `Bearer ${SUPABASE_ANON}`,
+      'Authorization': `Bearer ${session.access_token}`,
       'apikey':        SUPABASE_ANON,
     },
     body: JSON.stringify(body),
@@ -112,6 +119,7 @@ export default function HekbotPanel({ onLogged, userName }) {
   const inputRef  = useRef(null)
   const threadRef = useRef(null)
   const landingFormRef = useRef(null)
+  const activeCardRef = useRef(null)
   const { presets, refresh: refreshPresets } = usePresets()
   const helperSuffix = useTypewriterSuffix(HELPER_ROTATIONS)
 
@@ -134,6 +142,18 @@ export default function HekbotPanel({ onLogged, userName }) {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [expanded])
+
+  // Clicking outside the active chat card resets it back to the landing state.
+  useEffect(() => {
+    if (!started) return
+    function handleClickOutside(e) {
+      if (activeCardRef.current && !activeCardRef.current.contains(e.target)) {
+        startOver({ focusInput: false })
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [started])
 
   function hasReviewable(extraction) {
     return extraction && (extraction.food_items?.length > 0 || extraction.body_entry || extraction.workout_entry)
@@ -231,11 +251,12 @@ export default function HekbotPanel({ onLogged, userName }) {
     setMessages(prev => prev.map(m => (m.id === messageId ? { ...m, extraction: null, preset: null, discarded: true } : m)))
   }
 
-  function startOver() {
+  function startOver({ focusInput = true } = {}) {
     setMessages([])
+    setInput('')
     setError(null)
     setExpanded(false)
-    setTimeout(() => inputRef.current?.focus(), 50)
+    if (focusInput) setTimeout(() => inputRef.current?.focus(), 50)
   }
 
   return (
@@ -328,7 +349,7 @@ export default function HekbotPanel({ onLogged, userName }) {
           </div>
         ) : (
           // ── Active thread state ───────────────────────────────────────────
-          <div className="max-w-2xl mx-auto dn-card flex flex-col h-[min(72vh,560px)] animate-fade-in-up">
+          <div ref={activeCardRef} className="max-w-2xl mx-auto dn-card flex flex-col h-[min(72vh,560px)] animate-fade-in-up">
             {/* Header */}
             <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-white/[0.08] flex-shrink-0">
               <div className="flex items-center gap-3">
@@ -340,12 +361,21 @@ export default function HekbotPanel({ onLogged, userName }) {
                   HekBot
                 </span>
               </div>
-              <button
-                onClick={startOver}
-                className="font-sans text-[13px] uppercase tracking-[0.1em] text-dn-gray-light hover:text-dn-white transition-colors"
-              >
-                New chat
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => startOver()}
+                  className="font-sans text-[13px] uppercase tracking-[0.1em] text-dn-gray-light hover:text-dn-white transition-colors"
+                >
+                  New chat
+                </button>
+                <button
+                  onClick={() => startOver({ focusInput: false })}
+                  aria-label="Close chat and reset"
+                  className="text-dn-gray-light hover:text-dn-white transition-colors"
+                >
+                  <Icon name="close" size={18} />
+                </button>
+              </div>
             </div>
 
             {/* Message thread */}

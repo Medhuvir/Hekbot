@@ -44,17 +44,17 @@ npm run dev
 ```
 
 Open [http://localhost:5173](http://localhost:5173) for the public dashboard.  
-Open [http://localhost:5173/admin](http://localhost:5173/admin) for the admin portal.
+Open [http://localhost:5173/app](http://localhost:5173/app) for the full signed-in experience.
 
 ---
 
-## Two Routes
+## Routes
 
 | Route | Access | Purpose |
 |---|---|---|
-| `/` | Public | Read-only dashboard — charts, logs, progress |
-| `/admin` | Supabase Auth required | Full edit access — log food, workouts, check-ins |
-| `/admin/login` | Public | Login page — redirects to `/admin` on success |
+| `/` | Public | Read-only, shareable dashboard — charts, logs, progress. No HekBot, no edit controls. |
+| `/app` | Supabase Auth required | Full experience — HekBot chat/logging + manual edit tools |
+| `/login` | Public | Login page — redirects to `/app` on success |
 
 ---
 
@@ -71,7 +71,7 @@ Open [http://localhost:5173/admin](http://localhost:5173/admin) for the admin po
    - `VITE_SUPABASE_ANON_KEY`
 6. Trigger a deploy
 
-The `netlify.toml` redirect rule ensures React Router works for all routes including `/admin`.
+The `netlify.toml` redirect rule ensures React Router works for all routes including `/app`.
 
 ---
 
@@ -94,19 +94,19 @@ src/
 │   ├── profile/           # ProfilePanel
 │   └── checkin/           # WeeklySummary (with CheckinForm for admin)
 ├── pages/
-│   ├── PublicDashboard.jsx  # / route — isAdmin=false throughout
-│   ├── AdminDashboard.jsx   # /admin route — isAdmin=true throughout
-│   └── AdminLogin.jsx       # /admin/login
+│   ├── Dashboard.jsx        # / and /app routes — mode="public" | "app"
+│   └── Login.jsx            # /login
 └── guards/
-    └── AuthGuard.jsx        # Redirects unauthenticated users to login
+    └── AuthGuard.jsx        # Redirects unauthenticated users to /login
 ```
 
 ### Security model
 
 - The Supabase `anon` key is in client code — **this is safe by design** when Row Level Security (RLS) is configured correctly.
-- RLS policies (set up in Section 9-D) ensure the anon key can only SELECT, never INSERT/UPDATE/DELETE.
-- After admin login, Supabase Auth returns a JWT. The Supabase JS client automatically attaches this token to API calls, switching the role from `anon` to `authenticated` — unlocking write policies.
-- The service_role key is never used in this app.
+- RLS policies (set up in Section 9-D) ensure the anon key can only SELECT, never INSERT/UPDATE/DELETE, on any table.
+- After login, Supabase Auth returns a JWT. The Supabase JS client automatically attaches this token to API calls, switching the role from `anon` to `authenticated` — unlocking write policies for direct table access.
+- The HekBot `chat` and `log-commit` Edge Functions do their own writes via the service_role key (bypassing RLS), so they additionally verify the caller's bearer token resolves to a real authenticated user (see `supabase/functions/_shared/requireAuth.ts`) — the anon key alone is rejected. The client always sends the signed-in user's session token, never the static anon key, when calling these.
+- The service_role key is never exposed to the client; it only exists as an Edge Function secret.
 
 ---
 

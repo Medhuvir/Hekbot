@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
+import { requireAuthenticatedUser } from '../_shared/requireAuth.ts'
 
 const ANTHROPIC_KEY = Deno.env.get('ANTHROPIC_API_KEY')!
 const SUPABASE_URL  = Deno.env.get('SUPABASE_URL')!
@@ -156,6 +157,9 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: CORS })
   }
+
+  const user = await requireAuthenticatedUser(req)
+  if (!user) return jsonError('Sign in required.', 401)
 
   try {
     const { message, image } = await req.json()

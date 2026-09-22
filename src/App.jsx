@@ -1,20 +1,19 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import PublicDashboard from './pages/PublicDashboard'
-import AdminDashboard from './pages/AdminDashboard'
-import AdminLogin from './pages/AdminLogin'
+import Dashboard from './pages/Dashboard'
+import Login from './pages/Login'
 import AuthGuard from './guards/AuthGuard'
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<PublicDashboard />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/" element={<Dashboard mode="public" />} />
+        <Route path="/login" element={<Login />} />
         <Route
-          path="/admin"
+          path="/app"
           element={
             <AuthGuard>
-              <AdminDashboard />
+              <Dashboard mode="app" />
             </AuthGuard>
           }
         />

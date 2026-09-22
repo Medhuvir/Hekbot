@@ -8,14 +8,14 @@ export default function AuthGuard({ children }) {
     return (
       <div className="min-h-screen bg-dn-black flex items-center justify-center">
         <div className="font-display text-[22px] tracking-[0.15em] text-dn-gray-light animate-pulse">
-          ASCENSION
+          HEKBOT
         </div>
       </div>
     )
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/admin/login" replace />
+    return <Navigate to="/login" replace />
   }
 
   return children

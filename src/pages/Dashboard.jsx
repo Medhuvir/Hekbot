@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/layout/Header'
+import HekbotPanel from '../components/hekbot/HekbotPanel'
 import HeroImageBackdrop from '../components/HeroImageBackdrop'
 import PageWrapper from '../components/layout/PageWrapper'
 import SectionLabel from '../components/layout/SectionLabel'
@@ -13,6 +14,7 @@ import WorkoutLogPanel from '../components/tracker/WorkoutLogPanel'
 import MacroTotalsBar from '../components/tracker/MacroTotalsBar'
 import ProfilePanel from '../components/profile/ProfilePanel'
 import WeeklySummary from '../components/checkin/WeeklySummary'
+import ImportModal from '../components/admin/ImportModal'
 
 import { useFoodLogs, useFoodLogsRange } from '../hooks/useFoodLogs'
 import { useWorkoutLogs, useWorkoutLogsRange } from '../hooks/useWorkoutLogs'
@@ -20,7 +22,6 @@ import { useCheckins, useLatestCheckin } from '../hooks/useCheckins'
 import { useTargets } from '../hooks/useTargets'
 import { useProfile } from '../hooks/useProfile'
 import { useAuth } from '../hooks/useAuth'
-import ImportModal from '../components/admin/ImportModal'
 
 import { today, nDaysAgo, formatDateLong, sumMacros, sumCaloriesBurned, buildDailyTotals, computeWeeklySummary } from '../lib/helpers'
 
@@ -38,18 +39,23 @@ function getDatesInRange(start, end) {
   return dates
 }
 
-export default function AdminDashboard() {
+// `mode="app"` is the full, signed-in experience (HekBot + edit tools) —
+// this is what AuthGuard protects at /app.
+// `mode="public"` is the read-only dashboard anyone can be sent a link to —
+// no HekBot, no edit affordances, lives at the unauthenticated root /.
+export default function Dashboard({ mode }) {
+  const isApp = mode === 'app'
   const { signOut } = useAuth()
-  const navigate    = useNavigate()
-  const [view, setView]           = useState(VIEW_DAILY)
+  const navigate = useNavigate()
+  const [view, setView] = useState(VIEW_DAILY)
   const [showImport, setShowImport] = useState(false)
   const todayStr = today()
 
-  const { logs: foodLogs, loading: foodLoading, refresh: refreshFood } = useFoodLogs(todayStr)
-  const { logs: workoutLogs, loading: workoutLoading, refresh: refreshWorkout } = useWorkoutLogs(todayStr)
+  const { logs: foodLogs,    loading: foodLoading,    refresh: refreshFoodLogs    } = useFoodLogs(todayStr)
+  const { logs: workoutLogs, loading: workoutLoading, refresh: refreshWorkoutLogs } = useWorkoutLogs(todayStr)
 
   const rangeStart = nDaysAgo(13)
-  const { logs: foodRange }    = useFoodLogsRange(rangeStart, todayStr)
+  const { logs: foodRange    } = useFoodLogsRange(rangeStart, todayStr)
   const { logs: workoutRange } = useWorkoutLogsRange(rangeStart, todayStr)
 
   const { checkins, refresh: refreshCheckins } = useCheckins()
@@ -68,47 +74,59 @@ export default function AdminDashboard() {
   const last7Food = foodRange.filter(f => f.log_date >= nDaysAgo(6))
   const summary   = computeWeeklySummary(last7Food, checkins.slice(-2), targets)
 
-  async function handleSignOut() {
-    await signOut()
-    navigate('/admin/login', { replace: true })
+  const currentDate = formatDateLong(todayStr)
+
+  function handleLogged() {
+    refreshFoodLogs()
+    refreshWorkoutLogs()
+    refreshCheckins()
   }
 
-  const currentDate = formatDateLong(todayStr)
+  async function handleSignOut() {
+    await signOut()
+    navigate('/login', { replace: true })
+  }
 
   return (
     <div className="relative isolate min-h-screen bg-dn-black">
       <HeroImageBackdrop />
-      <Header isAdmin currentDate={currentDate} onSignOut={handleSignOut} />
+      <Header isAdmin={isApp} currentDate={currentDate} onSignOut={handleSignOut} />
+
+      {isApp && <HekbotPanel onLogged={handleLogged} userName={profile?.name} />}
 
       <PageWrapper>
-        {/* Admin banner */}
-        <div className="mb-6 flex items-center justify-between flex-wrap gap-3 px-4 py-2.5 bg-dn-orange/[0.08] border border-dn-orange/20 rounded-sm">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-1.5 h-1.5 rounded-full bg-dn-orange shrink-0" />
-            <span className="font-sans text-[14px] text-dn-orange">
-              <span className="sm:hidden">Admin mode</span>
-              <span className="hidden sm:inline">Admin mode — all edit controls are active</span>
-            </span>
+        {isApp && (
+          <div className="mb-6 flex items-center justify-between flex-wrap gap-3 px-4 py-2.5 bg-dn-orange/[0.08] border border-dn-orange/20 rounded-sm">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-1.5 h-1.5 rounded-full bg-dn-orange shrink-0" />
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-sans text-[14px] text-dn-orange hover:underline underline-offset-2"
+              >
+                View public dashboard ↗
+              </a>
+            </div>
+            <button
+              onClick={() => setShowImport(true)}
+              className="flex items-center gap-2 px-3 py-1 border border-dn-orange/30 rounded-sm hover:bg-dn-orange/10 transition-colors shrink-0"
+            >
+              <span className="font-sans text-[13px] text-dn-orange">↑</span>
+              <span className="font-sans text-[14px] text-dn-orange tracking-wide">Import MFP</span>
+            </button>
           </div>
-          <button
-            onClick={() => setShowImport(true)}
-            className="flex items-center gap-2 px-3 py-1 border border-dn-orange/30 rounded-sm hover:bg-dn-orange/10 transition-colors shrink-0"
-          >
-            <span className="font-sans text-[13px] text-dn-orange">↑</span>
-            <span className="font-sans text-[14px] text-dn-orange tracking-wide">Import MFP</span>
-          </button>
-        </div>
+        )}
 
-        {/* Import modal */}
-        {showImport && (
+        {isApp && showImport && (
           <ImportModal
             onClose={() => setShowImport(false)}
-            onImported={() => { refreshFood(); refreshCheckins() }}
+            onImported={() => { refreshFoodLogs(); refreshCheckins() }}
           />
         )}
 
         {/* Nutrition summary + weight progress — always visible, side by side */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5 sm:mb-7">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5 sm:mb-7 animate-fade-in-up">
           <MacroTotalsBar totals={dailyMacros} targets={targets} netCalories={netCalories} />
           <JourneyProgress currentWeight={latestCheckin?.weight_lbs} checkins={checkins} />
         </div>
@@ -137,25 +155,25 @@ export default function AdminDashboard() {
               <div className="space-y-4">
                 <DailyIntakePanel
                   foodLogs={foodLogs}
-                  isAdmin={true}
+                  isAdmin={isApp}
                   date={todayStr}
-                  onRefresh={refreshFood}
+                  onRefresh={refreshFoodLogs}
                   loading={foodLoading}
                   targets={targets}
                 />
                 <WorkoutLogPanel
                   workoutLogs={workoutLogs}
-                  isAdmin={true}
+                  isAdmin={isApp}
                   date={todayStr}
-                  onRefresh={refreshWorkout}
+                  onRefresh={refreshWorkoutLogs}
                   loading={workoutLoading}
                 />
               </div>
             </section>
 
             <section>
-              <SectionLabel number="02">Weekly Check-in</SectionLabel>
-              <WeeklySummary summary={summary} isAdmin={true} onRefresh={refreshCheckins} />
+              <SectionLabel number="02">Weekly Summary</SectionLabel>
+              <WeeklySummary summary={summary} isAdmin={isApp} onRefresh={refreshCheckins} />
             </section>
 
             <section>
@@ -183,17 +201,18 @@ export default function AdminDashboard() {
             </section>
 
             <section>
-              <SectionLabel number="04">Weekly Check-in History</SectionLabel>
-              <WeeklySummary summary={summary} isAdmin={true} onRefresh={refreshCheckins} />
+              <SectionLabel number="04">Weekly Summary</SectionLabel>
+              <WeeklySummary summary={summary} isAdmin={isApp} onRefresh={refreshCheckins} />
             </section>
           </div>
         )}
       </PageWrapper>
 
+      {/* Footer */}
       <footer className="border-t border-white/[0.06] mt-10 sm:mt-16 py-5 sm:py-6 px-4 sm:px-6">
         <div className="max-w-screen-xl mx-auto flex items-center justify-between flex-wrap gap-2">
           <div className="font-sans text-[12px] text-dn-gray-light tracking-[0.1em]">
-            Ascension · Admin Portal
+            {isApp ? 'Ascension' : 'Ascension · Personal · Read-only view'}
           </div>
           <div className="font-sans text-[12px] text-dn-gray-light/40">DN Creative LLC</div>
         </div>

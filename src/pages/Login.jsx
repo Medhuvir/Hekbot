@@ -5,7 +5,7 @@ import DNMark from '../components/DNMark'
 import Icon from '../components/Icon'
 import TopoBackground from '../components/TopoBackground'
 
-export default function AdminLogin() {
+export default function Login() {
   const { signIn, isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
@@ -14,7 +14,7 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false)
 
   if (isAuthenticated) {
-    navigate('/admin', { replace: true })
+    navigate('/app', { replace: true })
     return null
   }
 
@@ -24,7 +24,7 @@ export default function AdminLogin() {
     setError(null)
     try {
       await signIn(email, password)
-      navigate('/admin', { replace: true })
+      navigate('/app', { replace: true })
     } catch (e) {
       setError('Incorrect email or password.')
     } finally {
@@ -41,10 +41,10 @@ export default function AdminLogin() {
         <div className="flex flex-col items-center mb-10">
           <DNMark size={40} variant="white" />
           <div className="font-display text-[32px] tracking-[0.08em] text-dn-white mt-4 leading-none">
-            Ascension
+            HekBot
           </div>
           <div className="font-sans text-[13px] tracking-[0.2em] uppercase text-dn-gray-light mt-1">
-            Admin Portal
+            Sign in
           </div>
         </div>
 

@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 import { insertFoodItem, upsertBodyEntry, insertWorkoutEntry } from '../_shared/logInserts.ts'
+import { requireAuthenticatedUser, unauthorizedResponse } from '../_shared/requireAuth.ts'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SVC = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -15,6 +16,9 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: CORS })
   }
+
+  const user = await requireAuthenticatedUser(req)
+  if (!user) return unauthorizedResponse(CORS)
 
   try {
     const body = await req.json()

@@ -13,7 +13,7 @@ export default function Header({ isAdmin = false, onSignOut, currentDate }) {
       <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 py-2.5 sm:py-5 flex items-center justify-between">
 
         {/* DN mark | HEKBOT */}
-        <Link to="/" className="flex items-center gap-2 sm:gap-3 group min-w-0">
+        <Link to={isAdmin ? '/app' : '/'} className="flex items-center gap-2 sm:gap-3 group min-w-0">
           <DNMark size={20} variant="white" className="sm:hidden shrink-0" />
           <DNMark size={28} variant="white" className="hidden sm:block shrink-0" />
           <div className="w-px h-5 sm:h-7 bg-white/20 shrink-0" />
@@ -34,23 +34,18 @@ export default function Header({ isAdmin = false, onSignOut, currentDate }) {
         {/* Right side actions */}
         <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
           {isAdmin ? (
-            <>
-              <span className="hidden sm:block font-sans text-[13px] tracking-[0.15em] uppercase text-dn-orange">
-                Admin
-              </span>
-              <button
-                onClick={onSignOut}
-                className="font-sans text-[13px] sm:text-[14px] text-dn-gray-light hover:text-dn-white transition-colors duration-200 whitespace-nowrap"
-              >
-                Sign out
-              </button>
-            </>
-          ) : (
-            <Link
-              to="/admin/login"
+            <button
+              onClick={onSignOut}
               className="font-sans text-[13px] sm:text-[14px] text-dn-gray-light hover:text-dn-white transition-colors duration-200 whitespace-nowrap"
             >
-              Admin <Icon name="arrow_forward" size={11} className="align-[-1px]" />
+              Sign out
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="font-sans text-[13px] sm:text-[14px] text-dn-gray-light hover:text-dn-white transition-colors duration-200 whitespace-nowrap"
+            >
+              Sign in <Icon name="arrow_forward" size={11} className="align-[-1px]" />
             </Link>
           )}
         </div>
