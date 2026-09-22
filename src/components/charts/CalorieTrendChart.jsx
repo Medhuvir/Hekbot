@@ -13,22 +13,22 @@ function CustomTooltip({ active, payload, label }) {
   const net    = payload.find(p => p.dataKey === 'net')
   return (
     <div className="bg-dn-surface border border-white/[0.15] rounded-sm px-3 py-2 shadow-xl min-w-[120px]">
-      <div className="font-sans text-[10px] text-dn-graphite mb-2">{label}</div>
+      <div className="font-sans text-[13px] text-dn-gray-light mb-2">{label}</div>
       {intake && (
-        <div className="font-sans text-[11px] flex justify-between gap-4">
-          <span className="text-dn-graphite">Intake</span>
+        <div className="font-sans text-[14px] flex justify-between gap-4">
+          <span className="text-dn-gray-light">Intake</span>
           <span className="font-display text-[14px] tabular text-dn-orange">{intake.value} kcal</span>
         </div>
       )}
       {burned && burned.value > 0 && (
-        <div className="font-sans text-[11px] flex justify-between gap-4">
-          <span className="text-dn-graphite">Burned</span>
+        <div className="font-sans text-[14px] flex justify-between gap-4">
+          <span className="text-dn-gray-light">Burned</span>
           <span className="font-display text-[14px] tabular text-green-400">{burned.value} kcal</span>
         </div>
       )}
       {net && (
-        <div className="font-sans text-[11px] flex justify-between gap-4 border-t border-white/[0.08] mt-1 pt-1">
-          <span className="text-dn-graphite">Net</span>
+        <div className="font-sans text-[14px] flex justify-between gap-4 border-t border-white/[0.08] mt-1 pt-1">
+          <span className="text-dn-gray-light">Net</span>
           <span className="font-display text-[14px] tabular text-dn-white">{net.value} kcal</span>
         </div>
       )}
@@ -40,7 +40,7 @@ export default function CalorieTrendChart({ dailyTotals, targets }) {
   if (!dailyTotals?.length) {
     return (
       <div className="dn-card p-6 flex items-center justify-center h-52">
-        <div className="font-display text-[18px] tracking-[0.1em] text-dn-graphite">No data yet</div>
+        <div className="font-display text-[18px] tracking-[0.1em] text-dn-gray-light">No data yet</div>
       </div>
     )
   }
@@ -51,21 +51,21 @@ export default function CalorieTrendChart({ dailyTotals, targets }) {
   return (
     <div className="dn-card p-4 sm:p-6">
       <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
-        <div className="font-sans text-[10px] tracking-[0.2em] uppercase text-dn-graphite">
+        <div className="font-sans text-[13px] tracking-[0.2em] uppercase text-dn-gray-light">
           Calorie Trend
         </div>
         <div className="flex items-center gap-3 sm:gap-4">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-0.5 bg-dn-orange inline-block" />
-            <span className="font-sans text-[9px] text-dn-graphite">Intake</span>
+            <span className="font-sans text-[12px] text-dn-gray-light">Intake</span>
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-0.5 bg-green-400 inline-block" />
-            <span className="font-sans text-[9px] text-dn-graphite">Burned</span>
+            <span className="font-sans text-[12px] text-dn-gray-light">Burned</span>
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-0.5 bg-white/40 inline-block" />
-            <span className="font-sans text-[9px] text-dn-graphite">Net</span>
+            <span className="font-sans text-[12px] text-dn-gray-light">Net</span>
           </span>
         </div>
       </div>

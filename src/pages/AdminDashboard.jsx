@@ -76,7 +76,7 @@ export default function AdminDashboard() {
   const currentDate = formatDateLong(todayStr)
 
   return (
-    <div className="relative min-h-screen bg-dn-black">
+    <div className="relative isolate min-h-screen bg-dn-black">
       <HeroImageBackdrop />
       <Header isAdmin currentDate={currentDate} onSignOut={handleSignOut} />
 
@@ -85,7 +85,7 @@ export default function AdminDashboard() {
         <div className="mb-6 flex items-center justify-between flex-wrap gap-3 px-4 py-2.5 bg-dn-orange/[0.08] border border-dn-orange/20 rounded-sm">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-1.5 h-1.5 rounded-full bg-dn-orange shrink-0" />
-            <span className="font-sans text-[11px] text-dn-orange">
+            <span className="font-sans text-[14px] text-dn-orange">
               <span className="sm:hidden">Admin mode</span>
               <span className="hidden sm:inline">Admin mode — all edit controls are active</span>
             </span>
@@ -94,8 +94,8 @@ export default function AdminDashboard() {
             onClick={() => setShowImport(true)}
             className="flex items-center gap-2 px-3 py-1 border border-dn-orange/30 rounded-sm hover:bg-dn-orange/10 transition-colors shrink-0"
           >
-            <span className="font-sans text-[10px] text-dn-orange">↑</span>
-            <span className="font-sans text-[11px] text-dn-orange tracking-wide">Import MFP</span>
+            <span className="font-sans text-[13px] text-dn-orange">↑</span>
+            <span className="font-sans text-[14px] text-dn-orange tracking-wide">Import MFP</span>
           </button>
         </div>
 
@@ -119,10 +119,10 @@ export default function AdminDashboard() {
             <button
               key={v}
               onClick={() => setView(v)}
-              className={`px-4 py-1.5 rounded-sm font-sans text-[11px] uppercase tracking-[0.1em] transition-all duration-200 ${
+              className={`px-4 py-1.5 rounded-sm font-sans text-[14px] uppercase tracking-[0.1em] transition-all duration-200 ${
                 view === v
                   ? 'bg-dn-orange text-black font-semibold'
-                  : 'text-dn-graphite hover:text-dn-white'
+                  : 'text-dn-gray-light hover:text-dn-white'
               }`}
             >
               {v}
@@ -160,7 +160,7 @@ export default function AdminDashboard() {
 
             <section>
               <SectionLabel number="03">Profile</SectionLabel>
-              <ProfilePanel profile={profile} latestCheckin={latestCheckin} />
+              <ProfilePanel profile={profile} latestCheckin={latestCheckin} workoutLogs={workoutRange} />
             </section>
           </div>
         )}
@@ -192,10 +192,10 @@ export default function AdminDashboard() {
 
       <footer className="border-t border-white/[0.06] mt-10 sm:mt-16 py-5 sm:py-6 px-4 sm:px-6">
         <div className="max-w-screen-xl mx-auto flex items-center justify-between flex-wrap gap-2">
-          <div className="font-sans text-[9px] text-dn-graphite tracking-[0.1em]">
+          <div className="font-sans text-[12px] text-dn-gray-light tracking-[0.1em]">
             Ascension · Admin Portal
           </div>
-          <div className="font-sans text-[9px] text-dn-graphite/40">DN Creative LLC</div>
+          <div className="font-sans text-[12px] text-dn-gray-light/40">DN Creative LLC</div>
         </div>
       </footer>
     </div>

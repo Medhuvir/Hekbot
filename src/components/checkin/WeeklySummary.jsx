@@ -10,7 +10,7 @@ function TrendBadge({ trend }) {
     'Needs Adjustment': 'bg-red-400/10 text-red-400 border-red-400/20',
   }
   return (
-    <span className={`font-sans text-[10px] px-2.5 py-1 rounded-sm border ${styles[trend] ?? styles['On Track']}`}>
+    <span className={`font-sans text-[13px] px-2.5 py-1 rounded-sm border ${styles[trend] ?? styles['On Track']}`}>
       {trend}
     </span>
   )
@@ -46,7 +46,7 @@ function CheckinForm({ onAdded }) {
 
   return (
     <form onSubmit={handleSubmit} className="mt-4 pt-4 border-t border-white/[0.06] space-y-2">
-      <div className="font-sans text-[10px] uppercase tracking-[0.15em] text-dn-graphite mb-2">
+      <div className="font-sans text-[13px] uppercase tracking-[0.15em] text-dn-gray-light mb-2">
         New Check-in (fasted, morning)
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -92,7 +92,7 @@ function CheckinForm({ onAdded }) {
         value={form.notes}
         onChange={e => set('notes', e.target.value)}
       />
-      {error && <p className="font-sans text-[11px] text-red-400">{error}</p>}
+      {error && <p className="font-sans text-[14px] text-red-400">{error}</p>}
     </form>
   )
 }
@@ -101,10 +101,10 @@ export default function WeeklySummary({ summary, isAdmin, onRefresh }) {
   if (!summary) {
     return (
       <div className="dn-card p-4 sm:p-5">
-        <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-dn-graphite mb-3">
+        <div className="font-sans text-[13px] uppercase tracking-[0.2em] text-dn-gray-light mb-3">
           Weekly Check-in
         </div>
-        <div className="py-4 text-center font-sans text-[12px] text-dn-graphite">
+        <div className="py-4 text-center font-sans text-[12px] text-dn-gray-light">
           No check-ins logged yet.
         </div>
         {isAdmin && <CheckinForm onAdded={onRefresh} />}
@@ -119,7 +119,7 @@ export default function WeeklySummary({ summary, isAdmin, onRefresh }) {
       <CardTexture />
       <div className="relative">
       <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
-        <div className="font-sans text-[10px] uppercase tracking-[0.2em] text-dn-graphite">
+        <div className="font-sans text-[13px] uppercase tracking-[0.2em] text-dn-gray-light">
           Weekly Summary
         </div>
         <TrendBadge trend={trend} />
@@ -127,17 +127,17 @@ export default function WeeklySummary({ summary, isAdmin, onRefresh }) {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div>
-          <div className="font-sans text-[9px] uppercase tracking-[0.12em] text-dn-graphite mb-0.5">
+          <div className="font-sans text-[12px] uppercase tracking-[0.12em] text-dn-gray-light mb-0.5">
             Avg Calories
           </div>
           <div className="font-display text-[24px] text-dn-white tabular leading-none">
             {avgCalories.toLocaleString()}
           </div>
-          <div className="font-sans text-[9px] text-dn-graphite">kcal/day</div>
+          <div className="font-sans text-[12px] text-dn-gray-light">kcal/day</div>
         </div>
 
         <div>
-          <div className="font-sans text-[9px] uppercase tracking-[0.12em] text-dn-graphite mb-0.5">
+          <div className="font-sans text-[12px] uppercase tracking-[0.12em] text-dn-gray-light mb-0.5">
             Protein Days
           </div>
           <div className="font-display text-[24px] tabular leading-none" style={{
@@ -145,11 +145,11 @@ export default function WeeklySummary({ summary, isAdmin, onRefresh }) {
           }}>
             {proteinAdherence}%
           </div>
-          <div className="font-sans text-[9px] text-dn-graphite">≥ 180g protein</div>
+          <div className="font-sans text-[12px] text-dn-gray-light">≥ 180g protein</div>
         </div>
 
         <div>
-          <div className="font-sans text-[9px] uppercase tracking-[0.12em] text-dn-graphite mb-0.5">
+          <div className="font-sans text-[12px] uppercase tracking-[0.12em] text-dn-gray-light mb-0.5">
             Weight Δ
           </div>
           <div className="font-display text-[24px] tabular leading-none" style={{
@@ -157,17 +157,17 @@ export default function WeeklySummary({ summary, isAdmin, onRefresh }) {
           }}>
             {weightDelta === null ? '—' : `${weightDelta > 0 ? '+' : ''}${weightDelta}`}
           </div>
-          <div className="font-sans text-[9px] text-dn-graphite">lbs vs prior week</div>
+          <div className="font-sans text-[12px] text-dn-gray-light">lbs vs prior week</div>
         </div>
 
         <div>
-          <div className="font-sans text-[9px] uppercase tracking-[0.12em] text-dn-graphite mb-0.5">
+          <div className="font-sans text-[12px] uppercase tracking-[0.12em] text-dn-gray-light mb-0.5">
             Current Weight
           </div>
           <div className="font-display text-[24px] text-dn-white tabular leading-none">
             {latest?.weight_lbs ?? '—'}
           </div>
-          <div className="font-sans text-[9px] text-dn-graphite">lbs (last check-in)</div>
+          <div className="font-sans text-[12px] text-dn-gray-light">lbs (last check-in)</div>
         </div>
       </div>
 

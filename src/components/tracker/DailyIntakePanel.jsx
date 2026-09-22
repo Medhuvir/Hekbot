@@ -9,7 +9,7 @@ const MEAL_LABELS = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', 
 function MacroChip({ value, unit, color, bg }) {
   return (
     <span
-      className="inline-flex items-center rounded-sm px-1.5 py-0.5 font-sans text-[10px] font-semibold tabular"
+      className="inline-flex items-center rounded-sm px-1.5 py-0.5 font-sans text-[13px] font-semibold tabular"
       style={{ color, backgroundColor: bg }}
     >
       {value}{unit}
@@ -25,7 +25,7 @@ function FoodRow({ item, isAdmin, onDelete }) {
       <div className="flex-1 min-w-0">
         <span className="font-sans text-[13px] text-dn-white truncate block">{item.food_name}</span>
         {item.notes && (
-          <span className="font-sans text-[10px] text-dn-graphite truncate block">{item.notes}</span>
+          <span className="font-sans text-[13px] text-dn-gray-light truncate block">{item.notes}</span>
         )}
       </div>
       <div className="flex items-center gap-1 shrink-0">
@@ -39,13 +39,13 @@ function FoodRow({ item, isAdmin, onDelete }) {
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={() => { onDelete(item.id); setConfirming(false) }}
-              className="font-sans text-[10px] text-red-400 hover:text-red-300 transition-colors"
+              className="font-sans text-[13px] text-red-400 hover:text-red-300 transition-colors"
             >
               Delete
             </button>
             <button
               onClick={() => setConfirming(false)}
-              className="font-sans text-[10px] text-dn-graphite hover:text-dn-white transition-colors"
+              className="font-sans text-[13px] text-dn-gray-light hover:text-dn-white transition-colors"
             >
               Cancel
             </button>
@@ -54,7 +54,7 @@ function FoodRow({ item, isAdmin, onDelete }) {
           <button
             onClick={() => setConfirming(true)}
             aria-label="Delete food entry"
-            className="opacity-0 group-hover:opacity-100 text-dn-graphite hover:text-red-400 transition-all duration-200 shrink-0"
+            className="opacity-0 group-hover:opacity-100 text-dn-gray-light hover:text-red-400 transition-all duration-200 shrink-0"
           >
             <Icon name="close" size={12} />
           </button>
@@ -101,10 +101,10 @@ function AddFoodForm({ date, mealType, onAdded, onCancel }) {
   return (
     <form onSubmit={handleSubmit} className="mt-3 pt-3 border-t border-white/[0.06]">
       <div className="flex items-center justify-between mb-2">
-        <span className="font-sans text-[10px] uppercase tracking-[0.15em] text-dn-graphite">
+        <span className="font-sans text-[13px] uppercase tracking-[0.15em] text-dn-gray-light">
           Adding to {MEAL_LABELS[mealType]}
         </span>
-        <button type="button" onClick={onCancel} className="font-sans text-[10px] text-dn-graphite hover:text-dn-white transition-colors">
+        <button type="button" onClick={onCancel} className="font-sans text-[13px] text-dn-gray-light hover:text-dn-white transition-colors">
           Cancel
         </button>
       </div>
@@ -169,7 +169,7 @@ function AddFoodForm({ date, mealType, onAdded, onCancel }) {
           {saving ? '…' : 'Add'}
         </button>
       </div>
-      {error && <p className="font-sans text-[11px] text-red-400 mt-1">{error}</p>}
+      {error && <p className="font-sans text-[14px] text-red-400 mt-1">{error}</p>}
     </form>
   )
 }
@@ -192,7 +192,7 @@ export default function DailyIntakePanel({ foodLogs, isAdmin, date, onRefresh, l
 
   if (loading) {
     return (
-      <div className="dn-card p-4 sm:p-5 py-8 text-center font-sans text-[11px] text-dn-graphite">
+      <div className="dn-card p-4 sm:p-5 py-8 text-center font-sans text-[14px] text-dn-gray-light">
         Loading…
       </div>
     )
@@ -235,7 +235,7 @@ export default function DailyIntakePanel({ foodLogs, isAdmin, date, onRefresh, l
                 {MEAL_LABELS[type]}
               </h3>
               {mealTargetCal && (
-                <span className="font-sans text-[10px] text-dn-graphite tabular">
+                <span className="font-sans text-[13px] text-dn-gray-light tabular">
                   {Math.round(subtotal.cal)} / {mealTargetCal} kcal
                 </span>
               )}
@@ -250,7 +250,7 @@ export default function DailyIntakePanel({ foodLogs, isAdmin, date, onRefresh, l
             )}
 
             {items.length === 0 ? (
-              <p className="font-sans text-[12px] text-dn-graphite py-1">No items logged</p>
+              <p className="font-sans text-[12px] text-dn-gray-light py-1">No items logged</p>
             ) : (
               <div>
                 {items.map(item => (
@@ -270,7 +270,7 @@ export default function DailyIntakePanel({ foodLogs, isAdmin, date, onRefresh, l
               ) : (
                 <button
                   onClick={() => setOpenAddFor(type)}
-                  className="w-full mt-3 py-2 border border-dashed border-white/[0.15] rounded-sm font-sans text-[11px] font-semibold text-dn-orange hover:border-dn-orange/40 hover:bg-dn-orange/[0.04] transition-colors"
+                  className="w-full mt-3 py-2 border border-dashed border-white/[0.15] rounded-sm font-sans text-[14px] font-semibold text-dn-orange hover:border-dn-orange/40 hover:bg-dn-orange/[0.04] transition-colors"
                 >
                   + Add Food
                 </button>
@@ -280,7 +280,7 @@ export default function DailyIntakePanel({ foodLogs, isAdmin, date, onRefresh, l
         )
       })}
 
-      <div className="flex items-center gap-4 flex-wrap px-1 pt-1 font-sans text-[9px] text-dn-graphite tracking-[0.04em]">
+      <div className="flex items-center gap-4 flex-wrap px-1 pt-1 font-sans text-[12px] text-dn-gray-light tracking-[0.04em]">
         <span className="flex items-center gap-1.5">
           <span className="w-1.5 h-3 rounded-sm" style={{ backgroundColor: STATUS_COLORS.onTrack }} />
           On track

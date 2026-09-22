@@ -43,14 +43,14 @@ export default function AdminLogin() {
           <div className="font-display text-[32px] tracking-[0.08em] text-dn-white mt-4 leading-none">
             Ascension
           </div>
-          <div className="font-sans text-[10px] tracking-[0.2em] uppercase text-dn-graphite mt-1">
+          <div className="font-sans text-[13px] tracking-[0.2em] uppercase text-dn-gray-light mt-1">
             Admin Portal
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <label className="font-sans text-[10px] uppercase tracking-[0.15em] text-dn-graphite block mb-1.5">
+            <label className="font-sans text-[13px] uppercase tracking-[0.15em] text-dn-gray-light block mb-1.5">
               Email
             </label>
             <input
@@ -64,7 +64,7 @@ export default function AdminLogin() {
             />
           </div>
           <div>
-            <label className="font-sans text-[10px] uppercase tracking-[0.15em] text-dn-graphite block mb-1.5">
+            <label className="font-sans text-[13px] uppercase tracking-[0.15em] text-dn-gray-light block mb-1.5">
               Password
             </label>
             <input
@@ -92,7 +92,7 @@ export default function AdminLogin() {
         </form>
 
         <div className="mt-8 text-center">
-          <a href="/" className="font-sans text-[11px] text-dn-graphite hover:text-dn-white transition-colors">
+          <a href="/" className="font-sans text-[14px] text-dn-gray-light hover:text-dn-white transition-colors">
             <Icon name="arrow_back" size={11} className="align-[-1px]" /> Public dashboard
           </a>
         </div>

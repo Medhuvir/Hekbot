@@ -75,10 +75,10 @@ export default function PublicDashboard() {
   }
 
   return (
-    <div className="relative min-h-screen bg-dn-black">
+    <div className="relative isolate min-h-screen bg-dn-black">
       <HeroImageBackdrop />
       <Header currentDate={currentDate} />
-      <HekbotPanel onLogged={handleLogged} />
+      <HekbotPanel onLogged={handleLogged} userName={profile?.name} />
 
       <PageWrapper>
         {/* Nutrition summary + weight progress — always visible, side by side */}
@@ -93,10 +93,10 @@ export default function PublicDashboard() {
             <button
               key={v}
               onClick={() => setView(v)}
-              className={`px-4 py-1.5 rounded-sm font-sans text-[11px] uppercase tracking-[0.1em] transition-all duration-200 ${
+              className={`px-4 py-1.5 rounded-sm font-sans text-[14px] uppercase tracking-[0.1em] transition-all duration-200 ${
                 view === v
                   ? 'bg-dn-orange text-black font-semibold'
-                  : 'text-dn-graphite hover:text-dn-white'
+                  : 'text-dn-gray-light hover:text-dn-white'
               }`}
             >
               {v}
@@ -134,7 +134,7 @@ export default function PublicDashboard() {
 
             <section>
               <SectionLabel number="03">Profile</SectionLabel>
-              <ProfilePanel profile={profile} latestCheckin={latestCheckin} />
+              <ProfilePanel profile={profile} latestCheckin={latestCheckin} workoutLogs={workoutRange} />
             </section>
           </div>
         )}
@@ -167,10 +167,10 @@ export default function PublicDashboard() {
       {/* Footer */}
       <footer className="border-t border-white/[0.06] mt-10 sm:mt-16 py-5 sm:py-6 px-4 sm:px-6">
         <div className="max-w-screen-xl mx-auto flex items-center justify-between flex-wrap gap-2">
-          <div className="font-sans text-[9px] text-dn-graphite tracking-[0.1em]">
+          <div className="font-sans text-[12px] text-dn-gray-light tracking-[0.1em]">
             Ascension · Personal · Read-only view
           </div>
-          <div className="font-sans text-[9px] text-dn-graphite/40">DN Creative LLC</div>
+          <div className="font-sans text-[12px] text-dn-gray-light/40">DN Creative LLC</div>
         </div>
       </footer>
     </div>

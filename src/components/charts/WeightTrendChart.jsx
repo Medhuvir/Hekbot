@@ -16,12 +16,12 @@ function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
   return (
     <div className="bg-dn-surface border border-dn-orange/30 rounded-sm px-3 py-2 shadow-xl">
-      <div className="font-sans text-[10px] text-dn-graphite mb-1">{label}</div>
+      <div className="font-sans text-[13px] text-dn-gray-light mb-1">{label}</div>
       {payload.map(p => (
         <div key={p.name} className="font-sans text-[12px]" style={{ color: p.color }}>
           {p.name === 'projected' ? '(proj) ' : ''}
           <span className="font-display text-[16px] tabular">{p.value}</span>
-          <span className="text-[10px] ml-1">lbs</span>
+          <span className="text-[13px] ml-1">lbs</span>
         </div>
       ))}
     </div>
@@ -33,8 +33,8 @@ export default function WeightTrendChart({ checkins }) {
     return (
       <div className="dn-card p-6 flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="font-display text-[22px] tracking-[0.1em] text-dn-graphite">No Check-ins Yet</div>
-          <div className="font-sans text-[12px] text-dn-graphite/60 mt-1">Log your first weigh-in to see the trend</div>
+          <div className="font-display text-[22px] tracking-[0.1em] text-dn-gray-light">No Check-ins Yet</div>
+          <div className="font-sans text-[12px] text-dn-gray-light/60 mt-1">Log your first weigh-in to see the trend</div>
         </div>
       </div>
     )
@@ -62,7 +62,7 @@ export default function WeightTrendChart({ checkins }) {
 
   return (
     <div className="dn-card p-4 sm:p-6">
-      <div className="font-sans text-[10px] tracking-[0.2em] uppercase text-dn-graphite mb-4">
+      <div className="font-sans text-[13px] tracking-[0.2em] uppercase text-dn-gray-light mb-4">
         Weight Trend
       </div>
       <ResponsiveContainer width="100%" height={240}>
