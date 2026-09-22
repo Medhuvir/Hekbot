@@ -136,7 +136,7 @@ export default function Dashboard({ mode }) {
 
       {isApp
         ? <HekbotPanel onLogged={handleLogged} userName={profile?.name} timezone={timezone} />
-        : <PublicProfileHero profile={profile} currentWeight={latestCheckin?.weight_lbs} />
+        : <PublicProfileHero profile={profile} />
       }
 
       <PageWrapper>
