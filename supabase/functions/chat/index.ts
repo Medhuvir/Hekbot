@@ -204,7 +204,15 @@ food_items — array of food/drink items (empty array if none):
 {"food_item":"string","meal_type":"breakfast|lunch|dinner|snack|drink","kcal":0,"protein_g":0,"carbs_g":0,"fat_g":0,"confidence":"high|medium|low"}
 - One object per distinct food/drink item
 - Include caloric beverages (shakes, juice, milk, alcohol); skip plain water and black coffee
-- confidence: "high" for specific items with quantities, "low" for vague descriptions
+
+PORTION SIZING — this is critical, get it right:
+- Always parse the exact quantity/portion stated and compute macros for THAT amount — never default to a "typical" full serving when a different amount is given.
+- Recognize fractions ("half a bagel", "1/2 cup", "a quarter of the pizza", "two-thirds"), weights ("4oz chicken breast", "150g rice", "1lb"), volumes ("1 cup", "2 tbsp", "8oz glass"), counts ("2 eggs", "3 slices", "a dozen"), and vague-but-real sizes ("a small apple", "a large fries", "a couple tablespoons" ≈ 2 tbsp, "a handful" ≈ 1oz/28g).
+- To compute: start from a standard reference weight/size for one whole unit of that food (e.g. one bagel ≈ 95g, one large egg ≈ 50g, one slice of bread ≈ 28g, one medium banana ≈ 118g, one chicken breast ≈ 6oz/170g raw or ~4-5oz cooked), then scale ALL macros (kcal, protein_g, carbs_g, fat_g) linearly by the stated fraction/weight/count. "Half a bagel" = exactly half the macros of one whole bagel, not a full bagel's worth.
+- Weight/volume units given explicitly (oz, g, lb, cup, tbsp) are ground truth — use them directly instead of guessing a reference size, and convert to grams as needed (1oz = 28.35g).
+- Put the parsed portion in food_item itself so it's visible for review, e.g. "Bagel (1/2)", "Grilled chicken breast (4oz)", "Rice (150g)" — don't silently absorb the portion into just the numbers.
+- If NO quantity is stated at all (just "a bagel" or "chicken breast" with no size/weight), assume exactly ONE standard unit/serving and say so plainly in food_item (e.g. "Bagel") — don't invent a quantity that wasn't said.
+- confidence: "high" for items with an explicit quantity (fraction, weight, volume, or count); "medium" for a bare singular item with no stated quantity (assumed 1 unit); "low" for vague descriptions with no clear food or amount
 
 body_entry — if user mentions body weight or waist, otherwise null:
 {"weight_lbs": number|null, "waist_cm": number|null}
