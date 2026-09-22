@@ -4,7 +4,7 @@
 // public dashboard, or the first admin cards) — Header/HekbotPanel render
 // their own content on top of this with transparent backgrounds so it shows
 // through underneath their existing dot-grid overlay.
-export default function HeroImageBackdrop({ imageOpacity = 0.05 }) {
+export default function HeroImageBackdrop({ imageOpacity = 0.15 }) {
   return (
     <div className="absolute inset-x-0 top-0 h-screen pointer-events-none -z-10" aria-hidden="true">
       <div
