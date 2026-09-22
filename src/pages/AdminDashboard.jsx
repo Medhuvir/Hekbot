@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/layout/Header'
+import HeroImageBackdrop from '../components/HeroImageBackdrop'
 import PageWrapper from '../components/layout/PageWrapper'
 import SectionLabel from '../components/layout/SectionLabel'
 import JourneyProgress from '../components/charts/JourneyProgress'
@@ -75,7 +76,8 @@ export default function AdminDashboard() {
   const currentDate = formatDateLong(todayStr)
 
   return (
-    <div className="min-h-screen bg-dn-black">
+    <div className="relative min-h-screen bg-dn-black">
+      <HeroImageBackdrop />
       <Header isAdmin currentDate={currentDate} onSignOut={handleSignOut} />
 
       <PageWrapper>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Header from '../components/layout/Header'
 import HekbotPanel from '../components/hekbot/HekbotPanel'
+import HeroImageBackdrop from '../components/HeroImageBackdrop'
 import PageWrapper from '../components/layout/PageWrapper'
 import SectionLabel from '../components/layout/SectionLabel'
 import JourneyProgress from '../components/charts/JourneyProgress'
@@ -74,7 +75,8 @@ export default function PublicDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-dn-black">
+    <div className="relative min-h-screen bg-dn-black">
+      <HeroImageBackdrop />
       <Header currentDate={currentDate} />
       <HekbotPanel onLogged={handleLogged} />
 

@@ -161,7 +161,7 @@ export default function HekbotPanel({ onLogged }) {
   }
 
   return (
-    <section className="relative overflow-hidden bg-dn-surface-dark border-b border-white/[0.08]">
+    <section className="relative overflow-hidden border-b border-white/[0.08]">
       <DotGridWave overallOpacity={0.12} />
 
       <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 py-8 sm:py-14">

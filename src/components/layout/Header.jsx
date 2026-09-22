@@ -7,7 +7,7 @@ export default function Header({ isAdmin = false, onSignOut, currentDate }) {
   const navigate = useNavigate()
 
   return (
-    <header className="relative overflow-hidden bg-dn-black border-b border-white/[0.08]">
+    <header className="relative overflow-hidden border-b border-white/[0.08]">
       <DotGridWave />
 
       <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 py-2.5 sm:py-5 flex items-center justify-between">
