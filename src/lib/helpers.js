@@ -20,6 +20,12 @@ export function nDaysAgo(n) {
   return d.toISOString().split('T')[0]
 }
 
+export function addDays(dateStr, n) {
+  const d = new Date(dateStr + 'T00:00:00')
+  d.setDate(d.getDate() + n)
+  return d.toISOString().split('T')[0]
+}
+
 // ─── Unit conversion ─────────────────────────────────────────────────────────
 
 export function lbsToKg(lbs) {

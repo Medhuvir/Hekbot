@@ -3,6 +3,7 @@ import Icon from '../Icon'
 import CardTexture from '../CardTexture'
 import { addWorkoutLog, deleteWorkoutLog } from '../../lib/mutations'
 import { MACRO_COLORS, MACRO_CHIP_BG, CALORIE_CHIP_BG } from '../../lib/macroColors'
+import { today } from '../../lib/helpers'
 
 const WORKOUT_TYPES = ['Resistance Training', 'Martial Arts', 'Other']
 
@@ -190,7 +191,9 @@ export default function WorkoutLogPanel({ workoutLogs, isAdmin, date, onRefresh,
       </div>
 
       {workoutLogs.length === 0 ? (
-        <p className="font-sans text-[12px] text-dn-gray-light py-1">No training logged today.</p>
+        <p className="font-sans text-[12px] text-dn-gray-light py-1">
+          {date === today() ? 'No training logged today.' : 'No training logged on this day.'}
+        </p>
       ) : (
         <div>
           {workoutLogs.map(item => (

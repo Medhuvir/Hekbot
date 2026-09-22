@@ -1,10 +1,85 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import DNMark from '../DNMark'
 import Icon from '../Icon'
 import DotGridWave from '../DotGridWave'
 
-export default function Header({ isAdmin = false, onSignOut, currentDate }) {
-  const navigate = useNavigate()
+function DateNavControls({
+  currentDate,
+  isToday,
+  onPrevDay,
+  onNextDay,
+  onToday,
+  dateInputValue,
+  maxDate,
+  onPickDate,
+  large = false,
+}) {
+  return (
+    <div className="flex items-center gap-1 sm:gap-2">
+      <button
+        onClick={onPrevDay}
+        aria-label="Previous day"
+        className="text-dn-gray-light hover:text-dn-white transition-colors p-0.5"
+      >
+        <Icon name="chevron_left" size={large ? 20 : 16} />
+      </button>
+
+      <div className="flex flex-col items-center">
+        <div className="flex items-center gap-1 sm:gap-1.5">
+          <span className={`font-display ${large ? 'text-[34px]' : 'text-[18px]'} text-dn-white tracking-[0.06em] leading-none`}>
+            {currentDate}
+          </span>
+          <div className="relative flex items-center justify-center w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0">
+            <Icon
+              name="calendar_month"
+              size={large ? 16 : 13}
+              className="pointer-events-none text-dn-gray-light"
+            />
+            <input
+              type="date"
+              value={dateInputValue}
+              max={maxDate}
+              onChange={e => e.target.value && onPickDate(e.target.value)}
+              aria-label="Pick a date"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
+          </div>
+        </div>
+        {!isToday && (
+          <button
+            onClick={onToday}
+            className="font-sans text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-dn-orange mt-0.5 hover:underline underline-offset-2 whitespace-nowrap"
+          >
+            Jump to today
+          </button>
+        )}
+      </div>
+
+      <button
+        onClick={onNextDay}
+        disabled={isToday}
+        aria-label="Next day"
+        className="text-dn-gray-light hover:text-dn-white transition-colors p-0.5 disabled:opacity-30 disabled:cursor-not-allowed"
+      >
+        <Icon name="chevron_right" size={large ? 20 : 16} />
+      </button>
+    </div>
+  )
+}
+
+export default function Header({
+  isAdmin = false,
+  onSignOut,
+  currentDate,
+  isToday = true,
+  dateInputValue,
+  maxDate,
+  onPrevDay,
+  onNextDay,
+  onToday,
+  onPickDate,
+}) {
+  const hasDateNav = Boolean(currentDate && onPrevDay && onNextDay && onPickDate)
 
   return (
     <header className="relative overflow-hidden border-b border-white/[0.08]">
@@ -22,12 +97,20 @@ export default function Header({ isAdmin = false, onSignOut, currentDate }) {
           </span>
         </Link>
 
-        {/* Today's date — center on desktop */}
-        {currentDate && (
-          <div className="hidden md:flex items-center justify-center absolute left-1/2 -translate-x-1/2">
-            <div className="font-display text-[34px] text-dn-white tracking-[0.06em] leading-none">
-              {currentDate}
-            </div>
+        {/* Today's date + day navigation — center on desktop */}
+        {hasDateNav && (
+          <div className="hidden sm:flex items-center justify-center absolute left-1/2 -translate-x-1/2">
+            <DateNavControls
+              currentDate={currentDate}
+              isToday={isToday}
+              onPrevDay={onPrevDay}
+              onNextDay={onNextDay}
+              onToday={onToday}
+              dateInputValue={dateInputValue}
+              maxDate={maxDate}
+              onPickDate={onPickDate}
+              large
+            />
           </div>
         )}
 
@@ -50,6 +133,22 @@ export default function Header({ isAdmin = false, onSignOut, currentDate }) {
           )}
         </div>
       </div>
+
+      {/* Mobile date row — a full-width second row avoids crowding the logo/actions row */}
+      {hasDateNav && (
+        <div className="sm:hidden relative flex items-center justify-center pb-2.5 -mt-1">
+          <DateNavControls
+            currentDate={currentDate}
+            isToday={isToday}
+            onPrevDay={onPrevDay}
+            onNextDay={onNextDay}
+            onToday={onToday}
+            dateInputValue={dateInputValue}
+            maxDate={maxDate}
+            onPickDate={onPickDate}
+          />
+        </div>
+      )}
     </header>
   )
 }

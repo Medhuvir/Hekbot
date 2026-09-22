@@ -23,8 +23,9 @@ import { useCheckins, useLatestCheckin } from '../hooks/useCheckins'
 import { useTargets } from '../hooks/useTargets'
 import { useProfile } from '../hooks/useProfile'
 import { useAuth } from '../hooks/useAuth'
+import { useLiveToday } from '../hooks/useLiveToday'
 
-import { today, nDaysAgo, formatDateLong, sumMacros, sumCaloriesBurned, buildDailyTotals, computeWeeklySummary } from '../lib/helpers'
+import { nDaysAgo, addDays, formatDate, formatDateLong, sumMacros, sumCaloriesBurned, buildDailyTotals, computeWeeklySummary } from '../lib/helpers'
 
 const VIEW_DAILY  = 'daily'
 const VIEW_WEEKLY = 'weekly'
@@ -50,14 +51,39 @@ export default function Dashboard({ mode }) {
   const navigate = useNavigate()
   const [view, setView] = useState(VIEW_DAILY)
   const [showImport, setShowImport] = useState(false)
-  const todayStr = today()
 
-  const { logs: foodLogs,    loading: foodLoading,    refresh: refreshFoodLogs    } = useFoodLogs(todayStr)
-  const { logs: workoutLogs, loading: workoutLoading, refresh: refreshWorkoutLogs } = useWorkoutLogs(todayStr)
+  // The real, live calendar date — updates on its own if a tab is left open
+  // past midnight. `viewDate` is the day currently being browsed; null means
+  // "follow today" (so a midnight rollover carries the view forward too).
+  const liveToday = useLiveToday()
+  const [viewDate, setViewDate] = useState(null)
+  const displayDate    = viewDate ?? liveToday
+  const isViewingToday = displayDate === liveToday
 
+  function goToPrevDay() {
+    setViewDate(addDays(displayDate, -1))
+  }
+  function goToNextDay() {
+    const next = addDays(displayDate, 1)
+    if (next > liveToday) return
+    setViewDate(next === liveToday ? null : next)
+  }
+  function goToToday() {
+    setViewDate(null)
+  }
+  function goToDate(dateStr) {
+    if (!dateStr || dateStr > liveToday) return
+    setViewDate(dateStr === liveToday ? null : dateStr)
+  }
+
+  const { logs: foodLogs,    loading: foodLoading,    refresh: refreshFoodLogs    } = useFoodLogs(displayDate)
+  const { logs: workoutLogs, loading: workoutLoading, refresh: refreshWorkoutLogs } = useWorkoutLogs(displayDate)
+
+  // Weekly range data always trails the real live "today", independent of
+  // whichever single day is being browsed above.
   const rangeStart = nDaysAgo(13)
-  const { logs: foodRange    } = useFoodLogsRange(rangeStart, todayStr)
-  const { logs: workoutRange } = useWorkoutLogsRange(rangeStart, todayStr)
+  const { logs: foodRange    } = useFoodLogsRange(rangeStart, liveToday)
+  const { logs: workoutRange } = useWorkoutLogsRange(rangeStart, liveToday)
 
   const { checkins, refresh: refreshCheckins } = useCheckins()
   const { checkin: latestCheckin } = useLatestCheckin()
@@ -68,14 +94,15 @@ export default function Dashboard({ mode }) {
   const dailyBurned = sumCaloriesBurned(workoutLogs)
   const netCalories = dailyMacros.calories - dailyBurned
 
-  const dates       = getDatesInRange(rangeStart, todayStr)
+  const dates       = getDatesInRange(rangeStart, liveToday)
   const dailyTotals = buildDailyTotals(foodRange, workoutRange, dates)
   const last7       = dailyTotals.slice(-7)
 
   const last7Food = foodRange.filter(f => f.log_date >= nDaysAgo(6))
   const summary   = computeWeeklySummary(last7Food, checkins.slice(-2), targets)
 
-  const currentDate = formatDateLong(todayStr)
+  const currentDate = formatDateLong(displayDate)
+  const nutritionSectionLabel = isViewingToday ? "Today's Nutrition" : `Nutrition — ${formatDate(displayDate)}`
 
   function handleLogged() {
     refreshFoodLogs()
@@ -91,7 +118,18 @@ export default function Dashboard({ mode }) {
   return (
     <div className="relative isolate min-h-screen bg-dn-black">
       <HeroImageBackdrop />
-      <Header isAdmin={isApp} currentDate={currentDate} onSignOut={handleSignOut} />
+      <Header
+        isAdmin={isApp}
+        currentDate={currentDate}
+        onSignOut={handleSignOut}
+        isToday={isViewingToday}
+        dateInputValue={displayDate}
+        maxDate={liveToday}
+        onPrevDay={goToPrevDay}
+        onNextDay={goToNextDay}
+        onToday={goToToday}
+        onPickDate={goToDate}
+      />
 
       {isApp
         ? <HekbotPanel onLogged={handleLogged} userName={profile?.name} />
@@ -155,12 +193,12 @@ export default function Dashboard({ mode }) {
         {view === VIEW_DAILY && (
           <div className="space-y-4 sm:space-y-6">
             <section>
-              <SectionLabel number="01">Today's Nutrition</SectionLabel>
+              <SectionLabel number="01">{nutritionSectionLabel}</SectionLabel>
               <div className="space-y-4">
                 <DailyIntakePanel
                   foodLogs={foodLogs}
                   isAdmin={isApp}
-                  date={todayStr}
+                  date={displayDate}
                   onRefresh={refreshFoodLogs}
                   loading={foodLoading}
                   targets={targets}
@@ -168,7 +206,7 @@ export default function Dashboard({ mode }) {
                 <WorkoutLogPanel
                   workoutLogs={workoutLogs}
                   isAdmin={isApp}
-                  date={todayStr}
+                  date={displayDate}
                   onRefresh={refreshWorkoutLogs}
                   loading={workoutLoading}
                 />
