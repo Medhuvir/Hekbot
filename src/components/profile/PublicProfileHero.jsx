@@ -31,8 +31,8 @@ export default function PublicProfileHero({ profile }) {
     <section className="relative overflow-hidden border-b border-white/[0.08]">
       <DotGridWave overallOpacity={0.12} />
 
-      <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 py-5 sm:py-7">
-        <div className="flex items-center gap-3.5 sm:gap-4">
+      <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 py-5 sm:py-7 flex flex-col lg:flex-row lg:items-center gap-5 sm:gap-6">
+        <div className="flex items-center gap-3.5 sm:gap-4 shrink-0">
           <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-sm bg-white/[0.06] border border-white/[0.08] flex items-center justify-center shrink-0">
             {profile.avatar_url ? (
               <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover object-top rounded-sm" />
@@ -56,7 +56,9 @@ export default function PublicProfileHero({ profile }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-5 sm:mt-6 pt-5 sm:pt-6 border-t border-white/[0.08]">
+        <div className="hidden lg:block w-px h-10 bg-white/[0.08] shrink-0" />
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 flex-1 w-full lg:w-auto pt-5 lg:pt-0 border-t lg:border-t-0 border-white/[0.08]">
           {STATS.map(stat => <StatItem key={stat.label} {...stat} />)}
         </div>
       </div>
