@@ -4,6 +4,15 @@
 **Built by:** DN Creative LLC  
 **Stack:** React (Vite) + Tailwind · Supabase (Postgres + Auth) · Netlify · GitHub
 
+> **Status:** this is the original v1 planning spec, kept for historical
+> reference. The app shipped as **HekBot**, went well beyond v1 scope (an
+> AI chat coach, a public/authenticated route split, a secondary brand),
+> and diverged from some of the exact file/route names planned here.
+> **`README.md` is the current, accurate source of truth** — read that
+> first. Corrections below are limited to the sections most likely to
+> actively mislead (routes, data model, repo structure); the rest of this
+> document is left as-written, historical intent.
+
 ---
 
 ## Table of Contents
@@ -96,7 +105,14 @@ Progress is framed as a journey — not just a number dropping. Language through
 
 ## 4. App Architecture — Two Views
 
-### Route Map
+> **Superseded — see README.md.** Actual routes are `/` (public),
+> `/app` (authenticated, replaces the "Admin Portal" below — it now
+> includes the HekBot chat, not just manual edit forms), and `/login`
+> (replaces `/admin/login`). `/admin*` falls through to `/`. Both views
+> now live in one component, `pages/Dashboard.jsx`, parameterized by
+> `mode="public" | "app"`, rather than two separate page files.
+
+### Route Map (as originally planned — see note above for what shipped)
 
 ```
 /           → Public Dashboard (read-only)
@@ -263,6 +279,12 @@ Four chart types, rendered in both views via shared components (Recharts library
 
 All tables live in Supabase (PostgreSQL). Schema below.
 
+> **Since this was written:** `supabase/migrations/002`–`005` added
+> `food_presets`, `conversations`, `google_tokens` tables (not shown below —
+> see the migration files directly) and a `profiles.timezone` column (shown
+> inline below). Apply those migrations, in order, on top of everything in
+> this section.
+
 ### `profiles` — One row (the user)
 
 ```sql
@@ -276,6 +298,7 @@ CREATE TABLE profiles (
   avatar_url    text,           -- Supabase Storage URL
   training_notes text,
   reta_notes    text,           -- Admin-only field (private)
+  timezone      text NOT NULL DEFAULT 'America/New_York', -- added in migration 005; drives all "today" resolution, see README
   created_at    timestamptz DEFAULT now(),
   updated_at    timestamptz DEFAULT now()
 );
@@ -394,6 +417,13 @@ VITE_SUPABASE_ANON_KEY=your-anon-public-key
 
 ### Repository Structure
 
+> **Superseded — see README.md's Architecture section for the current
+> tree.** Several planned files below were never built as separate files
+> (e.g. `Sidebar.jsx`, `GoalsSummary.jsx`, `FoodLogForm.jsx`,
+> `TargetsEditor.jsx`) and the page split changed (`PublicDashboard.jsx` /
+> `AdminDashboard.jsx` / `AdminLogin.jsx` became `Dashboard.jsx` +
+> `Login.jsx`). Left as originally planned below for historical context.
+
 ```
 hekbot/
 ├── .env                        # Local env vars (git-ignored)
@@ -481,6 +511,13 @@ The redirect rule is critical — it tells Netlify to serve the React app for al
 
 **This is a DN Creative project.** The full DN Creative Brand Design System v1.0 applies.  
 Source: `DN-Creative-Brand-Design-System.md` · Brand assets: `Logo/SVG/Black.svg`, `Logo/SVG/White.svg`
+
+> **Two corrections since this was written** (see README.md): secondary
+> text was swept from `text-dn-graphite` to `text-dn-gray-light` app-wide
+> for contrast (graphite-on-black fails WCAG AA); the header lockup is no
+> longer "DN Creative / Design Studio" wordmark, it's `DN mark | HEKBOT`.
+> A secondary brand, Order of Fire, is also now pulled in selectively —
+> see README.md.
 
 ### DN Creative Color Palette
 
