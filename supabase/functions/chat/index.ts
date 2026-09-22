@@ -176,7 +176,7 @@ Deno.serve(async (req) => {
   if (!user) return jsonError('Sign in required.', 401)
 
   try {
-    const { message, image } = await req.json()
+    const { message, image, client_date } = await req.json()
     const msg = (message ?? '').trim()
     if (!msg) {
       return jsonError('message is required', 400)
@@ -189,8 +189,14 @@ Deno.serve(async (req) => {
       parsedImage = result
     }
 
-    const db       = createClient(SUPABASE_URL, SUPABASE_SVC)
-    const todayStr = new Date().toISOString().split('T')[0]
+    const db = createClient(SUPABASE_URL, SUPABASE_SVC)
+    // The server has no notion of the caller's timezone, so it can't derive
+    // "today" correctly on its own (a plain UTC date drifts from the user's
+    // actual local date for part of every day). Prefer the client's local
+    // date; only fall back to the server's UTC guess if it's missing/malformed.
+    const todayStr = /^\d{4}-\d{2}-\d{2}$/.test(client_date ?? '')
+      ? client_date
+      : new Date().toISOString().split('T')[0]
 
     // Fetch context in parallel
     const [profileRes, targetsRes, logsRes, historyRes] = await Promise.all([

@@ -1,7 +1,19 @@
 // ─── Date utilities ─────────────────────────────────────────────────────────
 
+// Formats a Date as 'YYYY-MM-DD' using its LOCAL calendar date — never use
+// `.toISOString().split('T')[0]` for this, which reads the UTC date instead
+// and drifts by a day for part of the day in any non-UTC timezone (worst
+// case, right around local midnight — exactly when "today" needs to be
+// correct).
+export function toLocalISODate(d) {
+  const year  = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day   = String(d.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export function today() {
-  return new Date().toISOString().split('T')[0]
+  return toLocalISODate(new Date())
 }
 
 export function formatDate(dateStr) {
@@ -17,13 +29,13 @@ export function formatDateLong(dateStr) {
 export function nDaysAgo(n) {
   const d = new Date()
   d.setDate(d.getDate() - n)
-  return d.toISOString().split('T')[0]
+  return toLocalISODate(d)
 }
 
 export function addDays(dateStr, n) {
   const d = new Date(dateStr + 'T00:00:00')
   d.setDate(d.getDate() + n)
-  return d.toISOString().split('T')[0]
+  return toLocalISODate(d)
 }
 
 // ─── Unit conversion ─────────────────────────────────────────────────────────
@@ -185,9 +197,10 @@ export function projectWeightTrend(checkins, daysAhead = 56) {
     const d = new Date(lastDate)
     d.setDate(d.getDate() + i)
     const projected = parseFloat((sorted[sorted.length - 1].weight_lbs + slopePerDay * i).toFixed(1))
+    const dStr = toLocalISODate(d)
     projections.push({
-      date: d.toISOString().split('T')[0],
-      label: formatDate(d.toISOString().split('T')[0]),
+      date: dStr,
+      label: formatDate(dStr),
       projected,
     })
   }

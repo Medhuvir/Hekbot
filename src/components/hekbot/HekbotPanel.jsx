@@ -5,6 +5,7 @@ import HekbotReview from './HekbotReview'
 import { usePresets } from '../../hooks/usePresets'
 import { prepareImageUpload, ImageValidationError } from '../../lib/imageUpload'
 import { supabase } from '../../supabaseClient'
+import { today } from '../../lib/helpers'
 
 const MEAL_PHOTO_PROMPT = 'Extract macros from this meal'
 const QUICK_ACTIONS = ['Daily summary', 'Weekly summary', 'Log weight', 'Log waist']
@@ -82,15 +83,14 @@ async function postJson(endpoint, body) {
 }
 
 async function callChat(message, image = null) {
-  return postJson(CHAT_ENDPOINT, { message, image }) // { reply, extraction }
+  // The Edge Function runs server-side with no notion of the caller's
+  // timezone, so it can't derive "today" correctly on its own — the client
+  // sends its actual local date instead of leaving the server to guess (in UTC).
+  return postJson(CHAT_ENDPOINT, { message, image, client_date: today() }) // { reply, extraction }
 }
 
 async function callLogCommit(payload) {
   return postJson(LOG_COMMIT_ENDPOINT, payload) // { logged }
-}
-
-function today() {
-  return new Date().toISOString().split('T')[0]
 }
 
 // Meal windows, in minutes since local midnight: 4:30am–11am Breakfast,

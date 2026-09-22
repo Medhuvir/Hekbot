@@ -1,5 +1,5 @@
 import CardTexture from '../CardTexture'
-import { lbsToKg } from '../../lib/helpers'
+import { lbsToKg, toLocalISODate } from '../../lib/helpers'
 
 const TRAINING_TYPE_LABELS = {
   'Resistance Training': 'Resistance',
@@ -20,7 +20,7 @@ function currentWeekDates() {
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday)
     d.setDate(monday.getDate() + i)
-    return d.toISOString().split('T')[0]
+    return toLocalISODate(d)
   })
 }
 

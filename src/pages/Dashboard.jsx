@@ -25,7 +25,7 @@ import { useProfile } from '../hooks/useProfile'
 import { useAuth } from '../hooks/useAuth'
 import { useLiveToday } from '../hooks/useLiveToday'
 
-import { nDaysAgo, addDays, formatDate, formatDateLong, sumMacros, sumCaloriesBurned, buildDailyTotals, computeWeeklySummary } from '../lib/helpers'
+import { nDaysAgo, addDays, formatDate, formatDateLong, toLocalISODate, sumMacros, sumCaloriesBurned, buildDailyTotals, computeWeeklySummary } from '../lib/helpers'
 
 const VIEW_DAILY  = 'daily'
 const VIEW_WEEKLY = 'weekly'
@@ -35,7 +35,7 @@ function getDatesInRange(start, end) {
   let cur = new Date(start + 'T00:00:00')
   const endD = new Date(end + 'T00:00:00')
   while (cur <= endD) {
-    dates.push(cur.toISOString().split('T')[0])
+    dates.push(toLocalISODate(cur))
     cur.setDate(cur.getDate() + 1)
   }
   return dates
