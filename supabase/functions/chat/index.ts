@@ -1,9 +1,23 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
-import { requireAuthenticatedUser } from '../_shared/requireAuth.ts'
 
 const ANTHROPIC_KEY = Deno.env.get('ANTHROPIC_API_KEY')!
 const SUPABASE_URL  = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SVC  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+const SUPABASE_ANON = Deno.env.get('SUPABASE_ANON_KEY')!
+
+// Both this function and log-commit use the service-role key internally (so
+// they can write regardless of RLS), which makes this check the only thing
+// standing between "anyone with the public anon key" and this app's data.
+// `verify_jwt` alone doesn't help — the anon key IS a valid JWT. This
+// confirms the caller's bearer token resolves to a real signed-in user.
+async function requireAuthenticatedUser(req: Request): Promise<{ id: string } | null> {
+  const token = (req.headers.get('Authorization') ?? '').replace(/^Bearer\s+/i, '').trim()
+  if (!token) return null
+  const authClient = createClient(SUPABASE_URL, SUPABASE_ANON)
+  const { data, error } = await authClient.auth.getUser(token)
+  if (error || !data.user) return null
+  return { id: data.user.id }
+}
 
 // Both calls here are low-complexity (a short templated coaching reply, and
 // structured JSON extraction) — no reasoning task needs a flagship model.
