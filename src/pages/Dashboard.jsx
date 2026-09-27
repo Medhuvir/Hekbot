@@ -226,7 +226,6 @@ export default function Dashboard({ mode }) {
               <ProfilePanel
                 profile={profile}
                 latestCheckin={latestCheckin}
-                workoutLogs={workoutRange}
                 isAdmin={isApp}
                 onProfileUpdated={refreshProfile}
               />
