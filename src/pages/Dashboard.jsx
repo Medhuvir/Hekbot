@@ -136,7 +136,7 @@ export default function Dashboard({ mode }) {
 
       {isApp
         ? <HekbotPanel onLogged={handleLogged} onProfileUpdated={refreshProfile} userName={profile?.name} timezone={timezone} />
-        : <PublicProfileHero profile={profile} />
+        : <PublicProfileHero profile={profile} latestCheckin={latestCheckin} />
       }
 
       <PageWrapper>
@@ -196,7 +196,7 @@ export default function Dashboard({ mode }) {
         {view === VIEW_DAILY && (
           <div className="space-y-4 sm:space-y-6">
             <section>
-              <SectionLabel number="01">{nutritionSectionLabel}</SectionLabel>
+              <SectionLabel>{nutritionSectionLabel}</SectionLabel>
               <div className="space-y-4">
                 <DailyIntakePanel
                   foodLogs={foodLogs}
@@ -217,41 +217,43 @@ export default function Dashboard({ mode }) {
             </section>
 
             <section>
-              <SectionLabel number="02">Weekly Summary</SectionLabel>
+              <SectionLabel>Weekly Summary</SectionLabel>
               <WeeklySummary summary={summary} isAdmin={isApp} onRefresh={refreshCheckins} />
             </section>
 
-            <section>
-              <SectionLabel number="03">Profile</SectionLabel>
-              <ProfilePanel
-                profile={profile}
-                latestCheckin={latestCheckin}
-                isAdmin={isApp}
-                onProfileUpdated={refreshProfile}
-              />
-            </section>
+            {isApp && (
+              <section>
+                <SectionLabel>Profile</SectionLabel>
+                <ProfilePanel
+                  profile={profile}
+                  latestCheckin={latestCheckin}
+                  isAdmin={isApp}
+                  onProfileUpdated={refreshProfile}
+                />
+              </section>
+            )}
           </div>
         )}
 
         {view === VIEW_WEEKLY && (
           <div className="space-y-4 sm:space-y-6">
             <section>
-              <SectionLabel number="01">Weight Trend</SectionLabel>
+              <SectionLabel>Weight Trend</SectionLabel>
               <WeightTrendChart checkins={checkins} />
             </section>
 
             <section>
-              <SectionLabel number="02">Calorie Trend — Last 14 Days</SectionLabel>
+              <SectionLabel>Calorie Trend — Last 14 Days</SectionLabel>
               <CalorieTrendChart dailyTotals={dailyTotals} targets={targets} />
             </section>
 
             <section>
-              <SectionLabel number="03">Macro Adherence</SectionLabel>
+              <SectionLabel>Macro Adherence</SectionLabel>
               <MacroAdherenceChart dailyTotals={last7} targets={targets} />
             </section>
 
             <section>
-              <SectionLabel number="04">Weekly Summary</SectionLabel>
+              <SectionLabel>Weekly Summary</SectionLabel>
               <WeeklySummary summary={summary} isAdmin={isApp} onRefresh={refreshCheckins} />
             </section>
           </div>
