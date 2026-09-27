@@ -17,7 +17,21 @@ const SUGGESTIONS = [
 ]
 
 const HELPER_PREFIX = 'Tell HekBot what you ate. '
-const HELPER_ROTATIONS = ['Did you train?', 'How long was it?', 'How do your joints feel?']
+const HELPER_ROTATIONS = [
+  'Did you train?',
+  'How long was it?',
+  'How do your joints feel?',
+  "How's your protein today?",
+  'Log today\'s weight?',
+  'Snap a photo of your plate?',
+  'Update your training days?',
+  "How'd today's session go?",
+  'Need your weekly numbers?',
+  'Log your waist measurement?',
+  'Save that meal as a preset?',
+  'Running behind on carbs?',
+  'How are you recovering?',
+]
 
 // Cycles `rotations` through a slow type → pause → delete → next loop, one
 // character at a time. `prefix` is rendered ahead of it and never animates.
