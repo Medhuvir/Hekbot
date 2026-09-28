@@ -121,7 +121,7 @@ export default function Header({
             <>
               <button
                 onClick={onOpenAdmin}
-                className="flex items-center gap-1 font-sans text-[13px] sm:text-[14px] text-dn-gray-light hover:text-dn-white transition-colors duration-200 whitespace-nowrap"
+                className="flex items-center gap-1 font-sans text-[13px] sm:text-[14px] text-dn-orange hover:text-dn-orange-light transition-colors duration-200 whitespace-nowrap"
               >
                 <Icon name="person" size={15} />
                 Admin
@@ -129,7 +129,7 @@ export default function Header({
               <div className="w-px h-4 bg-white/20" aria-hidden="true" />
               <button
                 onClick={onSignOut}
-                className="flex items-center gap-1 font-sans text-[13px] sm:text-[14px] text-dn-gray-light hover:text-dn-white transition-colors duration-200 whitespace-nowrap"
+                className="flex items-center gap-1 font-sans text-[13px] sm:text-[14px] text-dn-orange hover:text-dn-orange-light transition-colors duration-200 whitespace-nowrap"
               >
                 <Icon name="door_open" size={15} />
                 Sign Out
