@@ -1,6 +1,6 @@
 // Standard dashboard card background: a DN topo still + a dark gradient that
-// fully covers it at the top and fades to transparent by 50% of the card
-// height, so the topo only rises in through the lower half. The still itself
+// fully covers it at the top and fades to transparent by 65% of the card
+// height, so the topo only rises in through the lower third. The still itself
 // sits at 85% opacity to keep it behind the data.
 //
 // The stills in /images/topo come from the DN Creative topo generator
@@ -22,7 +22,7 @@ export default function CardTexture({ variant = 1 }) {
       />
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: 'linear-gradient(to bottom, rgba(30,30,30,1) 0%, rgba(30,30,30,0) 50%)' }}
+        style={{ background: 'linear-gradient(to bottom, rgba(30,30,30,1) 0%, rgba(30,30,30,0) 65%)' }}
       />
     </>
   )
