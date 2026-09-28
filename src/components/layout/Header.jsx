@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import DNMark from '../DNMark'
 import Icon from '../Icon'
 import DotGridWave from '../DotGridWave'
+import DatePickerPopover from './DatePickerPopover'
 
 function DateNavControls({
   currentDate,
@@ -14,8 +16,10 @@ function DateNavControls({
   onPickDate,
   large = false,
 }) {
+  const [pickerOpen, setPickerOpen] = useState(false)
+
   return (
-    <div className="flex items-center gap-1 sm:gap-2">
+    <div className="relative flex items-center gap-1 sm:gap-2">
       <button
         onClick={onPrevDay}
         aria-label="Previous day"
@@ -29,21 +33,16 @@ function DateNavControls({
           <span className={`font-display ${large ? 'text-[34px]' : 'text-[18px]'} text-dn-white tracking-[0.06em] leading-none`}>
             {currentDate}
           </span>
-          <div className={`group/cal relative flex items-center justify-center shrink-0 ${large ? 'w-7 h-7' : 'w-5 h-5'}`}>
-            <Icon
-              name="calendar_month"
-              size={large ? 26 : 18}
-              className="pointer-events-none text-dn-orange group-hover/cal:text-dn-orange-light transition-colors"
-            />
-            <input
-              type="date"
-              value={dateInputValue}
-              max={maxDate}
-              onChange={e => e.target.value && onPickDate(e.target.value)}
-              aria-label="Pick a date"
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer [color-scheme:dark] accent-dn-orange"
-            />
-          </div>
+          <button
+            type="button"
+            data-datepicker-toggle
+            onClick={() => setPickerOpen(o => !o)}
+            aria-label="Pick a date"
+            aria-expanded={pickerOpen}
+            className={`flex items-center justify-center shrink-0 text-dn-orange hover:text-dn-orange-light transition-colors ${large ? 'w-7 h-7' : 'w-5 h-5'}`}
+          >
+            <Icon name="calendar_month" size={large ? 26 : 18} />
+          </button>
         </div>
         {!isToday && (
           <button
@@ -63,6 +62,15 @@ function DateNavControls({
       >
         <Icon name="chevron_right" size={large ? 20 : 16} />
       </button>
+
+      {pickerOpen && (
+        <DatePickerPopover
+          value={dateInputValue}
+          max={maxDate}
+          onPick={onPickDate}
+          onClose={() => setPickerOpen(false)}
+        />
+      )}
     </div>
   )
 }
@@ -83,8 +91,11 @@ export default function Header({
   const hasDateNav = Boolean(currentDate && onPrevDay && onNextDay && onPickDate)
 
   return (
-    <header className="relative overflow-hidden border-b border-white/[0.08]">
-      <DotGridWave />
+    <header className="relative z-30 border-b border-white/[0.08]">
+      {/* Clip only the animated backdrop, so the date picker can overlap the page */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <DotGridWave />
+      </div>
 
       <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 py-2.5 sm:py-5 flex items-center justify-between">
 
