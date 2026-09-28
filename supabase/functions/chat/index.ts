@@ -106,6 +106,36 @@ async function callClaude(opts: {
   return data.content[0].text as string
 }
 
+// Turns the newest-first rows from `conversations` into a clean,
+// chronological user/assistant history for the chat call.
+//
+// Older rows were saved in pairs with identical created_at values, so the
+// database can hand a pair back in either order. When the assistant row
+// sorted first, the history ended on the previous *user* message, which got
+// merged with the new one, and the model answered both (re-logging the last
+// meal). Ties are broken user-first here, and anything that still doesn't
+// alternate cleanly (orphaned turns, a window starting on an assistant
+// reply) is dropped so the history always runs user → assistant pairs.
+function buildHistory(rows: { role: string; content: string; created_at: string }[]) {
+  const sorted = rows
+    .filter(r => (r.role === 'user' || r.role === 'assistant') && typeof r.content === 'string' && r.content.trim())
+    .sort((a, b) => {
+      const diff = new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      if (diff !== 0) return diff
+      return a.role === b.role ? 0 : a.role === 'user' ? -1 : 1
+    })
+
+  const history: { role: 'user' | 'assistant'; content: string }[] = []
+  for (let i = 0; i < sorted.length - 1; i++) {
+    if (sorted[i].role === 'user' && sorted[i + 1].role === 'assistant') {
+      history.push({ role: 'user', content: sorted[i].content })
+      history.push({ role: 'assistant', content: sorted[i + 1].content })
+      i++
+    }
+  }
+  return history
+}
+
 const DEFAULT_TRAINING_DAYS: Record<string, string | null> = {
   mon: 'Resistance Training', tue: 'Martial Arts', wed: 'Resistance Training',
   thu: 'Martial Arts',        fri: 'Resistance Training', sat: 'Martial Arts', sun: null,
@@ -271,7 +301,7 @@ Deno.serve(async (req) => {
     const [targetsRes, logsRes, historyRes] = await Promise.all([
       db.from('targets').select('*').order('effective_from', { ascending: false }).limit(1).single(),
       db.from('food_logs').select('calories, protein_g, carbs_g, fat_g').eq('log_date', todayStr),
-      db.from('conversations').select('role, content').order('created_at', { ascending: false }).limit(20),
+      db.from('conversations').select('role, content, created_at').order('created_at', { ascending: false }).limit(20),
     ])
 
     if (targetsRes.error)  console.error('[chat] targets:',  targetsRes.error.message)
@@ -288,8 +318,7 @@ Deno.serve(async (req) => {
       { calories: 0, protein_g: 0, carbs_g: 0, fat_g: 0 },
     )
 
-    const history: { role: 'user' | 'assistant'; content: string }[] =
-      ((historyRes.data ?? []) as any[]).reverse()
+    const history = buildHistory((historyRes.data ?? []) as any[])
 
     const userContent: any[] = []
     if (parsedImage) {
@@ -363,10 +392,13 @@ Deno.serve(async (req) => {
       console.error('[chat] extraction parse error:', parseErr, '| raw:', extractionRaw)
     }
 
-    // Save conversation — soft failure
+    // Save conversation — soft failure. Both rows go in one insert, so a
+    // DEFAULT now() would give them the exact same created_at and leave their
+    // order up to chance on the next read. Stamp them explicitly instead.
+    const savedAt = Date.now()
     const { error: convErr } = await db.from('conversations').insert([
-      { role: 'user',      content: msg   },
-      { role: 'assistant', content: reply },
+      { role: 'user',      content: msg,   created_at: new Date(savedAt).toISOString()     },
+      { role: 'assistant', content: reply, created_at: new Date(savedAt + 1).toISOString() },
     ])
     if (convErr) console.warn('[chat] conversations insert:', convErr.message)
 
