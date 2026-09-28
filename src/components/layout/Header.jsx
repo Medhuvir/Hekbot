@@ -19,7 +19,7 @@ function DateNavControls({
       <button
         onClick={onPrevDay}
         aria-label="Previous day"
-        className="text-dn-gray-light hover:text-dn-white transition-colors p-0.5"
+        className="text-dn-orange hover:text-dn-orange-light transition-colors p-0.5"
       >
         <Icon name="chevron_left" size={large ? 20 : 16} />
       </button>
@@ -29,11 +29,11 @@ function DateNavControls({
           <span className={`font-display ${large ? 'text-[34px]' : 'text-[18px]'} text-dn-white tracking-[0.06em] leading-none`}>
             {currentDate}
           </span>
-          <div className="relative flex items-center justify-center w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0">
+          <div className={`group/cal relative flex items-center justify-center shrink-0 ${large ? 'w-7 h-7' : 'w-5 h-5'}`}>
             <Icon
               name="calendar_month"
-              size={large ? 16 : 13}
-              className="pointer-events-none text-dn-gray-light"
+              size={large ? 26 : 18}
+              className="pointer-events-none text-dn-orange group-hover/cal:text-dn-orange-light transition-colors"
             />
             <input
               type="date"
@@ -41,7 +41,7 @@ function DateNavControls({
               max={maxDate}
               onChange={e => e.target.value && onPickDate(e.target.value)}
               aria-label="Pick a date"
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer [color-scheme:dark] accent-dn-orange"
             />
           </div>
         </div>
@@ -59,7 +59,7 @@ function DateNavControls({
         onClick={onNextDay}
         disabled={isToday}
         aria-label="Next day"
-        className="text-dn-gray-light hover:text-dn-white transition-colors p-0.5 disabled:opacity-30 disabled:cursor-not-allowed"
+        className="text-dn-orange hover:text-dn-orange-light transition-colors p-0.5 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-dn-orange"
       >
         <Icon name="chevron_right" size={large ? 20 : 16} />
       </button>
