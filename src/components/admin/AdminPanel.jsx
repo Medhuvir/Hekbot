@@ -8,20 +8,20 @@ import { TIMEZONE_OPTIONS } from '../../lib/helpers'
 const MIN_PASSWORD_LENGTH = 8
 
 const inputCls =
-  'w-full bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-2 font-sans text-[14px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/50 transition-colors disabled:opacity-50'
+  'w-full bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-2 font-sans text-[16px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/50 transition-colors disabled:opacity-50'
 
 const primaryBtnCls =
-  'px-4 py-2 bg-dn-orange text-black font-sans font-semibold text-[13px] uppercase tracking-[0.08em] rounded-sm hover:-translate-y-px transition-all duration-150 disabled:opacity-50 disabled:hover:translate-y-0'
+  'px-4 py-2 bg-dn-orange text-black font-sans font-semibold text-[15px] uppercase tracking-[0.08em] rounded-sm hover:-translate-y-px transition-all duration-150 disabled:opacity-50 disabled:hover:translate-y-0'
 
 const secondaryBtnCls =
-  'px-3 py-2 border border-dn-orange/30 text-dn-orange font-sans text-[13px] rounded-sm hover:bg-dn-orange/10 transition-colors disabled:opacity-50'
+  'px-3 py-2 border border-dn-orange/30 text-dn-orange font-sans text-[15px] rounded-sm hover:bg-dn-orange/10 transition-colors disabled:opacity-50'
 
 function Section({ icon, title, children }) {
   return (
     <section className="py-5 border-b border-white/[0.06] last:border-b-0">
       <div className="flex items-center gap-2 mb-3">
         <Icon name={icon} size={16} className="text-dn-orange" />
-        <h3 className="font-sans text-[13px] uppercase tracking-[0.2em] text-dn-gray-light">{title}</h3>
+        <h3 className="font-sans text-[15px] uppercase tracking-[0.2em] text-dn-gray-light">{title}</h3>
       </div>
       {children}
     </section>
@@ -32,7 +32,7 @@ function Section({ icon, title, children }) {
 function Status({ status }) {
   if (!status) return null
   return (
-    <p className={`mt-2 font-sans text-[13px] ${status.type === 'error' ? 'text-red-400' : 'text-green-400'}`}>
+    <p className={`mt-2 font-sans text-[15px] ${status.type === 'error' ? 'text-red-400' : 'text-green-400'}`}>
       {status.text}
     </p>
   )
@@ -112,7 +112,7 @@ function PasswordSection({ email }) {
       </form>
 
       <div className="mt-4 pt-4 border-t border-white/[0.04]">
-        <p className="font-sans text-[13px] text-dn-gray-light mb-2">
+        <p className="font-sans text-[15px] text-dn-gray-light mb-2">
           Or get a reset link by email{email ? <> at <span className="text-dn-white">{email}</span></> : null}.
         </p>
         <button type="button" onClick={handleReset} disabled={sending || !email} className={`${secondaryBtnCls} flex items-center gap-1.5`}>
@@ -205,7 +205,7 @@ function AvatarSection({ profile, onProfileUpdated }) {
           <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className={secondaryBtnCls}>
             {uploading ? 'Uploading…' : 'Upload new photo'}
           </button>
-          <p className="mt-1.5 font-sans text-[12px] text-dn-gray-light">JPG, PNG or HEIC, up to 10MB.</p>
+          <p className="mt-1.5 font-sans text-[14px] text-dn-gray-light">JPG, PNG or HEIC, up to 10MB.</p>
         </div>
       </div>
       <Status status={status} />
@@ -243,7 +243,7 @@ function TimezoneSection({ profile, onProfileUpdated }) {
           <option key={tz.value} value={tz.value}>{tz.label}</option>
         ))}
       </select>
-      <p className="mt-1.5 font-sans text-[12px] text-dn-gray-light">Sets when "today" rolls over on the dashboard and in HekBot.</p>
+      <p className="mt-1.5 font-sans text-[14px] text-dn-gray-light">Sets when "today" rolls over on the dashboard and in HekBot.</p>
       <Status status={status} />
     </Section>
   )
@@ -253,8 +253,8 @@ function MessageCoachSection() {
   return (
     <Section icon="chat" title="Message Coach">
       <div className="flex items-center justify-between gap-3 px-3 py-2.5 bg-white/[0.03] border border-white/[0.06] rounded-sm">
-        <span className="font-sans text-[14px] text-dn-gray-light">Send a message straight to your coach.</span>
-        <span className="shrink-0 font-sans text-[11px] uppercase tracking-[0.15em] text-dn-orange border border-dn-orange/30 rounded-sm px-2 py-0.5">
+        <span className="font-sans text-[16px] text-dn-gray-light">Send a message straight to your coach.</span>
+        <span className="shrink-0 font-sans text-[13px] uppercase tracking-[0.15em] text-dn-orange border border-dn-orange/30 rounded-sm px-2 py-0.5">
           Coming soon
         </span>
       </div>

@@ -26,7 +26,7 @@
     @apply flex items-center gap-3 mb-7;
   }
   .section-label span {
-    @apply text-[10px] font-normal tracking-[0.2em] uppercase text-dn-graphite font-sans whitespace-nowrap;
+    @apply text-[12px] font-normal tracking-[0.2em] uppercase text-dn-graphite font-sans whitespace-nowrap;
   }
   .section-label::after {
     content: '';
@@ -34,8 +34,11 @@
   }
 
   /* DN card with orange hover reveal */
+  /* Cards: no texture — a dark grey (#141414) to grey (#1E1E1E) fall from the
+     top, reaching the grey by 65% of the card's height. */
   .dn-card {
-    @apply relative bg-dn-surface border border-white/[0.08] rounded-sm overflow-hidden;
+    @apply relative border border-white/[0.08] rounded-sm overflow-hidden;
+    background: linear-gradient(to bottom, #141414 0%, #1E1E1E 65%);
     transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .dn-card::before {
@@ -92,4 +95,10 @@
 }
 .divide-half > * + * {
   border-top: 0.5px solid rgba(245, 243, 238, 0.08);
+}
+
+/* Accessibility: phones get 16px form fields, the minimum that stops iOS
+   Safari from zooming the page when a field is focused. */
+@media (max-width: 639px) {
+  input, select, textarea { font-size: 16px !important; }
 }

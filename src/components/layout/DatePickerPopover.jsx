@@ -67,7 +67,7 @@ export default function DatePickerPopover({ value, max, onPick, onClose }) {
         >
           <Icon name="chevron_left" size={18} />
         </button>
-        <span className="font-sans text-[13px] uppercase tracking-[0.15em] text-dn-white">{monthLabel}</span>
+        <span className="font-sans text-[15px] uppercase tracking-[0.15em] text-dn-white">{monthLabel}</span>
         <button
           type="button"
           onClick={() => shiftMonth(1)}
@@ -81,7 +81,7 @@ export default function DatePickerPopover({ value, max, onPick, onClose }) {
 
       <div className="grid grid-cols-7 gap-0.5 text-center">
         {WEEKDAYS.map((d, i) => (
-          <div key={i} className="font-sans text-[11px] text-dn-gray-light py-1">{d}</div>
+          <div key={i} className="font-sans text-[13px] text-dn-gray-light py-1">{d}</div>
         ))}
         {cells.map((day, i) => {
           if (!day) return <div key={`blank-${i}`} />
@@ -96,7 +96,7 @@ export default function DatePickerPopover({ value, max, onPick, onClose }) {
               disabled={isFuture}
               onClick={() => { onPick(iso); onClose() }}
               aria-current={isSelected ? 'date' : undefined}
-              className={`h-8 rounded-sm font-sans text-[13px] tabular transition-colors
+              className={`h-8 rounded-sm font-sans text-[15px] tabular transition-colors
                 ${isSelected
                   ? 'bg-dn-orange text-black font-semibold'
                   : isToday
@@ -114,7 +114,7 @@ export default function DatePickerPopover({ value, max, onPick, onClose }) {
         <button
           type="button"
           onClick={() => { onPick(max); onClose() }}
-          className="mt-2 w-full font-sans text-[12px] uppercase tracking-[0.15em] text-dn-orange hover:text-dn-orange-light transition-colors py-1"
+          className="mt-2 w-full font-sans text-[14px] uppercase tracking-[0.15em] text-dn-orange hover:text-dn-orange-light transition-colors py-1"
         >
           Today
         </button>

@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react'
-import DotGridWave from '../DotGridWave'
 import Icon from '../Icon'
 import HekbotReview from './HekbotReview'
 import { usePresets } from '../../hooks/usePresets'
@@ -278,15 +277,13 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdat
 
   return (
     <section className="relative overflow-hidden border-b border-white/[0.08]">
-      <DotGridWave overallOpacity={0.12} />
-
       <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 py-8 sm:py-14">
         {!started ? (
           // ── Landing state — headline + input, no thread yet ──────────────
           <div className="max-w-2xl mx-auto text-center animate-fade-in-up">
             <div className="flex items-center justify-center gap-2.5 mb-4">
               <div className="w-1.5 h-1.5 rounded-full bg-dn-orange animate-pulse [animation-duration:3s]" />
-              <span className="font-sans text-[13px] tracking-[0.3em] uppercase text-dn-orange">
+              <span className="font-sans text-[15px] tracking-[0.3em] uppercase text-dn-orange">
                 AI Nutrition Coach
               </span>
             </div>
@@ -321,7 +318,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdat
                 onKeyDown={handleTextareaKeyDown}
                 placeholder={HELPER_PREFIX + helperSuffix}
                 disabled={loading}
-                className={`w-full bg-transparent font-sans text-[14px] sm:text-[15px] text-dn-white placeholder-dn-graphite outline-none resize-none disabled:opacity-50 transition-all duration-300 ease-dn ${
+                className={`w-full bg-transparent font-sans text-[16px] sm:text-[15px] text-dn-white placeholder-dn-graphite outline-none resize-none disabled:opacity-50 transition-all duration-300 ease-dn ${
                   expanded ? 'min-h-[132px]' : 'min-h-[44px]'
                 }`}
               />
@@ -354,7 +351,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdat
                 <button
                   key={label}
                   onClick={() => sendMessage(label)}
-                  className="flex items-center gap-1.5 font-sans text-[14px] text-dn-orange border border-dn-orange/30 hover:border-dn-orange/60 hover:bg-dn-orange/10 rounded-sm px-3 py-1.5 transition-all duration-200"
+                  className="flex items-center gap-1.5 font-sans text-[16px] text-dn-orange border border-dn-orange/30 hover:border-dn-orange/60 hover:bg-dn-orange/10 rounded-sm px-3 py-1.5 transition-all duration-200"
                 >
                   <Icon name={icon} size={16} />
                   {label}
@@ -362,7 +359,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdat
               ))}
             </div>
 
-            {error && <p className="font-sans text-[14px] text-red-400 mt-4">{error}</p>}
+            {error && <p className="font-sans text-[16px] text-red-400 mt-4">{error}</p>}
           </div>
         ) : (
           // ── Active thread state ───────────────────────────────────────────
@@ -381,7 +378,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdat
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => startOver()}
-                  className="font-sans text-[13px] uppercase tracking-[0.1em] text-dn-gray-light hover:text-dn-white transition-colors"
+                  className="font-sans text-[15px] uppercase tracking-[0.1em] text-dn-gray-light hover:text-dn-white transition-colors"
                 >
                   New chat
                 </button>
@@ -414,7 +411,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdat
                           : 'bg-dn-gray-mid'
                       }`}
                     >
-                      <p className="font-sans text-[13px] text-dn-white leading-relaxed">
+                      <p className="font-sans text-[15px] text-dn-white leading-relaxed">
                         {msg.content}
                       </p>
                     </div>
@@ -432,7 +429,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdat
                       />
                     )}
                     {msg.discarded && (
-                      <span className="ml-0.5 font-sans text-[12px] text-dn-gray-light tracking-[0.12em] uppercase">Discarded</span>
+                      <span className="ml-0.5 font-sans text-[14px] text-dn-gray-light tracking-[0.12em] uppercase">Discarded</span>
                     )}
 
                     {/* Logged data badges */}
@@ -441,7 +438,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdat
                         {msg.logged.food?.map((item, j) => (
                           <div key={`food-${j}`} className="flex items-center gap-1.5">
                             <div className="w-1 h-1 rounded-full bg-green-400 flex-shrink-0" />
-                            <span className="font-sans text-[12px] text-green-400 tracking-[0.12em] uppercase">
+                            <span className="font-sans text-[14px] text-green-400 tracking-[0.12em] uppercase">
                               Logged · {item.food_item} · {Math.round(item.kcal ?? 0)} kcal · {Math.round(item.protein_g ?? 0)}g protein
                             </span>
                           </div>
@@ -449,7 +446,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdat
                         {msg.logged.weight && (
                           <div className="flex items-center gap-1.5">
                             <div className="w-1 h-1 rounded-full bg-blue-400 flex-shrink-0" />
-                            <span className="font-sans text-[12px] text-blue-400 tracking-[0.12em] uppercase">
+                            <span className="font-sans text-[14px] text-blue-400 tracking-[0.12em] uppercase">
                               Logged ·{msg.logged.weight.weight_lbs != null ? ` ${msg.logged.weight.weight_lbs} lbs` : ''}
                               {msg.logged.weight.waist_cm != null ? ` · ${msg.logged.weight.waist_cm} cm waist` : ''}
                             </span>
@@ -458,7 +455,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdat
                         {msg.logged.workout && (
                           <div className="flex items-center gap-1.5">
                             <div className="w-1 h-1 rounded-full bg-dn-orange flex-shrink-0" />
-                            <span className="font-sans text-[12px] text-dn-orange tracking-[0.12em] uppercase">
+                            <span className="font-sans text-[14px] text-dn-orange tracking-[0.12em] uppercase">
                               Logged · {msg.logged.workout.workout_type}
                               {msg.logged.workout.duration_min ? ` · ${msg.logged.workout.duration_min} min` : ''}
                               {msg.logged.workout.calories_burned ? ` · ${msg.logged.workout.calories_burned} kcal burned` : ''}
@@ -468,7 +465,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdat
                         {msg.logged.training_schedule && (
                           <div className="flex items-center gap-1.5">
                             <div className="w-1 h-1 rounded-full bg-dn-orange flex-shrink-0" />
-                            <span className="font-sans text-[12px] text-dn-orange tracking-[0.12em] uppercase">
+                            <span className="font-sans text-[14px] text-dn-orange tracking-[0.12em] uppercase">
                               Training schedule updated · {formatTrainingDays(msg.logged.training_schedule)}
                             </span>
                           </div>
@@ -476,7 +473,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdat
                         {msg.logged.targets && (
                           <div className="flex items-center gap-1.5">
                             <div className="w-1 h-1 rounded-full bg-dn-orange flex-shrink-0" />
-                            <span className="font-sans text-[12px] text-dn-orange tracking-[0.12em] uppercase">
+                            <span className="font-sans text-[14px] text-dn-orange tracking-[0.12em] uppercase">
                               Targets updated · {msg.logged.targets.calories_min}–{msg.logged.targets.calories_max} kcal · {msg.logged.targets.protein_g}g protein
                             </span>
                           </div>
@@ -515,7 +512,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdat
                   <button
                     key={preset.id}
                     onClick={() => handlePresetTap(preset)}
-                    className="font-sans text-[12px] tracking-[0.1em] text-dn-orange border border-dn-orange/25 hover:border-dn-orange/50 rounded-sm px-2.5 py-1.5 transition-all duration-200"
+                    className="font-sans text-[14px] tracking-[0.1em] text-dn-orange border border-dn-orange/25 hover:border-dn-orange/50 rounded-sm px-2.5 py-1.5 transition-all duration-200"
                   >
                     <Icon name="star" size={11} /> {preset.name}
                   </button>
@@ -530,7 +527,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdat
                   key={label}
                   onClick={() => sendMessage(label)}
                   disabled={loading}
-                  className="font-sans text-[12px] tracking-[0.15em] uppercase text-dn-gray-light hover:text-dn-white border border-white/[0.08] hover:border-white/20 rounded-sm px-2.5 py-1.5 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="font-sans text-[14px] tracking-[0.15em] uppercase text-dn-gray-light hover:text-dn-white border border-white/[0.08] hover:border-white/20 rounded-sm px-2.5 py-1.5 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {label}
                 </button>
@@ -561,7 +558,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdat
                 onChange={e => setInput(e.target.value)}
                 placeholder="Tell me what you ate, or ask anything..."
                 disabled={loading}
-                className="flex-1 bg-transparent font-sans text-[13px] text-dn-white placeholder-dn-graphite outline-none disabled:opacity-50"
+                className="flex-1 bg-transparent font-sans text-[15px] text-dn-white placeholder-dn-graphite outline-none disabled:opacity-50"
               />
 
               <button

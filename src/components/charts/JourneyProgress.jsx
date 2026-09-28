@@ -1,15 +1,14 @@
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import CardTexture from '../CardTexture'
 import { getPhaseProgress, formatDate } from '../../lib/helpers'
 
 function MiniTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
   return (
     <div className="bg-dn-surface border border-dn-orange/30 rounded-sm px-2.5 py-1.5 shadow-xl">
-      <div className="font-sans text-[12px] text-dn-gray-light">{label}</div>
-      <div className="font-display text-[14px] text-dn-white tabular leading-none">
+      <div className="font-sans text-[14px] text-dn-gray-light">{label}</div>
+      <div className="font-display text-[16px] text-dn-white tabular leading-none">
         {payload[0].value}
-        <span className="font-sans text-[12px] text-dn-gray-light ml-1">lbs</span>
+        <span className="font-sans text-[14px] text-dn-gray-light ml-1">lbs</span>
       </div>
     </div>
   )
@@ -19,11 +18,11 @@ function WeightMiniChart({ checkins }) {
   if (!checkins || checkins.length < 2) {
     return (
       <div className="mt-5 pt-4 border-t border-white/[0.06]">
-        <div className="font-sans text-[12px] uppercase tracking-[0.2em] text-dn-gray-light mb-2">
+        <div className="font-sans text-[14px] uppercase tracking-[0.2em] text-dn-gray-light mb-2">
           Weight Trend
         </div>
         <div className="h-20 flex items-center justify-center border border-dashed border-white/[0.08] rounded-sm">
-          <span className="font-sans text-[14px] text-dn-gray-light/60">
+          <span className="font-sans text-[16px] text-dn-gray-light/60">
             Log another weigh-in to see your trend
           </span>
         </div>
@@ -39,10 +38,10 @@ function WeightMiniChart({ checkins }) {
   return (
     <div className="mt-5 pt-4 border-t border-white/[0.06]">
       <div className="flex items-center justify-between mb-2">
-        <span className="font-sans text-[12px] uppercase tracking-[0.2em] text-dn-gray-light">
+        <span className="font-sans text-[14px] uppercase tracking-[0.2em] text-dn-gray-light">
           Weight Trend
         </span>
-        <span className={`font-sans text-[13px] tabular ${delta <= 0 ? 'text-green-400' : 'text-amber-400'}`}>
+        <span className={`font-sans text-[15px] tabular ${delta <= 0 ? 'text-green-400' : 'text-amber-400'}`}>
           {delta > 0 ? '+' : ''}{delta.toFixed(1)} lbs since {data[0].label}
         </span>
       </div>
@@ -82,13 +81,12 @@ export default function JourneyProgress({ currentWeight, checkins }) {
 
   return (
     <div className="dn-card relative overflow-hidden p-4 sm:p-6 animate-fade-in-up">
-      <CardTexture variant={2} />
 
       <div className="relative">
         {/* Header row */}
         <div className="flex items-start justify-between mb-5">
           <div>
-            <div className="font-sans text-[13px] font-normal tracking-[0.2em] uppercase text-dn-gray-light mb-1">
+            <div className="font-sans text-[15px] font-normal tracking-[0.2em] uppercase text-dn-gray-light mb-1">
               Ascension Progress
             </div>
             <div className="font-display text-[18px] tracking-[0.1em] text-dn-white">
@@ -113,34 +111,34 @@ export default function JourneyProgress({ currentWeight, checkins }) {
           </div>
           {/* Milestone markers */}
           <div className="flex justify-between mt-2">
-            <span className="font-sans text-[12px] text-dn-gray-light tabular">211 lbs</span>
-            <span className="font-sans text-[12px] text-dn-orange tabular">{progress.goalLabel}</span>
+            <span className="font-sans text-[14px] text-dn-gray-light tabular">211 lbs</span>
+            <span className="font-sans text-[14px] text-dn-orange tabular">{progress.goalLabel}</span>
           </div>
         </div>
 
         {/* Current weight pill */}
         <div className="mt-4 flex items-center gap-2 sm:gap-3 flex-wrap">
           <div className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-sm">
-            <span className="font-sans text-[13px] text-dn-gray-light tracking-wide">Current</span>
+            <span className="font-sans text-[15px] text-dn-gray-light tracking-wide">Current</span>
             <span className="font-display text-[16px] tracking-[0.08em] text-dn-white tabular">
               {currentWeight ? `${currentWeight} lbs` : '— lbs'}
             </span>
           </div>
           {progress.phase === 1 && (
             <div className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-sm">
-              <span className="font-sans text-[13px] text-dn-gray-light tracking-wide">Target</span>
+              <span className="font-sans text-[15px] text-dn-gray-light tracking-wide">Target</span>
               <span className="font-display text-[16px] tracking-[0.08em] text-dn-orange tabular">200 lbs</span>
             </div>
           )}
           {progress.phase === 2 && (
             <div className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-sm">
-              <span className="font-sans text-[13px] text-dn-gray-light tracking-wide">Target</span>
+              <span className="font-sans text-[15px] text-dn-gray-light tracking-wide">Target</span>
               <span className="font-display text-[16px] tracking-[0.08em] text-dn-orange tabular">190 lbs</span>
             </div>
           )}
           {currentWeight && (
             <div className="flex items-center gap-2 px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-sm">
-              <span className="font-sans text-[13px] text-dn-gray-light tracking-wide">To go</span>
+              <span className="font-sans text-[15px] text-dn-gray-light tracking-wide">To go</span>
               <span className="font-display text-[16px] tracking-[0.08em] text-dn-white tabular">
                 {Math.max(0, currentWeight - (progress.phase === 1 ? 200 : 190)).toFixed(1)} lbs
               </span>

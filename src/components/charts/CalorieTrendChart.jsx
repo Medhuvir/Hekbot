@@ -13,23 +13,23 @@ function CustomTooltip({ active, payload, label }) {
   const net    = payload.find(p => p.dataKey === 'net')
   return (
     <div className="bg-dn-surface border border-white/[0.15] rounded-sm px-3 py-2 shadow-xl min-w-[120px]">
-      <div className="font-sans text-[13px] text-dn-gray-light mb-2">{label}</div>
+      <div className="font-sans text-[15px] text-dn-gray-light mb-2">{label}</div>
       {intake && (
-        <div className="font-sans text-[14px] flex justify-between gap-4">
+        <div className="font-sans text-[16px] flex justify-between gap-4">
           <span className="text-dn-gray-light">Intake</span>
-          <span className="font-display text-[14px] tabular text-dn-orange">{intake.value} kcal</span>
+          <span className="font-display text-[16px] tabular text-dn-orange">{intake.value} kcal</span>
         </div>
       )}
       {burned && burned.value > 0 && (
-        <div className="font-sans text-[14px] flex justify-between gap-4">
+        <div className="font-sans text-[16px] flex justify-between gap-4">
           <span className="text-dn-gray-light">Burned</span>
-          <span className="font-display text-[14px] tabular text-green-400">{burned.value} kcal</span>
+          <span className="font-display text-[16px] tabular text-green-400">{burned.value} kcal</span>
         </div>
       )}
       {net && (
-        <div className="font-sans text-[14px] flex justify-between gap-4 border-t border-white/[0.08] mt-1 pt-1">
+        <div className="font-sans text-[16px] flex justify-between gap-4 border-t border-white/[0.08] mt-1 pt-1">
           <span className="text-dn-gray-light">Net</span>
-          <span className="font-display text-[14px] tabular text-dn-white">{net.value} kcal</span>
+          <span className="font-display text-[16px] tabular text-dn-white">{net.value} kcal</span>
         </div>
       )}
     </div>
@@ -51,21 +51,21 @@ export default function CalorieTrendChart({ dailyTotals, targets }) {
   return (
     <div className="dn-card p-4 sm:p-6">
       <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
-        <div className="font-sans text-[13px] tracking-[0.2em] uppercase text-dn-gray-light">
+        <div className="font-sans text-[15px] tracking-[0.2em] uppercase text-dn-gray-light">
           Calorie Trend
         </div>
         <div className="flex items-center gap-3 sm:gap-4">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-0.5 bg-dn-orange inline-block" />
-            <span className="font-sans text-[12px] text-dn-gray-light">Intake</span>
+            <span className="font-sans text-[14px] text-dn-gray-light">Intake</span>
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-0.5 bg-green-400 inline-block" />
-            <span className="font-sans text-[12px] text-dn-gray-light">Burned</span>
+            <span className="font-sans text-[14px] text-dn-gray-light">Burned</span>
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-0.5 bg-white/40 inline-block" />
-            <span className="font-sans text-[12px] text-dn-gray-light">Net</span>
+            <span className="font-sans text-[14px] text-dn-gray-light">Net</span>
           </span>
         </div>
       </div>
@@ -73,16 +73,16 @@ export default function CalorieTrendChart({ dailyTotals, targets }) {
       <ResponsiveContainer width="100%" height={200}>
         <ComposedChart data={dailyTotals} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
           <CartesianGrid stroke={GRID} vertical={false} />
-          <XAxis dataKey="label" tick={{ fill: AXIS, fontSize: 10, fontFamily: 'DM Sans' }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fill: AXIS, fontSize: 10, fontFamily: 'DM Sans' }} axisLine={false} tickLine={false} />
+          <XAxis dataKey="label" tick={{ fill: AXIS, fontSize: 12, fontFamily: 'DM Sans' }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fill: AXIS, fontSize: 12, fontFamily: 'DM Sans' }} axisLine={false} tickLine={false} />
           <Tooltip content={<CustomTooltip />} />
 
           {/* Target range band */}
           <ReferenceArea y1={calMin} y2={calMax} fill="rgba(255,94,26,0.05)" />
           <ReferenceLine y={calMin} stroke="#FF5E1A" strokeOpacity={0.2} strokeDasharray="3 3"
-            label={{ value: `${calMin}`, position: 'right', fontSize: 9, fill: '#FF5E1A', fontFamily: 'DM Sans' }} />
+            label={{ value: `${calMin}`, position: 'right', fontSize: 11, fill: '#FF5E1A', fontFamily: 'DM Sans' }} />
           <ReferenceLine y={calMax} stroke="#FF5E1A" strokeOpacity={0.2} strokeDasharray="3 3"
-            label={{ value: `${calMax}`, position: 'right', fontSize: 9, fill: '#FF5E1A', fontFamily: 'DM Sans' }} />
+            label={{ value: `${calMax}`, position: 'right', fontSize: 11, fill: '#FF5E1A', fontFamily: 'DM Sans' }} />
 
           <Line type="monotone" dataKey="calories" stroke="#FF5E1A" strokeWidth={2}
             dot={{ fill: '#FF5E1A', r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} />

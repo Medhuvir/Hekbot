@@ -1,4 +1,3 @@
-import CardTexture from '../CardTexture'
 import { MACRO_COLORS } from '../../lib/macroColors'
 
 function MacroBarRow({ label, value, target, targetMax, unit = 'g', color, big }) {
@@ -11,7 +10,7 @@ function MacroBarRow({ label, value, target, targetMax, unit = 'g', color, big }
     <div>
       <div className="flex items-baseline justify-between gap-2 mb-1.5">
         <span
-          className={`font-sans font-semibold uppercase tracking-[0.1em] ${big ? 'text-[14px]' : 'text-[13px]'}`}
+          className={`font-sans font-semibold uppercase tracking-[0.1em] ${big ? 'text-[16px]' : 'text-[15px]'}`}
           style={{ color }}
         >
           {label}
@@ -20,7 +19,7 @@ function MacroBarRow({ label, value, target, targetMax, unit = 'g', color, big }
           {big && (
             <span className="font-display text-[28px] text-dn-white mr-1">{Math.round(value)}</span>
           )}
-          <span className={big ? 'text-[14px]' : 'text-[13px]'}>
+          <span className={big ? 'text-[16px]' : 'text-[15px]'}>
             {big ? '' : `${Math.round(value)} `}
             {targetMax ? `/ ${target}–${targetMax}` : target ? `/ ${target}` : ''}
             {unit}
@@ -34,7 +33,7 @@ function MacroBarRow({ label, value, target, targetMax, unit = 'g', color, big }
         />
       </div>
       {denom > 0 && (
-        <div className={`text-right font-sans text-[12px] tracking-[0.06em] mt-0.5 ${over ? 'text-red-400' : 'text-dn-gray-light'}`}>
+        <div className={`text-right font-sans text-[14px] tracking-[0.06em] mt-0.5 ${over ? 'text-red-400' : 'text-dn-gray-light'}`}>
           {over ? `${Math.abs(remaining)}${unit} over` : `${remaining}${unit} remaining`}
         </div>
       )}
@@ -47,7 +46,6 @@ export default function MacroTotalsBar({ totals, targets, netCalories }) {
 
   return (
     <div className="dn-card relative overflow-hidden p-4 sm:p-5">
-      <CardTexture variant={1} />
       <div className="relative space-y-4">
       <MacroBarRow
         label="Calories"
@@ -79,13 +77,13 @@ export default function MacroTotalsBar({ totals, targets, netCalories }) {
 
       {netCalories !== null && netCalories !== undefined && (
         <div className="flex items-center justify-end pt-3 border-t border-white/[0.06]">
-          <span className="font-sans text-[14px] text-dn-gray-light">
+          <span className="font-sans text-[16px] text-dn-gray-light">
             Net
             <span className="font-display text-[16px] text-dn-white tabular ml-1.5">
               {netCalories >= 0 ? '+' : ''}
               {netCalories.toFixed(0)}
             </span>
-            <span className="text-[13px] ml-0.5">kcal</span>
+            <span className="text-[15px] ml-0.5">kcal</span>
           </span>
         </div>
       )}

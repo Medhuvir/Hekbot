@@ -161,7 +161,7 @@ export default function ImportModal({ onClose, onImported }) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08] shrink-0">
           <div>
             <div className="font-display text-[20px] tracking-[0.08em] text-dn-white">Import from MyFitnessPal</div>
-            <div className="font-sans text-[14px] text-dn-gray-light mt-0.5">
+            <div className="font-sans text-[16px] text-dn-gray-light mt-0.5">
               MFP → Settings → Export Data → select date range → download CSV
             </div>
           </div>
@@ -174,10 +174,10 @@ export default function ImportModal({ onClose, onImported }) {
         {result ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-4 p-10">
             <div className="font-display text-[48px] text-dn-orange leading-none">{result.imported}</div>
-            <div className="font-sans text-[14px] text-dn-white">entries imported successfully</div>
+            <div className="font-sans text-[16px] text-dn-white">entries imported successfully</div>
             <button
               onClick={onClose}
-              className="mt-4 px-6 py-2 bg-dn-orange text-black font-sans font-semibold text-[12px] rounded-sm hover:-translate-y-px transition-all duration-150"
+              className="mt-4 px-6 py-2 bg-dn-orange text-black font-sans font-semibold text-[14px] rounded-sm hover:-translate-y-px transition-all duration-150"
             >
               Done
             </button>
@@ -190,7 +190,7 @@ export default function ImportModal({ onClose, onImported }) {
                 <button
                   key={id}
                   onClick={() => { setTab(id); setParsed(null); setRaw('') }}
-                  className={`px-5 py-3 font-sans text-[14px] uppercase tracking-[0.1em] border-b-2 transition-colors ${
+                  className={`px-5 py-3 font-sans text-[16px] uppercase tracking-[0.1em] border-b-2 transition-colors ${
                     tab === id
                       ? 'border-dn-orange text-dn-orange'
                       : 'border-transparent text-dn-gray-light hover:text-dn-white'
@@ -208,22 +208,22 @@ export default function ImportModal({ onClose, onImported }) {
                   onClick={() => fileRef.current?.click()}
                   className="border border-dashed border-white/[0.15] rounded-sm p-8 text-center cursor-pointer hover:border-dn-orange/40 transition-colors"
                 >
-                  <div className="font-sans text-[13px] text-dn-white mb-1">Click to select your MFP export CSV</div>
-                  <div className="font-sans text-[14px] text-dn-gray-light">or drag and drop</div>
+                  <div className="font-sans text-[15px] text-dn-white mb-1">Click to select your MFP export CSV</div>
+                  <div className="font-sans text-[16px] text-dn-gray-light">or drag and drop</div>
                   <input ref={fileRef} type="file" accept=".csv,.txt" className="hidden" onChange={handleFile} />
                   {raw && (
-                    <div className="mt-3 font-sans text-[14px] text-dn-orange">
+                    <div className="mt-3 font-sans text-[16px] text-dn-orange">
                       File loaded — {raw.split('\n').length} lines
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <div className="font-sans text-[13px] uppercase tracking-[0.15em] text-dn-gray-light">
+                  <div className="font-sans text-[15px] uppercase tracking-[0.15em] text-dn-gray-light">
                     Paste CSV content below
                   </div>
                   <textarea
-                    className="w-full h-32 bg-black/30 border border-white/[0.08] rounded-sm px-3 py-2 font-sans text-[14px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors resize-none"
+                    className="w-full h-32 bg-black/30 border border-white/[0.08] rounded-sm px-3 py-2 font-sans text-[16px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors resize-none"
                     placeholder={"Date,Meal,Calories,Carbohydrates (g),Fat (g),Protein (g),...\n2026-06-24,Breakfast,350,45,12,28,..."}
                     value={raw}
                     onChange={e => { setRaw(e.target.value); setParsed(null) }}
@@ -231,7 +231,7 @@ export default function ImportModal({ onClose, onImported }) {
                   <button
                     onClick={handleParse}
                     disabled={!raw.trim()}
-                    className="px-4 py-1.5 border border-dn-orange/40 text-dn-orange font-sans text-[14px] rounded-sm hover:bg-dn-orange/10 transition-colors disabled:opacity-40"
+                    className="px-4 py-1.5 border border-dn-orange/40 text-dn-orange font-sans text-[16px] rounded-sm hover:bg-dn-orange/10 transition-colors disabled:opacity-40"
                   >
                     Parse
                   </button>
@@ -242,14 +242,14 @@ export default function ImportModal({ onClose, onImported }) {
             {/* Error */}
             {parsed?.error && (
               <div className="mx-6 mb-3 px-4 py-3 bg-red-400/10 border border-red-400/20 rounded-sm">
-                <div className="font-sans text-[12px] text-red-400">{parsed.error}</div>
+                <div className="font-sans text-[14px] text-red-400">{parsed.error}</div>
               </div>
             )}
 
             {/* Preview */}
             {parsed?.entries?.length > 0 && (
               <div className="flex-1 overflow-y-auto px-6 pb-2 min-h-0">
-                <div className="font-sans text-[13px] uppercase tracking-[0.15em] text-dn-gray-light mb-3">
+                <div className="font-sans text-[15px] uppercase tracking-[0.15em] text-dn-gray-light mb-3">
                   Preview — {parsed.entries.length} entries across {grouped.length} day{grouped.length !== 1 ? 's' : ''}
                 </div>
                 <div className="space-y-3">
@@ -259,22 +259,22 @@ export default function ImportModal({ onClose, onImported }) {
                     return (
                       <div key={date} className="border border-white/[0.06] rounded-sm overflow-hidden">
                         <div className="flex items-center justify-between px-4 py-2 bg-white/[0.03]">
-                          <span className="font-sans text-[14px] font-medium text-dn-white">{fmt(date)}</span>
-                          <span className="font-sans text-[13px] text-dn-gray-light tabular">
+                          <span className="font-sans text-[16px] font-medium text-dn-white">{fmt(date)}</span>
+                          <span className="font-sans text-[15px] text-dn-gray-light tabular">
                             {dayTotal} kcal · {dayProtein.toFixed(0)}g protein · {items.length} items
                           </span>
                         </div>
                         <div className="divide-y divide-white/[0.04]">
                           {items.slice(0, 4).map((item, i) => (
                             <div key={i} className="flex items-center justify-between px-4 py-1.5">
-                              <span className="font-sans text-[14px] text-dn-white/70 truncate max-w-[55%]">{item.food_name}</span>
-                              <span className="font-sans text-[13px] text-dn-gray-light tabular">
+                              <span className="font-sans text-[16px] text-dn-white/70 truncate max-w-[55%]">{item.food_name}</span>
+                              <span className="font-sans text-[15px] text-dn-gray-light tabular">
                                 {item.calories} kcal · P:{item.protein_g.toFixed(0)}g
                               </span>
                             </div>
                           ))}
                           {items.length > 4 && (
-                            <div className="px-4 py-1.5 font-sans text-[13px] text-dn-gray-light">
+                            <div className="px-4 py-1.5 font-sans text-[15px] text-dn-gray-light">
                               +{items.length - 4} more items
                             </div>
                           )}
@@ -289,13 +289,13 @@ export default function ImportModal({ onClose, onImported }) {
             {/* Footer actions */}
             {parsed?.entries?.length > 0 && (
               <div className="flex items-center justify-between px-6 py-4 border-t border-white/[0.08] shrink-0">
-                <div className="font-sans text-[14px] text-dn-gray-light">
+                <div className="font-sans text-[16px] text-dn-gray-light">
                   Entries will be appended — existing logs for these dates are preserved.
                 </div>
                 <button
                   onClick={handleImport}
                   disabled={importing}
-                  className="px-5 py-2 bg-dn-orange text-black font-sans font-semibold text-[12px] rounded-sm hover:-translate-y-px transition-all duration-150 disabled:opacity-50"
+                  className="px-5 py-2 bg-dn-orange text-black font-sans font-semibold text-[14px] rounded-sm hover:-translate-y-px transition-all duration-150 disabled:opacity-50"
                 >
                   {importing ? 'Importing…' : `Import ${parsed.entries.length} entries`}
                 </button>

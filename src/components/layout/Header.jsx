@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import DNMark from '../DNMark'
 import Icon from '../Icon'
-import DotGridWave from '../DotGridWave'
 import DatePickerPopover from './DatePickerPopover'
 
 function DateNavControls({
@@ -47,7 +46,7 @@ function DateNavControls({
         {!isToday && (
           <button
             onClick={onToday}
-            className="font-sans text-[9px] sm:text-[10px] uppercase tracking-[0.15em] text-dn-orange mt-0.5 hover:underline underline-offset-2 whitespace-nowrap"
+            className="font-sans text-[11px] sm:text-[12px] uppercase tracking-[0.15em] text-dn-orange mt-0.5 hover:underline underline-offset-2 whitespace-nowrap"
           >
             Jump to today
           </button>
@@ -92,10 +91,6 @@ export default function Header({
 
   return (
     <header className="relative z-30 border-b border-white/[0.08]">
-      {/* Clip only the animated backdrop, so the date picker can overlap the page */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <DotGridWave />
-      </div>
 
       <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 py-2.5 sm:py-5 flex items-center justify-between">
 
@@ -132,7 +127,7 @@ export default function Header({
             <>
               <button
                 onClick={onOpenAdmin}
-                className="flex items-center gap-1 font-sans text-[13px] sm:text-[14px] text-dn-orange hover:text-dn-orange-light transition-colors duration-200 whitespace-nowrap"
+                className="flex items-center gap-1 font-sans text-[15px] sm:text-[16px] text-dn-orange hover:text-dn-orange-light transition-colors duration-200 whitespace-nowrap"
               >
                 <Icon name="person" size={15} />
                 Admin
@@ -140,7 +135,7 @@ export default function Header({
               <div className="w-px h-4 bg-white/20" aria-hidden="true" />
               <button
                 onClick={onSignOut}
-                className="flex items-center gap-1 font-sans text-[13px] sm:text-[14px] text-dn-orange hover:text-dn-orange-light transition-colors duration-200 whitespace-nowrap"
+                className="flex items-center gap-1 font-sans text-[15px] sm:text-[16px] text-dn-orange hover:text-dn-orange-light transition-colors duration-200 whitespace-nowrap"
               >
                 <Icon name="door_open" size={15} />
                 Sign Out
@@ -149,7 +144,7 @@ export default function Header({
           ) : (
             <Link
               to="/login"
-              className="flex items-center gap-1 font-sans text-[13px] sm:text-[14px] text-dn-orange hover:text-dn-orange-light transition-colors duration-200 whitespace-nowrap"
+              className="flex items-center gap-1 font-sans text-[15px] sm:text-[16px] text-dn-orange hover:text-dn-orange-light transition-colors duration-200 whitespace-nowrap"
             >
               <Icon name="person" size={14} />
               Sign in <Icon name="arrow_forward" size={11} className="align-[-1px]" />

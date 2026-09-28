@@ -1,4 +1,3 @@
-import DotGridWave from '../DotGridWave'
 import Icon from '../Icon'
 import OrderOfFireMedallion from '../OrderOfFireMedallion'
 import { lbsToKg } from '../../lib/helpers'
@@ -23,8 +22,8 @@ function StatItem({ icon, label, value }) {
     <div className="flex items-start gap-2.5 min-w-0">
       <Icon name={icon} size={18} className="text-dn-orange shrink-0 mt-0.5" />
       <div className="min-w-0">
-        <div className="font-sans text-[10px] sm:text-[11px] tracking-[0.2em] uppercase text-dn-gray-light">{label}</div>
-        <div className="font-sans text-[13px] sm:text-[14px] text-dn-white mt-0.5 truncate">{value}</div>
+        <div className="font-sans text-[12px] sm:text-[13px] tracking-[0.2em] uppercase text-dn-gray-light">{label}</div>
+        <div className="font-sans text-[15px] sm:text-[16px] text-dn-white mt-0.5 truncate">{value}</div>
       </div>
     </div>
   )
@@ -41,8 +40,6 @@ export default function PublicProfileHero({ profile, latestCheckin }) {
 
   return (
     <section className="relative overflow-hidden border-b border-white/[0.08]">
-      <DotGridWave overallOpacity={0.12} />
-
       <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 py-5 sm:py-7">
         <div className="flex flex-col lg:flex-row lg:items-center gap-5 sm:gap-6">
           <div className="flex items-center gap-3.5 sm:gap-4 shrink-0">
@@ -61,27 +58,27 @@ export default function PublicProfileHero({ profile, latestCheckin }) {
                 {profile.name}
               </div>
               {profile.affiliation && (
-                <div className="inline-flex items-center gap-1.5 font-sans text-[11px] sm:text-[12px] tracking-[0.2em] uppercase text-dn-orange mt-1.5">
+                <div className="inline-flex items-center gap-1.5 font-sans text-[13px] sm:text-[14px] tracking-[0.2em] uppercase text-dn-orange mt-1.5">
                   <OrderOfFireMedallion size={12} />
                   {profile.affiliation}
                 </div>
               )}
               <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
                 {profile.age && (
-                  <span className="font-sans text-[12px] text-dn-gray-light">
+                  <span className="font-sans text-[14px] text-dn-gray-light">
                     Age <span className="text-dn-white">{profile.age}</span>
                   </span>
                 )}
                 {profile.height_cm && (
-                  <span className="font-sans text-[12px] text-dn-gray-light">
+                  <span className="font-sans text-[14px] text-dn-gray-light">
                     Height <span className="text-dn-white">5'10"</span>
                   </span>
                 )}
-                <span className="font-sans text-[12px] text-dn-gray-light">
+                <span className="font-sans text-[14px] text-dn-gray-light">
                   Weight <span className="text-dn-white">{currentWeight} lbs</span> ({currentKg} kg)
                 </span>
                 {profile.timezone && (
-                  <span className="font-sans text-[12px] text-dn-gray-light">
+                  <span className="font-sans text-[14px] text-dn-gray-light">
                     Timezone <span className="text-dn-white">{TIMEZONE_LABELS[profile.timezone] ?? profile.timezone}</span>
                   </span>
                 )}
@@ -99,11 +96,11 @@ export default function PublicProfileHero({ profile, latestCheckin }) {
         {/* Goal phases */}
         <div className="mt-5 pt-5 border-t border-white/[0.08] grid grid-cols-2 gap-3 max-w-md">
           <div className="bg-white/[0.03] border border-white/[0.06] rounded-sm px-3 py-2">
-            <div className="font-sans text-[12px] uppercase tracking-[0.15em] text-dn-gray-light">Phase I · 8 wks</div>
+            <div className="font-sans text-[14px] uppercase tracking-[0.15em] text-dn-gray-light">Phase I · 8 wks</div>
             <div className="font-display text-[20px] text-dn-orange tabular mt-0.5">Under 200 lbs</div>
           </div>
           <div className="bg-white/[0.03] border border-white/[0.06] rounded-sm px-3 py-2">
-            <div className="font-sans text-[12px] uppercase tracking-[0.15em] text-dn-gray-light">Phase II · 16 wks</div>
+            <div className="font-sans text-[14px] uppercase tracking-[0.15em] text-dn-gray-light">Phase II · 16 wks</div>
             <div className="font-display text-[20px] text-dn-white tabular mt-0.5">Strike 190 lbs</div>
           </div>
         </div>

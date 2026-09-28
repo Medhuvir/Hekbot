@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import DNMark from '../components/DNMark'
 import Icon from '../components/Icon'
-import DotGridWave from '../components/DotGridWave'
+import LiveTopo from '../components/LiveTopo'
 
 export default function Login() {
   const { signIn, sendPasswordReset, isAuthenticated } = useAuth()
@@ -50,7 +50,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-dn-black flex flex-col items-center justify-center px-6 relative overflow-hidden">
-      <DotGridWave />
+      <LiveTopo overlay="radial-gradient(ellipse at center, rgba(10,10,10,0.88) 0%, rgba(10,10,10,0.6) 45%, rgba(10,10,10,0.1) 100%)" />
 
       <div className="relative w-full max-w-sm">
         {/* DN Lockup */}
@@ -59,35 +59,35 @@ export default function Login() {
           <div className="font-display text-[32px] tracking-[0.08em] text-dn-white mt-4 leading-none">
             HekBot
           </div>
-          <div className="font-sans text-[13px] tracking-[0.2em] uppercase text-dn-gray-light mt-1">
+          <div className="font-sans text-[15px] tracking-[0.2em] uppercase text-dn-gray-light mt-1">
             Sign in
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
-            <label className="font-sans text-[13px] uppercase tracking-[0.15em] text-dn-gray-light block mb-1.5">
+            <label className="font-sans text-[15px] uppercase tracking-[0.15em] text-dn-gray-light block mb-1.5">
               Email
             </label>
             <input
               type="email"
               autoComplete="email"
               required
-              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-sm px-4 py-2.5 font-sans text-[14px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/50 transition-colors"
+              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-sm px-4 py-2.5 font-sans text-[16px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/50 transition-colors"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="you@example.com"
             />
           </div>
           <div>
-            <label className="font-sans text-[13px] uppercase tracking-[0.15em] text-dn-gray-light block mb-1.5">
+            <label className="font-sans text-[15px] uppercase tracking-[0.15em] text-dn-gray-light block mb-1.5">
               Password
             </label>
             <input
               type="password"
               autoComplete="current-password"
               required
-              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-sm px-4 py-2.5 font-sans text-[14px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/50 transition-colors"
+              className="w-full bg-white/[0.04] border border-white/[0.08] rounded-sm px-4 py-2.5 font-sans text-[16px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/50 transition-colors"
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="••••••••"
@@ -95,30 +95,30 @@ export default function Login() {
           </div>
 
           {error && (
-            <p className="font-sans text-[12px] text-red-400 pt-1">{error}</p>
+            <p className="font-sans text-[14px] text-red-400 pt-1">{error}</p>
           )}
           {resetMessage && (
-            <p className="font-sans text-[12px] text-green-400 pt-1">{resetMessage}</p>
+            <p className="font-sans text-[14px] text-green-400 pt-1">{resetMessage}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-3 bg-dn-orange text-black font-sans font-semibold text-[13px] tracking-[0.08em] uppercase rounded-sm hover:-translate-y-px transition-all duration-150 disabled:opacity-50"
+            className="w-full mt-2 py-3 bg-dn-orange text-black font-sans font-semibold text-[15px] tracking-[0.08em] uppercase rounded-sm hover:-translate-y-px transition-all duration-150 disabled:opacity-50"
           >
             {loading ? 'Signing in…' : 'Enter'}
           </button>
           <button
             type="button"
             onClick={handleForgotPassword}
-            className="w-full pt-1 font-sans text-[13px] text-dn-gray-light hover:text-dn-white transition-colors"
+            className="w-full pt-1 font-sans text-[15px] text-dn-gray-light hover:text-dn-white transition-colors"
           >
             Forgot password?
           </button>
         </form>
 
         <div className="mt-8 text-center">
-          <a href="/" className="font-sans text-[14px] text-dn-gray-light hover:text-dn-white transition-colors">
+          <a href="/" className="font-sans text-[16px] text-dn-gray-light hover:text-dn-white transition-colors">
             <Icon name="arrow_back" size={11} className="align-[-1px]" /> Public dashboard
           </a>
         </div>

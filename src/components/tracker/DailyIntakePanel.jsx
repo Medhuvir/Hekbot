@@ -9,7 +9,7 @@ const MEAL_LABELS = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', 
 function MacroChip({ value, unit, color, bg }) {
   return (
     <span
-      className="inline-flex items-center rounded-sm px-1.5 py-0.5 font-sans text-[13px] font-semibold tabular"
+      className="inline-flex items-center rounded-sm px-1.5 py-0.5 font-sans text-[15px] font-semibold tabular"
       style={{ color, backgroundColor: bg }}
     >
       {value}{unit}
@@ -23,9 +23,9 @@ function FoodRow({ item, isAdmin, onDelete }) {
   return (
     <div className="flex items-center justify-between gap-2 py-2 border-b border-white/[0.05] last:border-0 group">
       <div className="flex-1 min-w-0">
-        <span className="font-sans text-[13px] text-dn-white truncate block">{item.food_name}</span>
+        <span className="font-sans text-[15px] text-dn-white truncate block">{item.food_name}</span>
         {item.notes && (
-          <span className="font-sans text-[13px] text-dn-gray-light truncate block">{item.notes}</span>
+          <span className="font-sans text-[15px] text-dn-gray-light truncate block">{item.notes}</span>
         )}
       </div>
       <div className="flex items-center gap-1 shrink-0">
@@ -39,13 +39,13 @@ function FoodRow({ item, isAdmin, onDelete }) {
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={() => { onDelete(item.id); setConfirming(false) }}
-              className="font-sans text-[13px] text-red-400 hover:text-red-300 transition-colors"
+              className="font-sans text-[15px] text-red-400 hover:text-red-300 transition-colors"
             >
               Delete
             </button>
             <button
               onClick={() => setConfirming(false)}
-              className="font-sans text-[13px] text-dn-gray-light hover:text-dn-white transition-colors"
+              className="font-sans text-[15px] text-dn-gray-light hover:text-dn-white transition-colors"
             >
               Cancel
             </button>
@@ -101,16 +101,16 @@ function AddFoodForm({ date, mealType, onAdded, onCancel }) {
   return (
     <form onSubmit={handleSubmit} className="mt-3 pt-3 border-t border-white/[0.06]">
       <div className="flex items-center justify-between mb-2">
-        <span className="font-sans text-[13px] uppercase tracking-[0.15em] text-dn-gray-light">
+        <span className="font-sans text-[15px] uppercase tracking-[0.15em] text-dn-gray-light">
           Adding to {MEAL_LABELS[mealType]}
         </span>
-        <button type="button" onClick={onCancel} className="font-sans text-[13px] text-dn-gray-light hover:text-dn-white transition-colors">
+        <button type="button" onClick={onCancel} className="font-sans text-[15px] text-dn-gray-light hover:text-dn-white transition-colors">
           Cancel
         </button>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mb-2">
         <input
-          className="col-span-2 sm:col-span-2 bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[12px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors"
+          className="col-span-2 sm:col-span-2 bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[14px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors"
           placeholder="Food name"
           value={form.food_name}
           onChange={e => set('food_name', e.target.value)}
@@ -118,7 +118,7 @@ function AddFoodForm({ date, mealType, onAdded, onCancel }) {
           autoFocus
         />
         <input
-          className="bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[12px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors tabular"
+          className="bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[14px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors tabular"
           placeholder="kcal"
           type="number"
           min="0"
@@ -127,7 +127,7 @@ function AddFoodForm({ date, mealType, onAdded, onCancel }) {
           required
         />
         <input
-          className="bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[12px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors tabular"
+          className="bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[14px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors tabular"
           placeholder="protein g"
           type="number"
           min="0"
@@ -136,7 +136,7 @@ function AddFoodForm({ date, mealType, onAdded, onCancel }) {
           onChange={e => set('protein_g', e.target.value)}
         />
         <input
-          className="bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[12px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors tabular"
+          className="bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[14px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors tabular"
           placeholder="carbs g"
           type="number"
           min="0"
@@ -147,13 +147,13 @@ function AddFoodForm({ date, mealType, onAdded, onCancel }) {
       </div>
       <div className="flex gap-2 items-center flex-wrap">
         <input
-          className="flex-1 min-w-[120px] bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[12px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors"
+          className="flex-1 min-w-[120px] bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[14px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors"
           placeholder="Notes (optional)"
           value={form.notes}
           onChange={e => set('notes', e.target.value)}
         />
         <input
-          className="w-16 bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[12px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors tabular"
+          className="w-16 bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[14px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors tabular"
           placeholder="fat g"
           type="number"
           min="0"
@@ -164,12 +164,12 @@ function AddFoodForm({ date, mealType, onAdded, onCancel }) {
         <button
           type="submit"
           disabled={saving}
-          className="px-4 py-1.5 bg-dn-orange text-black font-sans font-semibold text-[12px] rounded-sm hover:-translate-y-px transition-all duration-150 disabled:opacity-50"
+          className="px-4 py-1.5 bg-dn-orange text-black font-sans font-semibold text-[14px] rounded-sm hover:-translate-y-px transition-all duration-150 disabled:opacity-50"
         >
           {saving ? '…' : 'Add'}
         </button>
       </div>
-      {error && <p className="font-sans text-[14px] text-red-400 mt-1">{error}</p>}
+      {error && <p className="font-sans text-[16px] text-red-400 mt-1">{error}</p>}
     </form>
   )
 }
@@ -192,7 +192,7 @@ export default function DailyIntakePanel({ foodLogs, isAdmin, date, onRefresh, l
 
   if (loading) {
     return (
-      <div className="dn-card p-4 sm:p-5 py-8 text-center font-sans text-[14px] text-dn-gray-light">
+      <div className="dn-card p-4 sm:p-5 py-8 text-center font-sans text-[16px] text-dn-gray-light">
         Loading…
       </div>
     )
@@ -235,7 +235,7 @@ export default function DailyIntakePanel({ foodLogs, isAdmin, date, onRefresh, l
                 {MEAL_LABELS[type]}
               </h3>
               {mealTargetCal && (
-                <span className="font-sans text-[13px] text-dn-gray-light tabular">
+                <span className="font-sans text-[15px] text-dn-gray-light tabular">
                   {Math.round(subtotal.cal)} / {mealTargetCal} kcal
                 </span>
               )}
@@ -250,7 +250,7 @@ export default function DailyIntakePanel({ foodLogs, isAdmin, date, onRefresh, l
             )}
 
             {items.length === 0 ? (
-              <p className="font-sans text-[12px] text-dn-gray-light py-1">No items logged</p>
+              <p className="font-sans text-[14px] text-dn-gray-light py-1">No items logged</p>
             ) : (
               <div>
                 {items.map(item => (
@@ -270,7 +270,7 @@ export default function DailyIntakePanel({ foodLogs, isAdmin, date, onRefresh, l
               ) : (
                 <button
                   onClick={() => setOpenAddFor(type)}
-                  className="w-full mt-3 py-2 border border-dashed border-white/[0.15] rounded-sm font-sans text-[14px] font-semibold text-dn-orange hover:border-dn-orange/40 hover:bg-dn-orange/[0.04] transition-colors"
+                  className="w-full mt-3 py-2 border border-dashed border-white/[0.15] rounded-sm font-sans text-[16px] font-semibold text-dn-orange hover:border-dn-orange/40 hover:bg-dn-orange/[0.04] transition-colors"
                 >
                   + Add Food
                 </button>
@@ -280,7 +280,7 @@ export default function DailyIntakePanel({ foodLogs, isAdmin, date, onRefresh, l
         )
       })}
 
-      <div className="flex items-center gap-4 flex-wrap px-1 pt-1 font-sans text-[12px] text-dn-gray-light tracking-[0.04em]">
+      <div className="flex items-center gap-4 flex-wrap px-1 pt-1 font-sans text-[14px] text-dn-gray-light tracking-[0.04em]">
         <span className="flex items-center gap-1.5">
           <span className="w-1.5 h-3 rounded-sm" style={{ backgroundColor: STATUS_COLORS.onTrack }} />
           On track
