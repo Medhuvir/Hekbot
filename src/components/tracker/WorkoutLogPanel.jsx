@@ -177,7 +177,7 @@ export default function WorkoutLogPanel({ workoutLogs, isAdmin, date, onRefresh,
 
   return (
     <div className="dn-card relative overflow-hidden p-4 sm:p-5">
-      <CardTexture />
+      <CardTexture variant={3} />
       <div className="relative">
       <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
         <h3 className="font-display text-[16px] tracking-[0.06em] text-dn-white">Training</h3>

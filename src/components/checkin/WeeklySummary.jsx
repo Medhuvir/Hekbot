@@ -116,7 +116,7 @@ export default function WeeklySummary({ summary, isAdmin, onRefresh }) {
 
   return (
     <div className="dn-card relative overflow-hidden p-4 sm:p-5">
-      <CardTexture />
+      <CardTexture variant={4} />
       <div className="relative">
       <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
         <div className="font-sans text-[13px] uppercase tracking-[0.2em] text-dn-gray-light">

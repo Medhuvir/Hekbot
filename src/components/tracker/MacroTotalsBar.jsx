@@ -47,7 +47,7 @@ export default function MacroTotalsBar({ totals, targets, netCalories }) {
 
   return (
     <div className="dn-card relative overflow-hidden p-4 sm:p-5">
-      <CardTexture />
+      <CardTexture variant={1} />
       <div className="relative space-y-4">
       <MacroBarRow
         label="Calories"

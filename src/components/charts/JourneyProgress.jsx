@@ -82,7 +82,7 @@ export default function JourneyProgress({ currentWeight, checkins }) {
 
   return (
     <div className="dn-card relative overflow-hidden p-4 sm:p-6 animate-fade-in-up">
-      <CardTexture />
+      <CardTexture variant={2} />
 
       <div className="relative">
         {/* Header row */}
