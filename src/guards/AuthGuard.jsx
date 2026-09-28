@@ -7,7 +7,7 @@ export default function AuthGuard({ children }) {
   if (loading) {
     return (
       <div className="min-h-screen bg-dn-black flex items-center justify-center">
-        <div className="font-display text-[22px] tracking-[0.15em] text-dn-gray-light animate-pulse">
+        <div className="font-display text-display-sm tracking-display text-dn-gray-light animate-pulse">
           HEKBOT
         </div>
       </div>

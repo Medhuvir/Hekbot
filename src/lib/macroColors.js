@@ -1,25 +1,22 @@
-// DN Creative brand-compliant macro color system.
-// The brand system allows exactly one orange accent per surface and no colors
-// outside its defined palette — so distinct macro colors come from tonal steps
-// of Warm White rather than introducing new hues (blue/red/amber like a
-// typical Material palette). Calories gets the ring's single orange accent;
-// protein/carbs/fat step down in brightness, matching nutrient priority
-// (protein is the non-negotiable macro per the nutrition targets).
+import { COLORS } from './tokens'
+
+// Macro colors. Brand rules allow one orange accent and no extra hues, so
+// macros are told apart by tonal steps of the neutral palette, stepping down
+// with nutrient priority (protein is the non-negotiable macro). Every step is
+// also used as text, so each one clears WCAG AA (4.5:1) on the card surface.
 export const MACRO_COLORS = {
-  calories: '#FF5E1A',
-  protein:  'rgba(245,243,238,0.92)',
-  carbs:    'rgba(245,243,238,0.55)',
-  fat:      'rgba(245,243,238,0.35)',
+  calories: COLORS.orange,
+  protein:  COLORS.white,
+  carbs:    COLORS.grayLight,
+  fat:      'rgba(200,198,192,0.7)', // Gray Light at 70% ≈ 6:1 on the card surface
 }
 
-export const MACRO_CHIP_BG = 'rgba(245,243,238,0.06)'
-export const CALORIE_CHIP_BG = 'rgba(255,94,26,0.10)'
+export const MACRO_CHIP_BG   = COLORS.fillStrong
+export const CALORIE_CHIP_BG = COLORS.tint
 
-// Functional adherence colors — not brand colors, the same semantic
-// green/amber/red used elsewhere in the app (WeeklySummary trend badge,
-// MacroBar thresholds) for on-track / partial / low status.
+// Functional status colors — the only non-brand hues, used only for meaning.
 export const STATUS_COLORS = {
-  onTrack: '#22C55E',
-  partial: '#F59E0B',
-  low:     '#EF4444',
+  onTrack: COLORS.success,
+  partial: COLORS.warning,
+  low:     COLORS.danger,
 }

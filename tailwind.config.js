@@ -1,3 +1,5 @@
+import { COLORS, FONT_SIZES, TRACKING } from './src/lib/tokens.js'
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -6,18 +8,12 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {
-        'dn-black':        '#0A0A0A',
-        'dn-white':        '#F5F3EE',
-        'dn-orange':       '#FF5E1A',
-        'dn-orange-dark':  '#CC4C16',
-        'dn-orange-light': '#FF8050',
-        'dn-surface':      '#1E1E1E',
-        'dn-surface-dark': '#141414',
-        'dn-graphite':     '#6B6B6B',
-        'dn-gray-light':   '#C8C6C0',
-        'dn-gray-mid':     '#383838',
-      },
+      // Built from src/lib/tokens.js — see docs/DESIGN_SYSTEM.md for the rules.
+      colors: Object.fromEntries(
+        Object.entries(COLORS).map(([k, v]) => [`dn-${k.replace(/[A-Z]/g, c => '-' + c.toLowerCase())}`, v]),
+      ),
+      fontSize: FONT_SIZES,
+      letterSpacing: TRACKING,
       fontFamily: {
         sans:    ['"DM Sans"', 'sans-serif'],
         display: ['"Bebas Neue"', 'sans-serif'],

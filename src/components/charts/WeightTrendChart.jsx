@@ -3,25 +3,26 @@ import {
   ReferenceLine, ResponsiveContainer, Legend
 } from 'recharts'
 import { formatDate, projectWeightTrend } from '../../lib/helpers'
+import { COLORS, CHART_FONT } from '../../lib/tokens'
 
-const COLORS = {
-  actual:    '#FF5E1A',
-  projected: '#FF5E1A',
-  grid:      'rgba(245,243,238,0.04)',
-  axis:      '#6B6B6B',
-  tooltip:   '#1E1E1E',
+const CHART = {
+  actual:    COLORS.orange,
+  projected: COLORS.orange,
+  grid:      COLORS.line,
+  axis:      COLORS.grayLight,
+  tooltip:   COLORS.surface,
 }
 
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
   return (
     <div className="bg-dn-surface border border-dn-orange/30 rounded-sm px-3 py-2 shadow-xl">
-      <div className="font-sans text-[15px] text-dn-gray-light mb-1">{label}</div>
+      <div className="font-sans text-body text-dn-gray-light mb-1">{label}</div>
       {payload.map(p => (
-        <div key={p.name} className="font-sans text-[14px]" style={{ color: p.color }}>
+        <div key={p.name} className="font-sans text-caption" style={{ color: p.color }}>
           {p.name === 'projected' ? '(proj) ' : ''}
-          <span className="font-display text-[16px] tabular">{p.value}</span>
-          <span className="text-[15px] ml-1">lbs</span>
+          <span className="font-display text-display-xs tabular">{p.value}</span>
+          <span className="text-body ml-1">lbs</span>
         </div>
       ))}
     </div>
@@ -33,8 +34,8 @@ export default function WeightTrendChart({ checkins }) {
     return (
       <div className="dn-card p-6 flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="font-display text-[22px] tracking-[0.1em] text-dn-gray-light">No Check-ins Yet</div>
-          <div className="font-sans text-[14px] text-dn-gray-light/60 mt-1">Log your first weigh-in to see the trend</div>
+          <div className="font-display text-display-xs tracking-display text-dn-gray-light">No Check-ins Yet</div>
+          <div className="font-sans text-caption text-dn-gray-light mt-1">Log your first weigh-in to see the trend</div>
         </div>
       </div>
     )
@@ -62,21 +63,21 @@ export default function WeightTrendChart({ checkins }) {
 
   return (
     <div className="dn-card p-4 sm:p-6">
-      <div className="font-sans text-[15px] tracking-[0.2em] uppercase text-dn-gray-light mb-4">
+      <div className="font-sans text-caption tracking-label uppercase text-dn-gray-light mb-4">
         Weight Trend
       </div>
       <ResponsiveContainer width="100%" height={240}>
         <LineChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
-          <CartesianGrid stroke={COLORS.grid} vertical={false} />
+          <CartesianGrid stroke={CHART.grid} vertical={false} />
           <XAxis
             dataKey="label"
-            tick={{ fill: COLORS.axis, fontSize: 12, fontFamily: 'DM Sans' }}
+            tick={{ fill: CHART.axis, ...CHART_FONT }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
             domain={[yMin, yMax]}
-            tick={{ fill: COLORS.axis, fontSize: 12, fontFamily: 'DM Sans' }}
+            tick={{ fill: CHART.axis, ...CHART_FONT }}
             axisLine={false}
             tickLine={false}
             tickFormatter={v => `${v}`}
@@ -84,22 +85,22 @@ export default function WeightTrendChart({ checkins }) {
           <Tooltip content={<CustomTooltip />} />
 
           {/* Goal reference lines */}
-          <ReferenceLine y={211} stroke="rgba(245,243,238,0.15)" strokeDasharray="4 4"
-            label={{ value: 'Start 211', position: 'right', fontSize: 11, fill: '#6B6B6B', fontFamily: 'DM Sans' }} />
-          <ReferenceLine y={200} stroke="#FF5E1A" strokeOpacity={0.4} strokeDasharray="4 4"
-            label={{ value: 'Break 200', position: 'right', fontSize: 11, fill: '#FF5E1A', fontFamily: 'DM Sans' }} />
-          <ReferenceLine y={190} stroke="#FF5E1A" strokeOpacity={0.6} strokeDasharray="4 4"
-            label={{ value: 'Strike 190', position: 'right', fontSize: 11, fill: '#FF5E1A', fontFamily: 'DM Sans' }} />
+          <ReferenceLine y={211} stroke={COLORS.lineStrong} strokeDasharray="4 4"
+            label={{ value: 'Start 211', position: 'right', ...CHART_FONT, fill: COLORS.grayLight }} />
+          <ReferenceLine y={200} stroke={COLORS.orange} strokeOpacity={0.4} strokeDasharray="4 4"
+            label={{ value: 'Break 200', position: 'right', ...CHART_FONT, fill: COLORS.orange }} />
+          <ReferenceLine y={190} stroke={COLORS.orange} strokeOpacity={0.6} strokeDasharray="4 4"
+            label={{ value: 'Strike 190', position: 'right', ...CHART_FONT, fill: COLORS.orange }} />
 
           {/* Actual weight line */}
           <Line
             type="monotone"
             dataKey="weight"
             name="weight"
-            stroke={COLORS.actual}
+            stroke={CHART.actual}
             strokeWidth={2}
-            dot={{ fill: '#FF5E1A', r: 4, strokeWidth: 0 }}
-            activeDot={{ r: 6, fill: '#FF5E1A' }}
+            dot={{ fill: COLORS.orange, r: 4, strokeWidth: 0 }}
+            activeDot={{ r: 6, fill: COLORS.orange }}
             connectNulls={false}
           />
 
@@ -109,7 +110,7 @@ export default function WeightTrendChart({ checkins }) {
               type="monotone"
               dataKey="projected"
               name="projected"
-              stroke={COLORS.projected}
+              stroke={CHART.projected}
               strokeWidth={1.5}
               strokeDasharray="5 5"
               strokeOpacity={0.4}

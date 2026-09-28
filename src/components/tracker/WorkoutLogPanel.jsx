@@ -15,7 +15,7 @@ const TYPE_ICONS = {
 function Chip({ value, color, bg }) {
   return (
     <span
-      className="inline-flex items-center rounded-sm px-1.5 py-0.5 font-sans text-[15px] font-semibold tabular"
+      className="inline-flex items-center rounded-sm px-1.5 py-0.5 font-sans text-body font-semibold tabular"
       style={{ color, backgroundColor: bg }}
     >
       {value}
@@ -27,10 +27,10 @@ function WorkoutRow({ item, isAdmin, onDelete }) {
   const [confirming, setConfirming] = useState(false)
 
   return (
-    <div className="flex items-center justify-between gap-2 py-2.5 border-b border-white/[0.05] last:border-0 group">
+    <div className="flex items-center justify-between gap-2 py-2.5 border-b border-dn-line last:border-0 group">
       <div className="flex items-center gap-3 min-w-0">
-        <span className="text-[16px] shrink-0">{TYPE_ICONS[item.workout_type] ?? '⚡'}</span>
-        <span className="font-sans text-[15px] text-dn-white truncate">
+        <span className="text-body shrink-0">{TYPE_ICONS[item.workout_type] ?? '⚡'}</span>
+        <span className="font-sans text-body text-dn-white truncate">
           {item.workout_name || item.workout_type}
         </span>
       </div>
@@ -47,13 +47,13 @@ function WorkoutRow({ item, isAdmin, onDelete }) {
           <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={() => { onDelete(item.id); setConfirming(false) }}
-              className="font-sans text-[15px] text-red-400 hover:text-red-300 transition-colors"
+              className="font-sans text-body text-dn-danger hover:text-dn-white transition-colors"
             >
               Delete
             </button>
             <button
               onClick={() => setConfirming(false)}
-              className="font-sans text-[15px] text-dn-gray-light hover:text-dn-white transition-colors"
+              className="font-sans text-body text-dn-gray-light hover:text-dn-white transition-colors"
             >
               Cancel
             </button>
@@ -62,7 +62,7 @@ function WorkoutRow({ item, isAdmin, onDelete }) {
           <button
             onClick={() => setConfirming(true)}
             aria-label="Delete workout entry"
-            className="opacity-0 group-hover:opacity-100 text-dn-gray-light hover:text-red-400 transition-all duration-200 shrink-0"
+            className="opacity-0 group-hover:opacity-100 text-dn-gray-light hover:text-dn-danger transition-all duration-200 shrink-0"
           >
             <Icon name="close" size={12} />
           </button>
@@ -102,25 +102,25 @@ function AddWorkoutForm({ date, onAdded, onCancel }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-3 pt-3 border-t border-white/[0.06] space-y-2">
+    <form onSubmit={handleSubmit} className="mt-3 pt-3 border-t border-dn-line space-y-2">
       <div className="flex items-center justify-between mb-1">
-        <span className="font-sans text-[15px] uppercase tracking-[0.15em] text-dn-gray-light">
+        <span className="font-sans text-caption uppercase tracking-label text-dn-gray-light">
           Log Training
         </span>
-        <button type="button" onClick={onCancel} className="font-sans text-[15px] text-dn-gray-light hover:text-dn-white transition-colors">
+        <button type="button" onClick={onCancel} className="font-sans text-body text-dn-gray-light hover:text-dn-white transition-colors">
           Cancel
         </button>
       </div>
       <div className="grid grid-cols-2 gap-2">
         <select
-          className="bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[14px] text-dn-white focus:outline-none focus:border-dn-orange/40 transition-colors"
+          className="bg-dn-fill border border-dn-line rounded-sm px-3 py-1.5 font-sans text-caption text-dn-white focus:outline-none focus:border-dn-orange/60 transition-colors"
           value={form.workout_type}
           onChange={e => set('workout_type', e.target.value)}
         >
           {WORKOUT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
         <input
-          className="bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[14px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors"
+          className="bg-dn-fill border border-dn-line rounded-sm px-3 py-1.5 font-sans text-caption text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/60 transition-colors"
           placeholder="Custom label (optional)"
           value={form.workout_name}
           onChange={e => set('workout_name', e.target.value)}
@@ -129,7 +129,7 @@ function AddWorkoutForm({ date, onAdded, onCancel }) {
       </div>
       <div className="flex gap-2 items-center flex-wrap">
         <input
-          className="w-24 bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[14px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors tabular"
+          className="w-24 bg-dn-fill border border-dn-line rounded-sm px-3 py-1.5 font-sans text-caption text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/60 transition-colors tabular"
           placeholder="min"
           type="number"
           min="0"
@@ -137,7 +137,7 @@ function AddWorkoutForm({ date, onAdded, onCancel }) {
           onChange={e => set('duration_min', e.target.value)}
         />
         <input
-          className="w-28 bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-1.5 font-sans text-[14px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors tabular"
+          className="w-28 bg-dn-fill border border-dn-line rounded-sm px-3 py-1.5 font-sans text-caption text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/60 transition-colors tabular"
           placeholder="kcal burned"
           type="number"
           min="0"
@@ -147,7 +147,7 @@ function AddWorkoutForm({ date, onAdded, onCancel }) {
         <button
           type="submit"
           disabled={saving}
-          className="px-4 py-1.5 bg-dn-orange text-black font-sans font-semibold text-[14px] rounded-sm hover:-translate-y-px transition-all duration-150 disabled:opacity-50"
+          className="btn-primary"
         >
           {saving ? '…' : 'Log'}
         </button>
@@ -168,7 +168,7 @@ export default function WorkoutLogPanel({ workoutLogs, isAdmin, date, onRefresh,
 
   if (loading) {
     return (
-      <div className="dn-card p-4 sm:p-5 py-8 text-center font-sans text-[16px] text-dn-gray-light">
+      <div className="dn-card p-4 sm:p-5 py-8 text-center font-sans text-body text-dn-gray-light">
         Loading…
       </div>
     )
@@ -178,18 +178,18 @@ export default function WorkoutLogPanel({ workoutLogs, isAdmin, date, onRefresh,
     <div className="dn-card relative overflow-hidden p-4 sm:p-5">
       <div className="relative">
       <div className="flex items-center justify-between flex-wrap gap-2 mb-3">
-        <h3 className="font-display text-[16px] tracking-[0.06em] text-dn-white">Training</h3>
+        <h3 className="font-display text-display-xs tracking-display text-dn-white">Training</h3>
         {totalBurned > 0 && (
-          <span className="font-sans text-[16px] text-dn-gray-light">
+          <span className="font-sans text-body text-dn-gray-light">
             Total burned
-            <span className="font-display text-[16px] text-dn-white tabular ml-1.5">{totalBurned}</span>
-            <span className="text-[15px] ml-0.5">kcal</span>
+            <span className="font-display text-display-xs text-dn-white tabular ml-1.5">{totalBurned}</span>
+            <span className="text-body ml-0.5">kcal</span>
           </span>
         )}
       </div>
 
       {workoutLogs.length === 0 ? (
-        <p className="font-sans text-[14px] text-dn-gray-light py-1">
+        <p className="font-sans text-caption text-dn-gray-light py-1">
           {date === today() ? 'No training logged today.' : 'No training logged on this day.'}
         </p>
       ) : (
@@ -210,7 +210,7 @@ export default function WorkoutLogPanel({ workoutLogs, isAdmin, date, onRefresh,
         ) : (
           <button
             onClick={() => setShowAdd(true)}
-            className="w-full mt-3 py-2 border border-dashed border-white/[0.15] rounded-sm font-sans text-[16px] font-semibold text-dn-orange hover:border-dn-orange/40 hover:bg-dn-orange/[0.04] transition-colors"
+            className="w-full mt-3 py-2 border border-dashed border-dn-line-strong rounded-sm font-sans text-body font-semibold text-dn-orange hover:border-dn-orange/60 hover:bg-dn-tint transition-colors"
           >
             + Log Training
           </button>

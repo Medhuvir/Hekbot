@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Header from '../components/layout/Header'
 import HekbotPanel from '../components/hekbot/HekbotPanel'
 import LiveTopo from '../components/LiveTopo'
+import { OVERLAYS } from '../lib/tokens'
 import PageWrapper from '../components/layout/PageWrapper'
 import SectionLabel from '../components/layout/SectionLabel'
 import JourneyProgress from '../components/charts/JourneyProgress'
@@ -129,7 +130,7 @@ export default function Dashboard({ mode }) {
       <div ref={topRef} className="relative">
       <LiveTopo
         hostRef={topRef}
-        overlay="linear-gradient(to bottom, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.55) 55%, rgba(10,10,10,0.95) 100%)"
+        overlay={OVERLAYS.header}
       />
       <Header
         isAdmin={isApp}
@@ -153,24 +154,24 @@ export default function Dashboard({ mode }) {
 
       <PageWrapper>
         {isApp && (
-          <div className="mb-6 flex items-center justify-between flex-wrap gap-3 px-4 py-2.5 bg-dn-orange/[0.08] border border-dn-orange/20 rounded-sm">
+          <div className="mb-6 flex items-center justify-between flex-wrap gap-3 px-4 py-2.5 bg-dn-tint border border-dn-orange/30 rounded-sm">
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-1.5 h-1.5 rounded-full bg-dn-orange shrink-0" />
               <a
                 href="/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-sans text-[16px] text-dn-orange hover:underline underline-offset-2"
+                className="font-sans text-body text-dn-orange hover:underline underline-offset-2"
               >
                 View public dashboard ↗
               </a>
             </div>
             <button
               onClick={() => setShowImport(true)}
-              className="flex items-center gap-2 px-3 py-1 border border-dn-orange/30 rounded-sm hover:bg-dn-orange/10 transition-colors shrink-0"
+              className="flex items-center gap-2 px-3 py-1 border border-dn-orange/30 rounded-sm hover:bg-dn-tint transition-colors shrink-0"
             >
-              <span className="font-sans text-[15px] text-dn-orange">↑</span>
-              <span className="font-sans text-[16px] text-dn-orange tracking-wide">Import MFP</span>
+              <span className="font-sans text-body text-dn-orange">↑</span>
+              <span className="font-sans text-body text-dn-orange ">Import MFP</span>
             </button>
           </div>
         )}
@@ -189,16 +190,16 @@ export default function Dashboard({ mode }) {
         </div>
 
         {/* View toggle */}
-        <div className="flex items-center gap-1 mb-5 sm:mb-7 w-fit border border-white/[0.08] rounded-sm p-0.5">
+        <div className="flex items-center gap-1 mb-5 sm:mb-7 w-fit border border-dn-line rounded-sm p-0.5">
           {[VIEW_DAILY, VIEW_WEEKLY].map(v => (
             <button
               key={v}
               onClick={() => setView(v)}
-              className={`px-4 py-1.5 rounded-sm font-sans text-[16px] uppercase tracking-[0.1em] transition-all duration-200 ${
-                view === v
-                  ? 'bg-dn-orange text-black font-semibold'
-                  : 'text-dn-gray-light hover:text-dn-white'
-              }`}
+              className={`px-4 py-1.5 rounded-sm font-sans text-body uppercase tracking-button transition-all duration-200 ${
+ view === v
+ ? 'bg-dn-orange text-dn-black font-semibold'
+ : 'text-dn-gray-light hover:text-dn-white'
+ }`}
             >
               {v}
             </button>
@@ -268,12 +269,12 @@ export default function Dashboard({ mode }) {
       </PageWrapper>
 
       {/* Footer */}
-      <footer className="border-t border-white/[0.06] mt-10 sm:mt-16 py-5 sm:py-6 px-4 sm:px-6">
+      <footer className="border-t border-dn-line mt-10 sm:mt-16 py-5 sm:py-6 px-4 sm:px-6">
         <div className="max-w-screen-xl mx-auto flex items-center justify-between flex-wrap gap-2">
-          <div className="font-sans text-[14px] text-dn-gray-light tracking-[0.1em]">
+          <div className="font-sans text-caption text-dn-gray-light ">
             {isApp ? 'Ascension' : 'Ascension · Personal · Read-only view'}
           </div>
-          <div className="font-sans text-[14px] text-dn-gray-light/40">DN Creative LLC</div>
+          <div className="font-sans text-caption text-dn-gray-light">DN Creative LLC</div>
         </div>
       </footer>
 

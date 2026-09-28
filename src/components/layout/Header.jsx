@@ -29,7 +29,7 @@ function DateNavControls({
 
       <div className="flex flex-col items-center">
         <div className="flex items-center gap-1 sm:gap-1.5">
-          <span className={`font-display ${large ? 'text-[34px]' : 'text-[18px]'} text-dn-white tracking-[0.06em] leading-none`}>
+          <span className={`font-display ${large ? 'text-display-md' : 'text-display-xs'} text-dn-white tracking-display leading-none`}>
             {currentDate}
           </span>
           <button
@@ -46,7 +46,7 @@ function DateNavControls({
         {!isToday && (
           <button
             onClick={onToday}
-            className="font-sans text-[11px] sm:text-[12px] uppercase tracking-[0.15em] text-dn-orange mt-0.5 hover:underline underline-offset-2 whitespace-nowrap"
+            className="font-sans text-label uppercase tracking-label text-dn-orange mt-0.5 hover:underline underline-offset-2 whitespace-nowrap"
           >
             Jump to today
           </button>
@@ -90,7 +90,7 @@ export default function Header({
   const hasDateNav = Boolean(currentDate && onPrevDay && onNextDay && onPickDate)
 
   return (
-    <header className="relative z-30 border-b border-white/[0.08]">
+    <header className="relative z-30 border-b border-dn-line">
 
       <div className="relative max-w-screen-xl mx-auto px-4 sm:px-6 py-2.5 sm:py-5 flex items-center justify-between">
 
@@ -98,8 +98,8 @@ export default function Header({
         <Link to={isAdmin ? '/app' : '/'} className="flex items-center gap-2 sm:gap-3 group min-w-0">
           <DNMark size={20} variant="white" className="sm:hidden shrink-0" />
           <DNMark size={28} variant="white" className="hidden sm:block shrink-0" />
-          <div className="w-px h-5 sm:h-7 bg-white/20 shrink-0" />
-          <span className="font-display text-[17px] sm:text-[24px] text-dn-white tracking-[0.1em] sm:tracking-[0.12em] leading-none truncate">
+          <div className="w-px h-5 sm:h-7 bg-dn-line-strong shrink-0" />
+          <span className="font-display text-display-xs sm:text-display-sm text-dn-white tracking-display sm:tracking-display leading-none truncate">
             HEKBOT
           </span>
         </Link>
@@ -127,15 +127,15 @@ export default function Header({
             <>
               <button
                 onClick={onOpenAdmin}
-                className="flex items-center gap-1 font-sans text-[15px] sm:text-[16px] text-dn-orange hover:text-dn-orange-light transition-colors duration-200 whitespace-nowrap"
+                className="flex items-center gap-1 font-sans text-body text-dn-orange hover:text-dn-orange-light transition-colors duration-200 whitespace-nowrap"
               >
                 <Icon name="person" size={15} />
                 Admin
               </button>
-              <div className="w-px h-4 bg-white/20" aria-hidden="true" />
+              <div className="w-px h-4 bg-dn-line-strong" aria-hidden="true" />
               <button
                 onClick={onSignOut}
-                className="flex items-center gap-1 font-sans text-[15px] sm:text-[16px] text-dn-orange hover:text-dn-orange-light transition-colors duration-200 whitespace-nowrap"
+                className="flex items-center gap-1 font-sans text-body text-dn-orange hover:text-dn-orange-light transition-colors duration-200 whitespace-nowrap"
               >
                 <Icon name="door_open" size={15} />
                 Sign Out
@@ -144,7 +144,7 @@ export default function Header({
           ) : (
             <Link
               to="/login"
-              className="flex items-center gap-1 font-sans text-[15px] sm:text-[16px] text-dn-orange hover:text-dn-orange-light transition-colors duration-200 whitespace-nowrap"
+              className="flex items-center gap-1 font-sans text-body text-dn-orange hover:text-dn-orange-light transition-colors duration-200 whitespace-nowrap"
             >
               <Icon name="person" size={14} />
               Sign in <Icon name="arrow_forward" size={11} className="align-[-1px]" />

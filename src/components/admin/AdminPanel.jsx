@@ -8,20 +8,18 @@ import { TIMEZONE_OPTIONS } from '../../lib/helpers'
 const MIN_PASSWORD_LENGTH = 8
 
 const inputCls =
-  'w-full bg-white/[0.04] border border-white/[0.08] rounded-sm px-3 py-2 font-sans text-[16px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/50 transition-colors disabled:opacity-50'
+  'w-full bg-dn-fill border border-dn-line rounded-sm px-3 py-2 font-sans text-body text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/60 transition-colors disabled:opacity-50'
 
-const primaryBtnCls =
-  'px-4 py-2 bg-dn-orange text-black font-sans font-semibold text-[15px] uppercase tracking-[0.08em] rounded-sm hover:-translate-y-px transition-all duration-150 disabled:opacity-50 disabled:hover:translate-y-0'
+const primaryBtnCls = 'btn-primary'
 
-const secondaryBtnCls =
-  'px-3 py-2 border border-dn-orange/30 text-dn-orange font-sans text-[15px] rounded-sm hover:bg-dn-orange/10 transition-colors disabled:opacity-50'
+const secondaryBtnCls = 'btn-secondary btn-sm'
 
 function Section({ icon, title, children }) {
   return (
-    <section className="py-5 border-b border-white/[0.06] last:border-b-0">
+    <section className="py-5 border-b border-dn-line last:border-b-0">
       <div className="flex items-center gap-2 mb-3">
         <Icon name={icon} size={16} className="text-dn-orange" />
-        <h3 className="font-sans text-[15px] uppercase tracking-[0.2em] text-dn-gray-light">{title}</h3>
+        <h3 className="font-sans text-caption uppercase tracking-label text-dn-gray-light">{title}</h3>
       </div>
       {children}
     </section>
@@ -32,7 +30,7 @@ function Section({ icon, title, children }) {
 function Status({ status }) {
   if (!status) return null
   return (
-    <p className={`mt-2 font-sans text-[15px] ${status.type === 'error' ? 'text-red-400' : 'text-green-400'}`}>
+    <p className={`mt-2 font-sans text-body ${status.type === 'error' ? 'text-dn-danger' : 'text-dn-success'}`}>
       {status.text}
     </p>
   )
@@ -111,8 +109,8 @@ function PasswordSection({ email }) {
         <Status status={status} />
       </form>
 
-      <div className="mt-4 pt-4 border-t border-white/[0.04]">
-        <p className="font-sans text-[15px] text-dn-gray-light mb-2">
+      <div className="mt-4 pt-4 border-t border-dn-line">
+        <p className="font-sans text-body text-dn-gray-light mb-2">
           Or get a reset link by email{email ? <> at <span className="text-dn-white">{email}</span></> : null}.
         </p>
         <button type="button" onClick={handleReset} disabled={sending || !email} className={`${secondaryBtnCls} flex items-center gap-1.5`}>
@@ -193,11 +191,11 @@ function AvatarSection({ profile, onProfileUpdated }) {
   return (
     <Section icon="photo_camera" title="Change Avatar">
       <div className="flex items-center gap-4">
-        <div className="w-16 h-16 rounded-sm bg-white/[0.06] border border-white/[0.08] flex items-center justify-center shrink-0 overflow-hidden">
+        <div className="w-16 h-16 rounded-sm bg-dn-fill-strong border border-dn-line flex items-center justify-center shrink-0 overflow-hidden">
           {profile?.avatar_url ? (
             <img src={profile.avatar_url} alt={profile.name} className="w-full h-full object-cover object-top" />
           ) : (
-            <span className="font-display text-[24px] text-dn-gray-light tracking-wider">{profile?.name?.[0] ?? 'M'}</span>
+            <span className="font-display text-display-sm text-dn-gray-light tracking-display">{profile?.name?.[0] ?? 'M'}</span>
           )}
         </div>
         <div>
@@ -205,7 +203,7 @@ function AvatarSection({ profile, onProfileUpdated }) {
           <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className={secondaryBtnCls}>
             {uploading ? 'Uploading…' : 'Upload new photo'}
           </button>
-          <p className="mt-1.5 font-sans text-[14px] text-dn-gray-light">JPG, PNG or HEIC, up to 10MB.</p>
+          <p className="mt-1.5 font-sans text-caption text-dn-gray-light">JPG, PNG or HEIC, up to 10MB.</p>
         </div>
       </div>
       <Status status={status} />
@@ -243,7 +241,7 @@ function TimezoneSection({ profile, onProfileUpdated }) {
           <option key={tz.value} value={tz.value}>{tz.label}</option>
         ))}
       </select>
-      <p className="mt-1.5 font-sans text-[14px] text-dn-gray-light">Sets when "today" rolls over on the dashboard and in HekBot.</p>
+      <p className="mt-1.5 font-sans text-caption text-dn-gray-light">Sets when "today" rolls over on the dashboard and in HekBot.</p>
       <Status status={status} />
     </Section>
   )
@@ -252,9 +250,9 @@ function TimezoneSection({ profile, onProfileUpdated }) {
 function MessageCoachSection() {
   return (
     <Section icon="chat" title="Message Coach">
-      <div className="flex items-center justify-between gap-3 px-3 py-2.5 bg-white/[0.03] border border-white/[0.06] rounded-sm">
-        <span className="font-sans text-[16px] text-dn-gray-light">Send a message straight to your coach.</span>
-        <span className="shrink-0 font-sans text-[13px] uppercase tracking-[0.15em] text-dn-orange border border-dn-orange/30 rounded-sm px-2 py-0.5">
+      <div className="flex items-center justify-between gap-3 px-3 py-2.5 bg-dn-fill border border-dn-line rounded-sm">
+        <span className="font-sans text-body text-dn-gray-light">Send a message straight to your coach.</span>
+        <span className="shrink-0 font-sans text-label uppercase tracking-label text-dn-orange border border-dn-orange/30 rounded-sm px-2 py-0.5">
           Coming soon
         </span>
       </div>
@@ -278,18 +276,18 @@ export default function AdminPanel({ open, onClose, profile, email, onProfileUpd
     <div className={`fixed inset-0 z-50 ${open ? '' : 'pointer-events-none'}`} aria-hidden={!open}>
       <div
         onClick={onClose}
-        className={`absolute inset-0 bg-black/60 backdrop-blur-[2px] transition-opacity duration-200 ${open ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 bg-dn-black/70 backdrop-blur-[2px] transition-opacity duration-200 ${open ? 'opacity-100' : 'opacity-0'}`}
       />
       <aside
         role="dialog"
         aria-modal="true"
         aria-label="Admin"
-        className={`absolute right-0 top-0 h-full w-full max-w-[420px] bg-dn-black border-l border-white/[0.08] shadow-2xl flex flex-col transition-transform duration-300 ease-out ${open ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`absolute right-0 top-0 h-full w-full max-w-[420px] bg-dn-black border-l border-dn-line shadow-2xl flex flex-col transition-transform duration-300 ease-out ${open ? 'translate-x-0' : 'translate-x-full'}`}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.08]">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-dn-line">
           <div className="flex items-center gap-2">
             <Icon name="person" size={18} className="text-dn-orange" />
-            <h2 className="font-display text-[22px] tracking-[0.1em] text-dn-white leading-none">ADMIN</h2>
+            <h2 className="font-display text-display-sm tracking-display text-dn-white leading-none">ADMIN</h2>
           </div>
           <button onClick={onClose} aria-label="Close admin panel" className="text-dn-gray-light hover:text-dn-white transition-colors p-1">
             <Icon name="close" size={18} />

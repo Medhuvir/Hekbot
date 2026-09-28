@@ -5,9 +5,9 @@ import { TRAINING_DAY_ORDER, TRAINING_DAY_LABEL } from '../../lib/helpers'
 const WORKOUT_TYPE_OPTIONS = ['Rest', 'Resistance Training', 'Martial Arts', 'Other']
 
 const inputCls =
-  'bg-dn-black/40 border border-white/[0.08] rounded-sm px-2.5 py-1.5 font-sans text-[14px] text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/40 transition-colors tabular'
+  'bg-dn-fill border border-dn-line rounded-sm px-2.5 py-1.5 font-sans text-caption text-dn-white placeholder-dn-graphite focus:outline-none focus:border-dn-orange/60 transition-colors tabular'
 
-const fieldLabelCls = 'font-sans text-[13px] uppercase tracking-[0.1em] text-dn-gray-light'
+const fieldLabelCls = 'font-sans text-label uppercase tracking-label text-dn-gray-light'
 
 const MACRO_FIELDS = [
   { key: 'kcal',      label: 'Calories', step: '1' },
@@ -182,8 +182,8 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
   if (!hasContent) return null
 
   return (
-    <div className="ml-7 rounded-sm border border-dn-orange/25 bg-dn-black/30 overflow-hidden">
-      <div className="px-3.5 py-2 border-b border-white/[0.06] font-sans text-[14px] uppercase tracking-[0.2em] text-dn-orange">
+    <div className="ml-7 rounded-sm border border-dn-orange/30 bg-dn-fill overflow-hidden">
+      <div className="px-3.5 py-2 border-b border-dn-line font-sans text-caption uppercase tracking-label text-dn-orange">
         Review before logging
       </div>
 
@@ -210,7 +210,7 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
                 type="button"
                 onClick={() => removeItem(it._id)}
                 aria-label="Remove item"
-                className="text-dn-gray-light hover:text-red-400 transition-colors px-1"
+                className="text-dn-gray-light hover:text-dn-danger transition-colors px-1"
               >
                 <Icon name="close" size={12} />
               </button>
@@ -230,14 +230,14 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
                   type="button"
                   onClick={() => submitSearch(it._id)}
                   disabled={it.searchLoading || !it.searchQuery.trim()}
-                  className="px-2.5 py-1.5 bg-dn-orange text-black font-sans font-semibold text-[15px] uppercase rounded-sm disabled:opacity-40 transition-all"
+                  className="btn-primary btn-sm"
                 >
                   {it.searchLoading ? '…' : 'Go'}
                 </button>
               </div>
             )}
             {it.searchError && (
-              <p className="font-sans text-[15px] text-red-400">{it.searchError}</p>
+              <p className="font-sans text-body text-dn-danger">{it.searchError}</p>
             )}
 
             <div className="grid grid-cols-4 gap-1.5">
@@ -256,7 +256,7 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
                 />
               ))}
             </div>
-            <label className="flex items-center gap-1.5 font-sans text-[15px] text-dn-gray-light">
+            <label className="flex items-center gap-1.5 font-sans text-body text-dn-gray-light">
               <input
                 type="checkbox"
                 checked={it.savePreset}
@@ -269,8 +269,8 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
         ))}
 
         {bodyEntry && (
-          <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
-            <label className="flex items-center gap-1.5 font-sans text-[15px] text-dn-gray-light">
+          <div className="space-y-1.5 pt-1 border-t border-dn-line">
+            <label className="flex items-center gap-1.5 font-sans text-body text-dn-gray-light">
               <input
                 type="checkbox"
                 checked={bodyEntry.include}
@@ -291,8 +291,8 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
         )}
 
         {workoutEntry && (
-          <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
-            <label className="flex items-center gap-1.5 font-sans text-[15px] text-dn-gray-light">
+          <div className="space-y-1.5 pt-1 border-t border-dn-line">
+            <label className="flex items-center gap-1.5 font-sans text-body text-dn-gray-light">
               <input
                 type="checkbox"
                 checked={workoutEntry.include}
@@ -313,8 +313,8 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
         )}
 
         {trainingSchedule && (
-          <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
-            <label className="flex items-center gap-1.5 font-sans text-[15px] text-dn-gray-light">
+          <div className="space-y-1.5 pt-1 border-t border-dn-line">
+            <label className="flex items-center gap-1.5 font-sans text-body text-dn-gray-light">
               <input
                 type="checkbox"
                 checked={trainingSchedule.include}
@@ -330,7 +330,7 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
                   <select
                     value={trainingSchedule[day] ?? 'Rest'}
                     onChange={e => updateScheduleDay(day, e.target.value)}
-                    className={`${inputCls} w-full px-1 py-1 text-[13px]`}
+                    className={`${inputCls} w-full px-1 py-1 text-label`}
                   >
                     {WORKOUT_TYPE_OPTIONS.map(opt => (
                       <option key={opt} value={opt}>{opt === 'Resistance Training' ? 'Resist.' : opt === 'Martial Arts' ? 'Martial' : opt}</option>
@@ -343,8 +343,8 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
         )}
 
         {targets && (
-          <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
-            <label className="flex items-center gap-1.5 font-sans text-[15px] text-dn-gray-light">
+          <div className="space-y-1.5 pt-1 border-t border-dn-line">
+            <label className="flex items-center gap-1.5 font-sans text-body text-dn-gray-light">
               <input
                 type="checkbox"
                 checked={targets.include}
@@ -372,12 +372,12 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
         )}
       </div>
 
-      <div className="flex items-center gap-2 px-3.5 py-2.5 border-t border-white/[0.06]">
+      <div className="flex items-center gap-2 px-3.5 py-2.5 border-t border-dn-line">
         <button
           type="button"
           onClick={handleConfirm}
           disabled={submitting}
-          className="px-4 py-1.5 bg-dn-orange text-black font-sans font-semibold text-[16px] uppercase tracking-[0.08em] rounded-sm hover:-translate-y-px transition-all duration-150 disabled:opacity-50"
+          className="btn-primary"
         >
           {submitting ? 'Logging…' : 'Confirm & Log'}
         </button>
@@ -385,7 +385,7 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
           type="button"
           onClick={onDiscard}
           disabled={submitting}
-          className="px-3 py-1.5 font-sans text-[16px] text-white/50 hover:text-white/100 transition-colors disabled:opacity-50"
+          className="px-3 py-1.5 font-sans text-body text-dn-gray-light hover:text-dn-white transition-colors disabled:opacity-50"
         >
           Discard
         </button>

@@ -2,9 +2,10 @@ import {
   ComposedChart, Line, Area, XAxis, YAxis, CartesianGrid,
   Tooltip, ReferenceLine, ResponsiveContainer, ReferenceArea
 } from 'recharts'
+import { COLORS, CHART_FONT } from '../../lib/tokens'
 
-const GRID  = 'rgba(245,243,238,0.04)'
-const AXIS  = '#6B6B6B'
+const GRID  = COLORS.line
+const AXIS  = COLORS.grayLight
 
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
@@ -12,24 +13,24 @@ function CustomTooltip({ active, payload, label }) {
   const burned = payload.find(p => p.dataKey === 'burned')
   const net    = payload.find(p => p.dataKey === 'net')
   return (
-    <div className="bg-dn-surface border border-white/[0.15] rounded-sm px-3 py-2 shadow-xl min-w-[120px]">
-      <div className="font-sans text-[15px] text-dn-gray-light mb-2">{label}</div>
+    <div className="bg-dn-surface border border-dn-line-strong rounded-sm px-3 py-2 shadow-xl min-w-[120px]">
+      <div className="font-sans text-body text-dn-gray-light mb-2">{label}</div>
       {intake && (
-        <div className="font-sans text-[16px] flex justify-between gap-4">
+        <div className="font-sans text-body flex justify-between gap-4">
           <span className="text-dn-gray-light">Intake</span>
-          <span className="font-display text-[16px] tabular text-dn-orange">{intake.value} kcal</span>
+          <span className="font-display text-display-xs tabular text-dn-orange">{intake.value} kcal</span>
         </div>
       )}
       {burned && burned.value > 0 && (
-        <div className="font-sans text-[16px] flex justify-between gap-4">
+        <div className="font-sans text-body flex justify-between gap-4">
           <span className="text-dn-gray-light">Burned</span>
-          <span className="font-display text-[16px] tabular text-green-400">{burned.value} kcal</span>
+          <span className="font-display text-display-xs tabular text-dn-success">{burned.value} kcal</span>
         </div>
       )}
       {net && (
-        <div className="font-sans text-[16px] flex justify-between gap-4 border-t border-white/[0.08] mt-1 pt-1">
+        <div className="font-sans text-body flex justify-between gap-4 border-t border-dn-line mt-1 pt-1">
           <span className="text-dn-gray-light">Net</span>
-          <span className="font-display text-[16px] tabular text-dn-white">{net.value} kcal</span>
+          <span className="font-display text-display-xs tabular text-dn-white">{net.value} kcal</span>
         </div>
       )}
     </div>
@@ -40,7 +41,7 @@ export default function CalorieTrendChart({ dailyTotals, targets }) {
   if (!dailyTotals?.length) {
     return (
       <div className="dn-card p-6 flex items-center justify-center h-52">
-        <div className="font-display text-[18px] tracking-[0.1em] text-dn-gray-light">No data yet</div>
+        <div className="font-display text-display-xs tracking-display text-dn-gray-light">No data yet</div>
       </div>
     )
   }
@@ -51,21 +52,21 @@ export default function CalorieTrendChart({ dailyTotals, targets }) {
   return (
     <div className="dn-card p-4 sm:p-6">
       <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
-        <div className="font-sans text-[15px] tracking-[0.2em] uppercase text-dn-gray-light">
+        <div className="font-sans text-caption tracking-label uppercase text-dn-gray-light">
           Calorie Trend
         </div>
         <div className="flex items-center gap-3 sm:gap-4">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-0.5 bg-dn-orange inline-block" />
-            <span className="font-sans text-[14px] text-dn-gray-light">Intake</span>
+            <span className="font-sans text-caption text-dn-gray-light">Intake</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-0.5 bg-green-400 inline-block" />
-            <span className="font-sans text-[14px] text-dn-gray-light">Burned</span>
+            <span className="w-2 h-0.5 bg-dn-success inline-block" />
+            <span className="font-sans text-caption text-dn-gray-light">Burned</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-0.5 bg-white/40 inline-block" />
-            <span className="font-sans text-[14px] text-dn-gray-light">Net</span>
+            <span className="w-2 h-0.5 bg-dn-gray-light inline-block" />
+            <span className="font-sans text-caption text-dn-gray-light">Net</span>
           </span>
         </div>
       </div>
@@ -73,22 +74,22 @@ export default function CalorieTrendChart({ dailyTotals, targets }) {
       <ResponsiveContainer width="100%" height={200}>
         <ComposedChart data={dailyTotals} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
           <CartesianGrid stroke={GRID} vertical={false} />
-          <XAxis dataKey="label" tick={{ fill: AXIS, fontSize: 12, fontFamily: 'DM Sans' }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fill: AXIS, fontSize: 12, fontFamily: 'DM Sans' }} axisLine={false} tickLine={false} />
+          <XAxis dataKey="label" tick={{ fill: AXIS, ...CHART_FONT }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fill: AXIS, ...CHART_FONT }} axisLine={false} tickLine={false} />
           <Tooltip content={<CustomTooltip />} />
 
           {/* Target range band */}
-          <ReferenceArea y1={calMin} y2={calMax} fill="rgba(255,94,26,0.05)" />
-          <ReferenceLine y={calMin} stroke="#FF5E1A" strokeOpacity={0.2} strokeDasharray="3 3"
-            label={{ value: `${calMin}`, position: 'right', fontSize: 11, fill: '#FF5E1A', fontFamily: 'DM Sans' }} />
-          <ReferenceLine y={calMax} stroke="#FF5E1A" strokeOpacity={0.2} strokeDasharray="3 3"
-            label={{ value: `${calMax}`, position: 'right', fontSize: 11, fill: '#FF5E1A', fontFamily: 'DM Sans' }} />
+          <ReferenceArea y1={calMin} y2={calMax} fill={COLORS.tint} />
+          <ReferenceLine y={calMin} stroke={COLORS.orange} strokeOpacity={0.2} strokeDasharray="3 3"
+            label={{ value: `${calMin}`, position: 'right', ...CHART_FONT, fill: COLORS.orange }} />
+          <ReferenceLine y={calMax} stroke={COLORS.orange} strokeOpacity={0.2} strokeDasharray="3 3"
+            label={{ value: `${calMax}`, position: 'right', ...CHART_FONT, fill: COLORS.orange }} />
 
-          <Line type="monotone" dataKey="calories" stroke="#FF5E1A" strokeWidth={2}
-            dot={{ fill: '#FF5E1A', r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} />
-          <Line type="monotone" dataKey="burned" stroke="#22C55E" strokeWidth={1.5}
-            dot={{ fill: '#22C55E', r: 2, strokeWidth: 0 }} strokeDasharray="4 2" />
-          <Line type="monotone" dataKey="net" stroke="rgba(245,243,238,0.35)" strokeWidth={1.5}
+          <Line type="monotone" dataKey="calories" stroke={COLORS.orange} strokeWidth={2}
+            dot={{ fill: COLORS.orange, r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} />
+          <Line type="monotone" dataKey="burned" stroke={COLORS.success} strokeWidth={1.5}
+            dot={{ fill: COLORS.success, r: 2, strokeWidth: 0 }} strokeDasharray="4 2" />
+          <Line type="monotone" dataKey="net" stroke={COLORS.grayLight} strokeWidth={1.5}
             dot={false} />
         </ComposedChart>
       </ResponsiveContainer>

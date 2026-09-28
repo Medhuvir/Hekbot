@@ -56,7 +56,7 @@ export default function DatePickerPopover({ value, max, onPick, onClose }) {
       ref={ref}
       role="dialog"
       aria-label="Choose a date"
-      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-40 w-[260px] p-3 bg-dn-black border border-white/[0.1] rounded-sm shadow-2xl"
+      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-40 w-[260px] p-3 bg-dn-black border border-dn-line rounded-sm shadow-2xl"
     >
       <div className="flex items-center justify-between mb-2">
         <button
@@ -67,7 +67,7 @@ export default function DatePickerPopover({ value, max, onPick, onClose }) {
         >
           <Icon name="chevron_left" size={18} />
         </button>
-        <span className="font-sans text-[15px] uppercase tracking-[0.15em] text-dn-white">{monthLabel}</span>
+        <span className="font-sans text-caption uppercase tracking-label text-dn-white">{monthLabel}</span>
         <button
           type="button"
           onClick={() => shiftMonth(1)}
@@ -81,7 +81,7 @@ export default function DatePickerPopover({ value, max, onPick, onClose }) {
 
       <div className="grid grid-cols-7 gap-0.5 text-center">
         {WEEKDAYS.map((d, i) => (
-          <div key={i} className="font-sans text-[13px] text-dn-gray-light py-1">{d}</div>
+          <div key={i} className="font-sans text-label text-dn-gray-light py-1">{d}</div>
         ))}
         {cells.map((day, i) => {
           if (!day) return <div key={`blank-${i}`} />
@@ -96,13 +96,13 @@ export default function DatePickerPopover({ value, max, onPick, onClose }) {
               disabled={isFuture}
               onClick={() => { onPick(iso); onClose() }}
               aria-current={isSelected ? 'date' : undefined}
-              className={`h-8 rounded-sm font-sans text-[15px] tabular transition-colors
-                ${isSelected
-                  ? 'bg-dn-orange text-black font-semibold'
-                  : isToday
-                    ? 'text-dn-orange border border-dn-orange/50 hover:bg-dn-orange/15'
-                    : 'text-dn-white hover:bg-white/[0.08]'}
-                disabled:text-white/20 disabled:hover:bg-transparent disabled:cursor-not-allowed`}
+              className={`h-8 rounded-sm font-sans text-body tabular transition-colors
+ ${isSelected
+ ? 'bg-dn-orange text-dn-black font-semibold'
+ : isToday
+ ? 'text-dn-orange border border-dn-orange/60 hover:bg-dn-tint'
+ : 'text-dn-white hover:bg-dn-fill-strong'}
+ disabled:text-dn-gray-light/30 disabled:hover:bg-transparent disabled:cursor-not-allowed`}
             >
               {day}
             </button>
@@ -114,7 +114,7 @@ export default function DatePickerPopover({ value, max, onPick, onClose }) {
         <button
           type="button"
           onClick={() => { onPick(max); onClose() }}
-          className="mt-2 w-full font-sans text-[14px] uppercase tracking-[0.15em] text-dn-orange hover:text-dn-orange-light transition-colors py-1"
+          className="mt-2 w-full font-sans text-caption uppercase tracking-label text-dn-orange hover:text-dn-orange-light transition-colors py-1"
         >
           Today
         </button>
