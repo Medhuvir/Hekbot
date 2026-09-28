@@ -1,39 +1,12 @@
-import { useState } from 'react'
 import CardTexture from '../CardTexture'
 import OrderOfFireMedallion from '../OrderOfFireMedallion'
-import { lbsToKg } from '../../lib/helpers'
-import { updateProfile } from '../../lib/mutations'
+import { lbsToKg, TIMEZONE_OPTIONS } from '../../lib/helpers'
 
-const TIMEZONE_OPTIONS = [
-  { value: 'America/New_York',    label: 'Eastern (New York)' },
-  { value: 'America/Chicago',     label: 'Central (Chicago)' },
-  { value: 'America/Denver',      label: 'Mountain (Denver)' },
-  { value: 'America/Los_Angeles', label: 'Pacific (Los Angeles)' },
-  { value: 'America/Anchorage',   label: 'Alaska' },
-  { value: 'Pacific/Honolulu',    label: 'Hawaii' },
-  { value: 'UTC',                 label: 'UTC' },
-]
-
-export default function ProfilePanel({ profile, latestCheckin, isAdmin = false, onProfileUpdated }) {
-  const [savingTimezone, setSavingTimezone] = useState(false)
-
+export default function ProfilePanel({ profile, latestCheckin }) {
   if (!profile) return null
 
   const currentWeight = latestCheckin?.weight_lbs ?? profile.start_weight_lbs
   const currentKg     = lbsToKg(currentWeight)
-
-  async function handleTimezoneChange(e) {
-    const timezone = e.target.value
-    setSavingTimezone(true)
-    try {
-      await updateProfile(profile.id, { timezone })
-      onProfileUpdated?.()
-    } catch (err) {
-      console.error('[ProfilePanel] timezone update failed:', err)
-    } finally {
-      setSavingTimezone(false)
-    }
-  }
 
   return (
     <div className="dn-card relative overflow-hidden p-4 sm:p-5">
@@ -81,26 +54,10 @@ export default function ProfilePanel({ profile, latestCheckin, isAdmin = false, 
             </span>
           </div>
 
-          {isAdmin ? (
-            <label className="mt-2.5 flex items-center gap-2 font-sans text-[13px] text-dn-gray-light">
-              Timezone
-              <select
-                value={profile.timezone ?? 'America/New_York'}
-                onChange={handleTimezoneChange}
-                disabled={savingTimezone}
-                className="bg-white/[0.04] border border-white/[0.08] rounded-sm px-2 py-1 text-[13px] text-dn-white focus:outline-none focus:border-dn-orange/40 transition-colors disabled:opacity-50"
-              >
-                {TIMEZONE_OPTIONS.map(tz => (
-                  <option key={tz.value} value={tz.value}>{tz.label}</option>
-                ))}
-              </select>
-            </label>
-          ) : (
-            profile.timezone && (
-              <div className="mt-2 font-sans text-[13px] text-dn-gray-light">
-                Timezone <span className="text-dn-white">{TIMEZONE_OPTIONS.find(tz => tz.value === profile.timezone)?.label ?? profile.timezone}</span>
-              </div>
-            )
+          {profile.timezone && (
+            <div className="mt-2 font-sans text-[13px] text-dn-gray-light">
+              Timezone <span className="text-dn-white">{TIMEZONE_OPTIONS.find(tz => tz.value === profile.timezone)?.label ?? profile.timezone}</span>
+            </div>
           )}
         </div>
       </div>

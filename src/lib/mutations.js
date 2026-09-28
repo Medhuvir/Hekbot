@@ -103,6 +103,16 @@ export async function updateProfile(id, updates) {
   return data
 }
 
+// Uploads a prepared (JPEG data URL) avatar under a fresh filename and returns
+// its public URL. A new name per upload sidesteps CDN caching of the old image.
+export async function uploadAvatar(dataUrl) {
+  const blob = await (await fetch(dataUrl)).blob()
+  const path = `avatar-${Date.now()}.jpg`
+  const { error } = await supabase.storage.from('avatars').upload(path, blob, { contentType: 'image/jpeg' })
+  if (error) throw error
+  return supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl
+}
+
 // ─── Targets ────────────────────────────────────────────────────────────────
 
 export async function updateTargets(id, updates) {

@@ -56,6 +56,16 @@ export function addDays(dateStr, n) {
 
 // ─── Training schedule ───────────────────────────────────────────────────────
 
+export const TIMEZONE_OPTIONS = [
+  { value: 'America/New_York',    label: 'Eastern (New York)' },
+  { value: 'America/Chicago',     label: 'Central (Chicago)' },
+  { value: 'America/Denver',      label: 'Mountain (Denver)' },
+  { value: 'America/Los_Angeles', label: 'Pacific (Los Angeles)' },
+  { value: 'America/Anchorage',   label: 'Alaska' },
+  { value: 'Pacific/Honolulu',    label: 'Hawaii' },
+  { value: 'UTC',                 label: 'UTC' },
+]
+
 export const TRAINING_DAY_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 export const TRAINING_DAY_LABEL = { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' }
 

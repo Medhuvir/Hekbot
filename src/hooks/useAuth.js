@@ -27,5 +27,21 @@ export function useAuth() {
     await supabase.auth.signOut()
   }
 
-  return { session, loading, signIn, signOut, isAuthenticated: !!session }
+  async function updatePassword(password) {
+    const { error } = await supabase.auth.updateUser({ password })
+    if (error) throw error
+  }
+
+  // The link lands on /reset-password, where the recovery session it carries
+  // lets the user pick a new password. That URL must be in the project's
+  // allowed Redirect URLs; if it isn't, Supabase falls back to the Site URL
+  // and App's PASSWORD_RECOVERY listener routes there instead.
+  async function sendPasswordReset(email) {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    if (error) throw error
+  }
+
+  return { session, loading, signIn, signOut, updatePassword, sendPasswordReset, isAuthenticated: !!session }
 }

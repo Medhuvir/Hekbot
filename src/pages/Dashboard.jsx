@@ -16,6 +16,7 @@ import ProfilePanel from '../components/profile/ProfilePanel'
 import PublicProfileHero from '../components/profile/PublicProfileHero'
 import WeeklySummary from '../components/checkin/WeeklySummary'
 import ImportModal from '../components/admin/ImportModal'
+import AdminPanel from '../components/admin/AdminPanel'
 
 import { useFoodLogs, useFoodLogsRange } from '../hooks/useFoodLogs'
 import { useWorkoutLogs, useWorkoutLogsRange } from '../hooks/useWorkoutLogs'
@@ -47,10 +48,11 @@ function getDatesInRange(start, end) {
 // no HekBot, no edit affordances, lives at the unauthenticated root /.
 export default function Dashboard({ mode }) {
   const isApp = mode === 'app'
-  const { signOut } = useAuth()
+  const { session, signOut } = useAuth()
   const navigate = useNavigate()
   const [view, setView] = useState(VIEW_DAILY)
   const [showImport, setShowImport] = useState(false)
+  const [showAdmin, setShowAdmin] = useState(false)
 
   const { profile, refresh: refreshProfile } = useProfile()
   const timezone = profile?.timezone
@@ -125,6 +127,7 @@ export default function Dashboard({ mode }) {
         isAdmin={isApp}
         currentDate={currentDate}
         onSignOut={handleSignOut}
+        onOpenAdmin={() => setShowAdmin(true)}
         isToday={isViewingToday}
         dateInputValue={displayDate}
         maxDate={liveToday}
@@ -224,12 +227,7 @@ export default function Dashboard({ mode }) {
             {isApp && (
               <section>
                 <SectionLabel>Profile</SectionLabel>
-                <ProfilePanel
-                  profile={profile}
-                  latestCheckin={latestCheckin}
-                  isAdmin={isApp}
-                  onProfileUpdated={refreshProfile}
-                />
+                <ProfilePanel profile={profile} latestCheckin={latestCheckin} />
               </section>
             )}
           </div>
@@ -269,6 +267,16 @@ export default function Dashboard({ mode }) {
           <div className="font-sans text-[12px] text-dn-gray-light/40">DN Creative LLC</div>
         </div>
       </footer>
+
+      {isApp && (
+        <AdminPanel
+          open={showAdmin}
+          onClose={() => setShowAdmin(false)}
+          profile={profile}
+          email={session?.user?.email}
+          onProfileUpdated={refreshProfile}
+        />
+      )}
     </div>
   )
 }

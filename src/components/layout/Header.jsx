@@ -70,6 +70,7 @@ function DateNavControls({
 export default function Header({
   isAdmin = false,
   onSignOut,
+  onOpenAdmin,
   currentDate,
   isToday = true,
   dateInputValue,
@@ -117,12 +118,23 @@ export default function Header({
         {/* Right side actions */}
         <div className="flex items-center gap-2.5 sm:gap-4 shrink-0">
           {isAdmin ? (
-            <button
-              onClick={onSignOut}
-              className="font-sans text-[13px] sm:text-[14px] text-dn-gray-light hover:text-dn-white transition-colors duration-200 whitespace-nowrap"
-            >
-              Sign out
-            </button>
+            <>
+              <button
+                onClick={onOpenAdmin}
+                className="flex items-center gap-1 font-sans text-[13px] sm:text-[14px] text-dn-gray-light hover:text-dn-white transition-colors duration-200 whitespace-nowrap"
+              >
+                <Icon name="person" size={15} />
+                Admin
+              </button>
+              <div className="w-px h-4 bg-white/20" aria-hidden="true" />
+              <button
+                onClick={onSignOut}
+                className="flex items-center gap-1 font-sans text-[13px] sm:text-[14px] text-dn-gray-light hover:text-dn-white transition-colors duration-200 whitespace-nowrap"
+              >
+                <Icon name="door_open" size={15} />
+                Sign Out
+              </button>
+            </>
           ) : (
             <Link
               to="/login"

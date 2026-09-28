@@ -6,12 +6,13 @@ import Icon from '../components/Icon'
 import TopoBackground from '../components/TopoBackground'
 
 export default function Login() {
-  const { signIn, isAuthenticated } = useAuth()
+  const { signIn, sendPasswordReset, isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [resetMessage, setResetMessage] = useState(null)
 
   if (isAuthenticated) {
     navigate('/app', { replace: true })
@@ -29,6 +30,21 @@ export default function Login() {
       setError('Incorrect email or password.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleForgotPassword() {
+    setError(null)
+    setResetMessage(null)
+    if (!email) {
+      setError('Enter your email above first.')
+      return
+    }
+    try {
+      await sendPasswordReset(email)
+      setResetMessage(`If ${email} has an account, a reset link is on its way.`)
+    } catch (e) {
+      setError(e.message || 'Could not send reset email.')
     }
   }
 
@@ -81,6 +97,9 @@ export default function Login() {
           {error && (
             <p className="font-sans text-[12px] text-red-400 pt-1">{error}</p>
           )}
+          {resetMessage && (
+            <p className="font-sans text-[12px] text-green-400 pt-1">{resetMessage}</p>
+          )}
 
           <button
             type="submit"
@@ -88,6 +107,13 @@ export default function Login() {
             className="w-full mt-2 py-3 bg-dn-orange text-black font-sans font-semibold text-[13px] tracking-[0.08em] uppercase rounded-sm hover:-translate-y-px transition-all duration-150 disabled:opacity-50"
           >
             {loading ? 'Signing in…' : 'Enter'}
+          </button>
+          <button
+            type="button"
+            onClick={handleForgotPassword}
+            className="w-full pt-1 font-sans text-[13px] text-dn-gray-light hover:text-dn-white transition-colors"
+          >
+            Forgot password?
           </button>
         </form>
 
