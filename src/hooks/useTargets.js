@@ -1,16 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { getTargets } from '../lib/queries'
 
 export function useTargets() {
   const [targets, setTargets] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    getTargets()
-      .then(setTargets)
-      .catch(console.error)
-      .finally(() => setLoading(false))
+  const fetch = useCallback(async () => {
+    try {
+      setTargets(await getTargets())
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
-  return { targets, loading }
+  useEffect(() => { fetch() }, [fetch])
+
+  return { targets, loading, refresh: fetch }
 }

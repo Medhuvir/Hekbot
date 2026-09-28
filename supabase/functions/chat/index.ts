@@ -141,6 +141,15 @@ const DEFAULT_TRAINING_DAYS: Record<string, string | null> = {
   thu: 'Martial Arts',        fri: 'Resistance Training', sat: 'Martial Arts', sun: null,
 }
 const DAY_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+
+const TARGET_FIELDS = [
+  'calories', 'calories_min', 'calories_max', 'protein_g',
+  'carbs_min_g', 'carbs_max_g', 'fat_min_g', 'fat_max_g',
+] as const
+const DEFAULT_TARGETS: Record<string, number> = {
+  calories: 2250, calories_min: 2100, calories_max: 2400, protein_g: 180,
+  carbs_min_g: 200, carbs_max_g: 230, fat_min_g: 55, fat_max_g: 70,
+}
 const DAY_LABEL: Record<string, string> = {
   mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun',
 }
@@ -211,15 +220,20 @@ RULES
 5. When a workout is logged: acknowledge it and connect to nutrition/recovery.
 6. When a summary is requested: use the exact numbers above, be specific.
 7. When the user asks to change their weekly training schedule/days: restate what you understood the new schedule to be, then tell them to tap "Confirm & Log" on the card below to save it. NEVER say or imply the schedule is "confirmed", "locked in", "saved", or "updated" — you have no way to know that, and nothing is written until they tap that button. This applies even if their next message just says "confirm" or "yes" — that plain text does NOT save anything; only the button does. If they say "confirm" with no schedule details in the message, tell them to use the button on the card above, don't declare success.
-8. Tone: warm, direct, performance-focused. Never preachy.`
+8. When the user asks to change their calorie or macro targets/goals: restate the new targets you understood, then tell them to tap "Confirm & Log" on the card below to save them. Same rule as the schedule — NEVER say or imply the targets are "set", "saved", "updated", or "locked in", and a plain "confirm"/"yes" message saves nothing; only the button does. The DAILY TARGETS above are what's actually saved right now.
+9. Tone: warm, direct, performance-focused. Never preachy.`
 }
 
 // ── Unified extraction prompt ─────────────────────────────────────────
 // Returns one JSON object covering all loggable data types. The current
-// training schedule is interpolated in so the model can resolve relative/
-// partial edits ("move Saturday to Sunday instead") against what's actually
-// set today, rather than guessing at a full week from a partial instruction.
-function buildExtractionSystem(currentTrainingDays: Record<string, string | null>): string {
+// training schedule and targets are interpolated in so the model can resolve
+// relative/partial edits ("move Saturday to Sunday instead", "drop my
+// calories by 200") against what's actually set today, rather than guessing
+// from a partial instruction.
+function buildExtractionSystem(
+  currentTrainingDays: Record<string, string | null>,
+  currentTargets: Record<string, number>,
+): string {
   return `You extract loggable fitness data from messages. Return ONLY a valid JSON object — no explanation, no markdown, no code fences.
 
 Always return this exact shape:
@@ -227,7 +241,8 @@ Always return this exact shape:
   "food_items": [],
   "body_entry": null,
   "workout_entry": null,
-  "training_schedule": null
+  "training_schedule": null,
+  "targets": null
 }
 
 food_items — array of food/drink items (empty array if none):
@@ -260,7 +275,16 @@ training_schedule — if the user asks to change, set, update, or move their WEE
 - The user's CURRENT schedule is: ${JSON.stringify(currentTrainingDays)}
 - Start from the current schedule and apply only the change described — always return all 7 days (mon..sun), carrying over any day the user didn't mention
 - null means a rest day
-- Do NOT set this for "I trained today" / "logged a workout" style messages — that's workout_entry, not a schedule change`
+- Do NOT set this for "I trained today" / "logged a workout" style messages — that's workout_entry, not a schedule change
+
+targets — if the user asks to change, set, or update their daily calorie or macro TARGETS/GOALS (not food they ate), otherwise null:
+{"calories":0,"calories_min":0,"calories_max":0,"protein_g":0,"carbs_min_g":0,"carbs_max_g":0,"fat_min_g":0,"fat_max_g":0}
+- The user's CURRENT targets are: ${JSON.stringify(currentTargets)}
+- Start from the current targets and apply only the change described — always return all 8 fields as whole numbers, carrying over anything the user didn't mention
+- If the user gives a single calorie goal ("new calorie goal is 2000", "set calories to 1900"), set calories to it and shift calories_min/calories_max so they keep the same distance from calories as they do now; if they give a range ("1800-2000"), set min/max to it and calories to the midpoint
+- Relative changes ("drop calories by 200", "bump protein 20g") apply to the current values
+- A single carbs/fat number sets both its min and max to that number unless a range is given
+- Do NOT set this for food logging or for questions about progress — only for an explicit request to change the goals`
 }
 
 // ── Main handler ─────────────────────────────────────────────────────
@@ -299,7 +323,7 @@ Deno.serve(async (req) => {
 
     // Fetch the rest of the context in parallel
     const [targetsRes, logsRes, historyRes] = await Promise.all([
-      db.from('targets').select('*').order('effective_from', { ascending: false }).limit(1).single(),
+      db.from('targets').select('*').order('effective_from', { ascending: false }).order('created_at', { ascending: false }).limit(1).single(),
       db.from('food_logs').select('calories, protein_g, carbs_g, fat_g').eq('log_date', todayStr),
       db.from('conversations').select('role, content, created_at').order('created_at', { ascending: false }).limit(20),
     ])
@@ -336,6 +360,9 @@ Deno.serve(async (req) => {
 
     const systemPrompt = buildSystemPrompt(profileRes.data, targetsRes.data, todayTotals)
     const currentTrainingDays = profileRes.data?.training_days ?? DEFAULT_TRAINING_DAYS
+    const currentTargets = Object.fromEntries(
+      TARGET_FIELDS.map(f => [f, Number(targetsRes.data?.[f] ?? DEFAULT_TARGETS[f])]),
+    )
 
     // Fire chat + extraction in parallel
     const [reply, extractionRaw] = await Promise.all([
@@ -347,7 +374,7 @@ Deno.serve(async (req) => {
       }),
       callClaude({
         model:     EXTRACTION_MODEL,
-        system:    buildExtractionSystem(currentTrainingDays),
+        system:    buildExtractionSystem(currentTrainingDays, currentTargets),
         messages:  [{ role: 'user', content: parsedImage ? userContent : msg }],
         maxTokens: 1024,
       }),
@@ -361,6 +388,7 @@ Deno.serve(async (req) => {
     let bodyEntry:         Record<string, any> | null = null
     let workoutEntry:      Record<string, any> | null = null
     let trainingSchedule:  Record<string, any> | null = null
+    let newTargets:        Record<string, number> | null = null
 
     try {
       const cleaned = extractionRaw
@@ -381,12 +409,20 @@ Deno.serve(async (req) => {
         trainingSchedule = Object.fromEntries(DAY_ORDER.map(day => [day, schedule[day] ?? null]))
       }
 
+      const t = extracted.targets
+      if (t && TARGET_FIELDS.some(f => f in t)) {
+        newTargets = Object.fromEntries(
+          TARGET_FIELDS.map(f => [f, Math.round(Number(t[f] ?? currentTargets[f]) || currentTargets[f])]),
+        )
+      }
+
       console.log(
         '[chat] extracted —',
         `food: ${foodItems.length}`,
         `weight: ${bodyEntry ? 'yes' : 'no'}`,
         `workout: ${workoutEntry ? 'yes' : 'no'}`,
         `training_schedule: ${trainingSchedule ? 'yes' : 'no'}`,
+        `targets: ${newTargets ? 'yes' : 'no'}`,
       )
     } catch (parseErr) {
       console.error('[chat] extraction parse error:', parseErr, '| raw:', extractionRaw)
@@ -413,6 +449,7 @@ Deno.serve(async (req) => {
           body_entry:        bodyEntry,
           workout_entry:     workoutEntry,
           training_schedule: trainingSchedule,
+          targets:           newTargets,
         },
       }),
       { headers: { ...CORS, 'Content-Type': 'application/json' } },

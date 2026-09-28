@@ -93,6 +93,41 @@ async function updateTrainingSchedule(
   return true
 }
 
+const TARGET_FIELDS = [
+  'calories', 'calories_min', 'calories_max', 'protein_g',
+  'carbs_min_g', 'carbs_max_g', 'fat_min_g', 'fat_max_g',
+]
+
+// Saves new daily targets as a fresh `targets` row effective from logDate,
+// rather than editing the old one, so the history of goals is kept. Readers
+// take the newest row (effective_from, then created_at).
+async function insertTargets(
+  db: any,
+  targets: Record<string, any>,
+  logDate: string,
+): Promise<Record<string, number> | null> {
+  const row: Record<string, number> = {}
+  for (const f of TARGET_FIELDS) {
+    const n = Math.round(Number(targets[f]))
+    if (!Number.isFinite(n) || n < 0) {
+      console.error('[log-commit] targets: invalid value for', f, targets[f])
+      return null
+    }
+    row[f] = n
+  }
+  if (row.calories_min > row.calories_max || row.carbs_min_g > row.carbs_max_g || row.fat_min_g > row.fat_max_g) {
+    console.error('[log-commit] targets: a min is above its max', row)
+    return null
+  }
+
+  const { error } = await db.from('targets').insert({ ...row, effective_from: logDate, notes: 'Updated via HekBot' })
+  if (error) {
+    console.error('[log-commit] targets insert failed:', error.message)
+    return null
+  }
+  return row
+}
+
 async function insertWorkoutEntry(
   db: any,
   workout: { workout_type?: string; workout_name?: string | null; duration_min?: number | null; calories_burned?: number | null },
@@ -142,6 +177,7 @@ Deno.serve(async (req) => {
     let   loggedWeight:   Record<string, any> | null = null
     let   loggedWorkout:  Record<string, any> | null = null
     let   loggedSchedule: Record<string, any> | null = null
+    let   loggedTargets:  Record<string, any> | null = null
 
     for (const item of (body.food_items ?? [])) {
       if (!item.food_item) continue
@@ -186,6 +222,10 @@ Deno.serve(async (req) => {
       if (ok) loggedSchedule = body.training_schedule
     }
 
+    if (body.targets) {
+      loggedTargets = await insertTargets(db, body.targets, logDate)
+    }
+
     // Bookmark any confirmed food items as reusable presets
     for (const save of (body.save_as_preset ?? [])) {
       const item = (body.food_items ?? [])[save.food_item_index]
@@ -208,6 +248,7 @@ Deno.serve(async (req) => {
           weight:            loggedWeight,
           workout:           loggedWorkout,
           training_schedule: loggedSchedule,
+          targets:           loggedTargets,
         },
       }),
       { headers: { ...CORS, 'Content-Type': 'application/json' } },

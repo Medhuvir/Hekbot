@@ -15,6 +15,7 @@ export async function getTargets() {
     .from('targets')
     .select('*')
     .order('effective_from', { ascending: false })
+    .order('created_at', { ascending: false })
     .limit(1)
     .single()
   if (error) throw error

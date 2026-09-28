@@ -124,7 +124,7 @@ function getMealGreeting(name) {
 let msgCounter = 0
 function nextMsgId() { return `msg-${++msgCounter}` }
 
-export default function HekbotPanel({ onLogged, onProfileUpdated, userName, timezone }) {
+export default function HekbotPanel({ onLogged, onProfileUpdated, onTargetsUpdated, userName, timezone }) {
   const [messages, setMessages] = useState([])
   const [input, setInput]   = useState('')
   const [loading, setLoading] = useState(false)
@@ -171,7 +171,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, userName, time
   }, [started])
 
   function hasReviewable(extraction) {
-    return extraction && (extraction.food_items?.length > 0 || extraction.body_entry || extraction.workout_entry || extraction.training_schedule)
+    return extraction && (extraction.food_items?.length > 0 || extraction.body_entry || extraction.workout_entry || extraction.training_schedule || extraction.targets)
   }
 
   async function sendMessage(text, image = null) {
@@ -255,6 +255,7 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, userName, time
       setMessages(prev => prev.map(m => (m.id === messageId ? { ...m, extraction: null, preset: null, logged } : m)))
       onLogged?.()
       if (logged.training_schedule) onProfileUpdated?.()
+      if (logged.targets) onTargetsUpdated?.()
       if (payload.save_as_preset?.length > 0) refreshPresets()
     } catch (err) {
       setError(err.message)
@@ -469,6 +470,14 @@ export default function HekbotPanel({ onLogged, onProfileUpdated, userName, time
                             <div className="w-1 h-1 rounded-full bg-dn-orange flex-shrink-0" />
                             <span className="font-sans text-[12px] text-dn-orange tracking-[0.12em] uppercase">
                               Training schedule updated · {formatTrainingDays(msg.logged.training_schedule)}
+                            </span>
+                          </div>
+                        )}
+                        {msg.logged.targets && (
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-1 h-1 rounded-full bg-dn-orange flex-shrink-0" />
+                            <span className="font-sans text-[12px] text-dn-orange tracking-[0.12em] uppercase">
+                              Targets updated · {msg.logged.targets.calories_min}–{msg.logged.targets.calories_max} kcal · {msg.logged.targets.protein_g}g protein
                             </span>
                           </div>
                         )}
