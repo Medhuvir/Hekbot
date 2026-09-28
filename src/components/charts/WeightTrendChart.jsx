@@ -67,7 +67,7 @@ export default function WeightTrendChart({ checkins }) {
         Weight Trend
       </div>
       <ResponsiveContainer width="100%" height={240}>
-        <LineChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
+        <LineChart data={data} margin={{ top: 8, right: 76, bottom: 0, left: -12 }}>
           <CartesianGrid stroke={CHART.grid} vertical={false} />
           <XAxis
             dataKey="label"

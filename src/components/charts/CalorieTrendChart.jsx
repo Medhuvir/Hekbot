@@ -65,14 +65,14 @@ export default function CalorieTrendChart({ dailyTotals, targets }) {
             <span className="font-sans text-caption text-dn-gray-light">Burned</span>
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-0.5 bg-dn-gray-light inline-block" />
+            <span className="w-2 h-0.5 bg-dn-gray-light/50 inline-block" />
             <span className="font-sans text-caption text-dn-gray-light">Net</span>
           </span>
         </div>
       </div>
 
       <ResponsiveContainer width="100%" height={200}>
-        <ComposedChart data={dailyTotals} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
+        <ComposedChart data={dailyTotals} margin={{ top: 8, right: 44, bottom: 0, left: -12 }}>
           <CartesianGrid stroke={GRID} vertical={false} />
           <XAxis dataKey="label" tick={{ fill: AXIS, ...CHART_FONT }} axisLine={false} tickLine={false} />
           <YAxis tick={{ fill: AXIS, ...CHART_FONT }} axisLine={false} tickLine={false} />
@@ -89,7 +89,7 @@ export default function CalorieTrendChart({ dailyTotals, targets }) {
             dot={{ fill: COLORS.orange, r: 3, strokeWidth: 0 }} activeDot={{ r: 5 }} />
           <Line type="monotone" dataKey="burned" stroke={COLORS.success} strokeWidth={1.5}
             dot={{ fill: COLORS.success, r: 2, strokeWidth: 0 }} strokeDasharray="4 2" />
-          <Line type="monotone" dataKey="net" stroke={COLORS.grayLight} strokeWidth={1.5}
+          <Line type="monotone" dataKey="net" stroke={COLORS.grayLight} strokeOpacity={0.45} strokeWidth={1.5}
             dot={false} />
         </ComposedChart>
       </ResponsiveContainer>
