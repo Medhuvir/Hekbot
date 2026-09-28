@@ -16,6 +16,17 @@ const MACRO_FIELDS = [
   { key: 'fat_g',      label: 'Fat g',     step: '0.1' },
 ]
 
+const TARGET_FIELDS = [
+  { key: 'calories',     label: 'Kcal' },
+  { key: 'calories_min', label: 'Kcal min' },
+  { key: 'calories_max', label: 'Kcal max' },
+  { key: 'protein_g',    label: 'Protein g' },
+  { key: 'carbs_min_g',  label: 'Carbs min' },
+  { key: 'carbs_max_g',  label: 'Carbs max' },
+  { key: 'fat_min_g',    label: 'Fat min' },
+  { key: 'fat_max_g',    label: 'Fat max' },
+]
+
 let uid = 0
 function nextId() { return `review-${++uid}` }
 
@@ -50,7 +61,11 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
     extraction?.training_schedule ? { ...extraction.training_schedule, include: true } : null
   ))
 
-  const hasContent = foodItems.length > 0 || bodyEntry || workoutEntry || trainingSchedule
+  const [targetsUpdate, setTargetsUpdate] = useState(() => (
+    extraction?.targets_update ? { ...extraction.targets_update, include: true } : null
+  ))
+
+  const hasContent = foodItems.length > 0 || bodyEntry || workoutEntry || trainingSchedule || targetsUpdate
 
   function updateScheduleDay(day, value) {
     setTrainingSchedule(s => ({ ...s, [day]: value === 'Rest' ? null : value }))
@@ -157,6 +172,9 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
       save_as_preset: savePresetPayload,
       training_schedule: trainingSchedule?.include
         ? Object.fromEntries(TRAINING_DAY_ORDER.map(day => [day, trainingSchedule[day] ?? null]))
+        : null,
+      targets_update: targetsUpdate?.include
+        ? Object.fromEntries(TARGET_FIELDS.map(f => [f.key, Number(targetsUpdate[f.key]) || 0]))
         : null,
     })
   }
@@ -318,6 +336,35 @@ export default function HekbotReview({ extraction, preset, logDate, onConfirm, o
                       <option key={opt} value={opt}>{opt === 'Resistance Training' ? 'Resist.' : opt === 'Martial Arts' ? 'Martial' : opt}</option>
                     ))}
                   </select>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {targetsUpdate && (
+          <div className="space-y-1.5 pt-1 border-t border-white/[0.06]">
+            <label className="flex items-center gap-1.5 font-sans text-[13px] text-dn-gray-light">
+              <input
+                type="checkbox"
+                checked={targetsUpdate.include}
+                onChange={e => setTargetsUpdate(t => ({ ...t, include: e.target.checked }))}
+                className="accent-dn-orange"
+              />
+              Daily targets
+            </label>
+            <div className="grid grid-cols-4 gap-1.5">
+              {TARGET_FIELDS.map(f => (
+                <div key={f.key} className="space-y-1">
+                  <div className={fieldLabelCls}>{f.label}</div>
+                  <input
+                    className={`${inputCls} w-full`}
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={targetsUpdate[f.key] ?? ''}
+                    onChange={e => setTargetsUpdate(t => ({ ...t, [f.key]: e.target.value }))}
+                  />
                 </div>
               ))}
             </div>

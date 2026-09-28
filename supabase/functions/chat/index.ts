@@ -160,6 +160,19 @@ function formatTrainingDays(trainingDays: Record<string, string | null>): string
   return [...byType.entries()].map(([type, days]) => `${type} ${days.join('/')}`).join(' · ')
 }
 
+const TARGET_FIELDS = [
+  'calories', 'calories_min', 'calories_max', 'protein_g',
+  'carbs_min_g', 'carbs_max_g', 'fat_min_g', 'fat_max_g',
+] as const
+const TARGET_DEFAULTS: Record<string, number> = {
+  calories: 2250, calories_min: 2100, calories_max: 2400, protein_g: 180,
+  carbs_min_g: 200, carbs_max_g: 230, fat_min_g: 55, fat_max_g: 70,
+}
+
+function currentTargetValues(targets: Record<string, any> | null): Record<string, number> {
+  return Object.fromEntries(TARGET_FIELDS.map(f => [f, Number(targets?.[f] ?? TARGET_DEFAULTS[f])]))
+}
+
 // ── System prompt ────────────────────────────────────────────────────
 function buildSystemPrompt(
   profile: Record<string, any> | null,
@@ -211,7 +224,8 @@ RULES
 5. When a workout is logged: acknowledge it and connect to nutrition/recovery.
 6. When a summary is requested: use the exact numbers above, be specific.
 7. When the user asks to change their weekly training schedule/days: restate what you understood the new schedule to be, then tell them to tap "Confirm & Log" on the card below to save it. NEVER say or imply the schedule is "confirmed", "locked in", "saved", or "updated" — you have no way to know that, and nothing is written until they tap that button. This applies even if their next message just says "confirm" or "yes" — that plain text does NOT save anything; only the button does. If they say "confirm" with no schedule details in the message, tell them to use the button on the card above, don't declare success.
-8. Tone: warm, direct, performance-focused. Never preachy.`
+8. When the user asks to change their daily calorie/macro targets: restate the new targets you understood, then tell them to tap "Confirm & Log" on the card below to save them. Same as rule 7 — NEVER say the targets are saved or updated, and never tell them to go change them somewhere else in the app. If they ask to change targets without giving numbers, ask for the numbers.
+9. Tone: warm, direct, performance-focused. Never preachy.`
 }
 
 // ── Unified extraction prompt ─────────────────────────────────────────
@@ -219,7 +233,10 @@ RULES
 // training schedule is interpolated in so the model can resolve relative/
 // partial edits ("move Saturday to Sunday instead") against what's actually
 // set today, rather than guessing at a full week from a partial instruction.
-function buildExtractionSystem(currentTrainingDays: Record<string, string | null>): string {
+function buildExtractionSystem(
+  currentTrainingDays: Record<string, string | null>,
+  currentTargets: Record<string, number>,
+): string {
   return `You extract loggable fitness data from messages. Return ONLY a valid JSON object — no explanation, no markdown, no code fences.
 
 Always return this exact shape:
@@ -227,7 +244,8 @@ Always return this exact shape:
   "food_items": [],
   "body_entry": null,
   "workout_entry": null,
-  "training_schedule": null
+  "training_schedule": null,
+  "targets_update": null
 }
 
 food_items — array of food/drink items (empty array if none):
@@ -260,7 +278,16 @@ training_schedule — if the user asks to change, set, update, or move their WEE
 - The user's CURRENT schedule is: ${JSON.stringify(currentTrainingDays)}
 - Start from the current schedule and apply only the change described — always return all 7 days (mon..sun), carrying over any day the user didn't mention
 - null means a rest day
-- Do NOT set this for "I trained today" / "logged a workout" style messages — that's workout_entry, not a schedule change`
+- Do NOT set this for "I trained today" / "logged a workout" style messages — that's workout_entry, not a schedule change
+
+targets_update — if the user asks to set, change, or update their DAILY calorie or macro targets/goals, otherwise null:
+{"calories":number|null,"calories_min":number|null,"calories_max":number|null,"protein_g":number|null,"carbs_min_g":number|null,"carbs_max_g":number|null,"fat_min_g":number|null,"fat_max_g":number|null}
+- The user's CURRENT targets are: ${JSON.stringify(currentTargets)}
+- Only fill the fields the user actually changed; leave everything else null (it carries over)
+- A single calorie number ("2000 calories") sets calories, calories_min to 150 below it, and calories_max to 150 above it, unless they give a range
+- A single carb or fat number ("160g carbs") sets both its min and max to that number; a range ("150-170g carbs") sets min and max separately
+- Only set this when actual numbers are given in the message
+- Do NOT set this for food being eaten ("I had 40g protein") — that's food_items`
 }
 
 // ── Main handler ─────────────────────────────────────────────────────
@@ -336,6 +363,7 @@ Deno.serve(async (req) => {
 
     const systemPrompt = buildSystemPrompt(profileRes.data, targetsRes.data, todayTotals)
     const currentTrainingDays = profileRes.data?.training_days ?? DEFAULT_TRAINING_DAYS
+    const currentTargets = currentTargetValues(targetsRes.data)
 
     // Fire chat + extraction in parallel
     const [reply, extractionRaw] = await Promise.all([
@@ -347,7 +375,7 @@ Deno.serve(async (req) => {
       }),
       callClaude({
         model:     EXTRACTION_MODEL,
-        system:    buildExtractionSystem(currentTrainingDays),
+        system:    buildExtractionSystem(currentTrainingDays, currentTargets),
         messages:  [{ role: 'user', content: parsedImage ? userContent : msg }],
         maxTokens: 1024,
       }),
@@ -361,6 +389,7 @@ Deno.serve(async (req) => {
     let bodyEntry:         Record<string, any> | null = null
     let workoutEntry:      Record<string, any> | null = null
     let trainingSchedule:  Record<string, any> | null = null
+    let targetsUpdate:     Record<string, number> | null = null
 
     try {
       const cleaned = extractionRaw
@@ -381,12 +410,22 @@ Deno.serve(async (req) => {
         trainingSchedule = Object.fromEntries(DAY_ORDER.map(day => [day, schedule[day] ?? null]))
       }
 
+      const tu = extracted.targets_update
+      if (tu && TARGET_FIELDS.some(f => Number(tu[f]) > 0)) {
+        // Fill anything the model left null from the current targets, so the
+        // review card always shows (and saves) a complete set.
+        targetsUpdate = Object.fromEntries(TARGET_FIELDS.map(f => [
+          f, Number(tu[f]) > 0 ? Math.round(Number(tu[f])) : currentTargets[f],
+        ]))
+      }
+
       console.log(
         '[chat] extracted —',
         `food: ${foodItems.length}`,
         `weight: ${bodyEntry ? 'yes' : 'no'}`,
         `workout: ${workoutEntry ? 'yes' : 'no'}`,
         `training_schedule: ${trainingSchedule ? 'yes' : 'no'}`,
+        `targets: ${targetsUpdate ? 'yes' : 'no'}`,
       )
     } catch (parseErr) {
       console.error('[chat] extraction parse error:', parseErr, '| raw:', extractionRaw)
@@ -413,6 +452,7 @@ Deno.serve(async (req) => {
           body_entry:        bodyEntry,
           workout_entry:     workoutEntry,
           training_schedule: trainingSchedule,
+          targets_update:    targetsUpdate,
         },
       }),
       { headers: { ...CORS, 'Content-Type': 'application/json' } },

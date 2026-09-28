@@ -91,7 +91,7 @@ export default function Dashboard({ mode }) {
 
   const { checkins, refresh: refreshCheckins } = useCheckins()
   const { checkin: latestCheckin } = useLatestCheckin()
-  const { targets } = useTargets()
+  const { targets, refresh: refreshTargets } = useTargets()
 
   const dailyMacros = sumMacros(foodLogs)
   const dailyBurned = sumCaloriesBurned(workoutLogs)
@@ -135,7 +135,7 @@ export default function Dashboard({ mode }) {
       />
 
       {isApp
-        ? <HekbotPanel onLogged={handleLogged} onProfileUpdated={refreshProfile} userName={profile?.name} timezone={timezone} />
+        ? <HekbotPanel onLogged={handleLogged} onProfileUpdated={refreshProfile} onTargetsUpdated={refreshTargets} userName={profile?.name} timezone={timezone} />
         : <PublicProfileHero profile={profile} latestCheckin={latestCheckin} />
       }
 
