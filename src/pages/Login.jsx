@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import DNMark from '../components/DNMark'
 import Icon from '../components/Icon'
-import TopoBackground from '../components/TopoBackground'
+import DotGridWave from '../components/DotGridWave'
 
 export default function Login() {
   const { signIn, sendPasswordReset, isAuthenticated } = useAuth()
@@ -50,7 +50,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-dn-black flex flex-col items-center justify-center px-6 relative overflow-hidden">
-      <TopoBackground opacity={0.07} />
+      <DotGridWave />
 
       <div className="relative w-full max-w-sm">
         {/* DN Lockup */}

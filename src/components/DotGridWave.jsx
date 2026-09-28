@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 
 // Native dot-grid-wave background — a grid of DN-orange dots whose size and
 // opacity ripple in a traveling sine wave. Brand-standard: low peak opacity,
-// same understated-texture role TopoBackground plays elsewhere.
+// used behind the header and the sign-in / reset-password pages.
 export default function DotGridWave({
   className = '',
   color = '#FF5E1A',

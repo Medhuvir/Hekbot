@@ -31,14 +31,9 @@ export default {
         'dn': 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
       animation: {
-        'topo-shift': 'topoShift 18s ease-in-out infinite',
         'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both',
       },
       keyframes: {
-        topoShift: {
-          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
-          '50%':      { transform: 'translate(-1%, 0.5%) scale(1.01)' },
-        },
         fadeInUp: {
           from: { opacity: '0', transform: 'translateY(28px)' },
           to:   { opacity: '1', transform: 'translateY(0)' },

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import DNMark from '../components/DNMark'
 import Icon from '../components/Icon'
-import TopoBackground from '../components/TopoBackground'
+import DotGridWave from '../components/DotGridWave'
 
 const MIN_PASSWORD_LENGTH = 8
 
@@ -39,7 +39,7 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen bg-dn-black flex flex-col items-center justify-center px-6 relative overflow-hidden">
-      <TopoBackground opacity={0.07} />
+      <DotGridWave />
 
       <div className="relative w-full max-w-sm">
         <div className="flex flex-col items-center mb-10">
