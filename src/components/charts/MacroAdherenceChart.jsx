@@ -40,10 +40,6 @@ export default function MacroAdherenceChart({ dailyTotals, targets }) {
 
   return (
     <div className="dn-card p-4 sm:p-6">
-      <div className="font-sans text-caption tracking-label uppercase text-dn-gray-light mb-4">
-        Macro Adherence — Last 7 Days
-      </div>
-
       {/* Protein */}
       <div className="mb-5">
         <div className="font-sans text-caption text-dn-gray-light uppercase tracking-label mb-2">

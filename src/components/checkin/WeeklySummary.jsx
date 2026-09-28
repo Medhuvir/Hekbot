@@ -118,9 +118,7 @@ export default function WeeklySummary({ summary, isAdmin, onRefresh }) {
     <div className="dn-card relative overflow-hidden p-4 sm:p-5">
       <div className="relative">
       <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
-        <div className="font-sans text-caption uppercase tracking-label text-dn-gray-light">
-          Weekly Summary
-        </div>
+        <div className="font-sans text-caption text-dn-gray-light">Last 7 days</div>
         <TrendBadge trend={trend} />
       </div>
 

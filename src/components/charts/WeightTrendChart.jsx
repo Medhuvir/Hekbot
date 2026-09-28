@@ -63,9 +63,6 @@ export default function WeightTrendChart({ checkins }) {
 
   return (
     <div className="dn-card p-4 sm:p-6">
-      <div className="font-sans text-caption tracking-label uppercase text-dn-gray-light mb-4">
-        Weight Trend
-      </div>
       <ResponsiveContainer width="100%" height={240}>
         <LineChart data={data} margin={{ top: 8, right: 76, bottom: 0, left: -12 }}>
           <CartesianGrid stroke={CHART.grid} vertical={false} />

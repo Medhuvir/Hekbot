@@ -51,10 +51,8 @@ export default function CalorieTrendChart({ dailyTotals, targets }) {
 
   return (
     <div className="dn-card p-4 sm:p-6">
-      <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
-        <div className="font-sans text-caption tracking-label uppercase text-dn-gray-light">
-          Calorie Trend
-        </div>
+      {/* The section heading above names the chart, so the card only carries its legend */}
+      <div className="flex items-center justify-end mb-4">
         <div className="flex items-center gap-3 sm:gap-4">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-0.5 bg-dn-orange inline-block" />
@@ -75,7 +73,7 @@ export default function CalorieTrendChart({ dailyTotals, targets }) {
         <ComposedChart data={dailyTotals} margin={{ top: 8, right: 44, bottom: 0, left: -12 }}>
           <CartesianGrid stroke={GRID} vertical={false} />
           <XAxis dataKey="label" tick={{ fill: AXIS, ...CHART_FONT }} axisLine={false} tickLine={false} />
-          <YAxis tick={{ fill: AXIS, ...CHART_FONT }} axisLine={false} tickLine={false} />
+          <YAxis domain={[0, dataMax => Math.max(dataMax, calMax + 100)]} tick={{ fill: AXIS, ...CHART_FONT }} axisLine={false} tickLine={false} />
           <Tooltip content={<CustomTooltip />} />
 
           {/* Target range band */}

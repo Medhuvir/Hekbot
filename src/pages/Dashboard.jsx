@@ -256,7 +256,7 @@ export default function Dashboard({ mode }) {
             </section>
 
             <section>
-              <SectionLabel>Macro Adherence</SectionLabel>
+              <SectionLabel>Macro Adherence — Last 7 Days</SectionLabel>
               <MacroAdherenceChart dailyTotals={last7} targets={targets} />
             </section>
 
